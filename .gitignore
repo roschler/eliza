@@ -48,5 +48,5 @@ tsup.config.bundled_*.mjs
 
 .turbo
 
-#WebStorm
+#WebStorm IDE file
 .idea
