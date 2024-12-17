@@ -4,6 +4,7 @@ export default defineConfig({
     entry: ["src/index.ts"],
     outDir: "dist",
     sourcemap: "inline",
+    inlineSources: true,
     clean: true,
 
     // Ensure you're targeting CommonJS
