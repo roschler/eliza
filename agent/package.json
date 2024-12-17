@@ -4,6 +4,7 @@
     "main": "src/index.ts",
     "type": "module",
     "scripts": {
+        "build": "tsup --format esm --dts",
         "start": "node --loader ts-node/esm src/index.ts",
         "dev": "node --loader ts-node/esm src/index.ts",
         "check-types": "tsc --noEmit"
