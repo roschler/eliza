@@ -3,12 +3,16 @@ import { defineConfig } from "tsup";
 export default defineConfig({
     entry: ["src/index.ts"],
     outDir: "dist",
-    sourcemap: true,
+    sourcemap: "external",
     clean: true,
-    format: ["esm"], // Ensure you're targeting CommonJS
+
+    // Ensure you're targeting CommonJS
+    format: ["esm"],
+
     loader: {
         ".cdc": "text",
     },
+
     external: [
         "dotenv", // Externalize dotenv to prevent bundling
         "fs", // Externalize fs to use Node.js built-in module
@@ -32,4 +36,8 @@ export default defineConfig({
         "sha3",
         "elliptic",
     ],
+
+    footer: {
+        js: "//# sourceMappingURL=/home/rusty/Documents/GitHub/eliza/[name].js.map"
+    }
 });

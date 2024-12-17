@@ -50,3 +50,8 @@ tsup.config.bundled_*.mjs
 
 #WebStorm IDE file
 .idea
+
+utilities
+
+*.sh
+*.bak

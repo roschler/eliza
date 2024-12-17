@@ -3,9 +3,10 @@ import { defineConfig } from "tsup";
 export default defineConfig({
     entry: ["src/index.ts"],
     outDir: "dist",
-    sourcemap: true,
+    sourcemap: "external",
     clean: true,
     format: ["esm"],
+
     external: [
         "dotenv",
         "fs",
@@ -16,4 +17,8 @@ export default defineConfig({
         "http",
         "agentkeepalive",
     ],
+
+    footer: {
+        js: "//# sourceMappingURL=/home/rusty/Documents/GitHub/eliza/[name].js.map"
+    }
 });

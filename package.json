@@ -6,6 +6,7 @@
         "start": "pnpm --filter \"@ai16z/agent\" start --isRoot",
         "start:client": "pnpm --dir client start --isRoot",
         "start:debug": "cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --filter \"@ai16z/agent\" start --isRoot",
+        "start:debug_tsx": "cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --filter \"@ai16z/agent\" start --isRoot",
         "dev": "bash ./scripts/dev.sh",
         "lint": "bash ./scripts/lint.sh",
         "prettier-check": "npx prettier --check .",
@@ -17,9 +18,12 @@
         "docker:bash": "bash ./scripts/docker.sh bash",
         "docker:start": "bash ./scripts/docker.sh start",
         "docker": "pnpm docker:build && pnpm docker:run && pnpm docker:bash",
-        "test": "bash ./scripts/test.sh"
+        "test": "bash ./scripts/test.sh",
+        "update-tsup-config": "cd /home/rusty/Documents/GitHub/eliza && tsx /home/rusty/Documents/GitHub/eliza/utilities/updateTsupConfig.ts",
+        "rebuild-all": "pnpm run build -r"
     },
     "devDependencies": {
+        "@babel/parser": "^7.26.3",
         "@commitlint/cli": "18.6.1",
         "@commitlint/config-conventional": "18.6.3",
         "@typescript-eslint/eslint-plugin": "8.16.0",
@@ -33,6 +37,9 @@
         "lerna": "8.1.5",
         "only-allow": "1.2.1",
         "prettier": "3.4.1",
+        "recast": "^0.23.9",
+        "ts-node": "10.9.2",
+        "tsx": "^4.19.2",
         "turbo": "2.3.3",
         "typedoc": "0.26.11",
         "typescript": "5.6.3",
@@ -50,9 +57,9 @@
     "dependencies": {
         "@0glabs/0g-ts-sdk": "0.2.1",
         "@coinbase/coinbase-sdk": "0.10.0",
+        "@vitest/eslint-plugin": "1.0.1",
         "amqplib": "0.10.5",
         "csv-parse": "5.6.0",
-        "@vitest/eslint-plugin": "1.0.1",
         "ollama-ai-provider": "0.16.1",
         "optional": "0.1.4",
         "pnpm": "9.14.4",

@@ -1,0 +1,4 @@
+Plasma configuration backups created on Sun 15 Dec 2024 09:43:26 PM EST:
+Configuration Backup: /home/rusty/plasma-config-backups/config-backup-20241215-214115
+Local Data Backup: /home/rusty/plasma-config-backups/local-backup-20241215-214115
+KDE Backup: /home/rusty/plasma-config-backups/kde-backup-20241215-214115
