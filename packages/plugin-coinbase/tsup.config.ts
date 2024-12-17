@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
     entry: ["src/index.ts"],
     outDir: "dist",
-    sourcemap: "external",
+    sourcemap: "inline",
     clean: true,
     format: ["cjs", "esm"],
     dts: true,
@@ -47,9 +47,5 @@ export default defineConfig({
         options.bundle = true;
         options.platform = 'node';
         options.target = 'node18';
-    },
-
-    footer: {
-        js: "//# sourceMappingURL=/home/rusty/Documents/GitHub/eliza/[name].js.map"
     }
 });

@@ -1,3 +1,5 @@
+// Agent level index file.
+
 import { PostgresDatabaseAdapter } from "@ai16z/adapter-postgres";
 import { SqliteDatabaseAdapter } from "@ai16z/adapter-sqlite";
 import { AutoClientInterface } from "@ai16z/client-auto";
@@ -51,6 +53,7 @@ import path from "path";
 import readline from "readline";
 import { fileURLToPath } from "url";
 import yargs from "yargs";
+import pilTermsPlugin from "@ai16z/plugin-pilterms";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -187,7 +190,7 @@ export async function loadCharacters(
 
     if (loadedCharacters.length === 0) {
         elizaLogger.info("No characters found, using default character");
-        loadedCharacters.push(mainCharacter);
+        loadedCharacters.push(defaultCharacter);
     }
 
     return loadedCharacters;
@@ -377,6 +380,7 @@ export function createAgent(
         character,
         plugins: [
             bootstrapPlugin,
+            pilTermsPlugin,
             getSecret(character, "CONFLUX_CORE_PRIVATE_KEY")
                 ? confluxPlugin
                 : null,
@@ -403,11 +407,11 @@ export function createAgent(
             ...(getSecret(character, "COINBASE_API_KEY") &&
             getSecret(character, "COINBASE_PRIVATE_KEY")
                 ? [
-                      coinbaseMassPaymentsPlugin,
-                      tradePlugin,
-                      tokenContractPlugin,
-                      advancedTradePlugin,
-                  ]
+                    coinbaseMassPaymentsPlugin,
+                    tradePlugin,
+                    tokenContractPlugin,
+                    advancedTradePlugin,
+                ]
                 : []),
             getSecret(character, "COINBASE_API_KEY") &&
             getSecret(character, "COINBASE_PRIVATE_KEY") &&
@@ -431,7 +435,7 @@ export function createAgent(
     });
 }
 
-function intializeFsCache(baseDir: string, character: Character) {
+function initializeFsCache(baseDir: string, character: Character) {
     const cacheDir = path.resolve(baseDir, character.id, "cache");
 
     const cache = new CacheManager(new FsCacheAdapter(cacheDir));
@@ -484,13 +488,65 @@ async function startAgent(character: Character, directClient) {
     }
 }
 
+/**
+ * Extracts the value of the first command-line
+ *  argument starting with "--character",
+ *  splits it into an array by commas, removes
+ *  double quotes, and trims each element.
+ *
+ * @returns {string[] | null} An array of
+ *   processed character strings if a suitable
+ *   command line argument was found, or
+ *   null if not.
+ */
+const failsafeFindCharactersArg = (): string[] | null => {
+    // Initialize the variable to null
+    let failsafeFindCharactersRaw: string | null = null;
+
+    // Look for the first argument starting with "--character"
+    const argPrefix = "--character";
+    for (const arg of process.argv) {
+        if (arg.startsWith(argPrefix)) {
+            const [, value] = arg.split("=");
+            failsafeFindCharactersRaw = value || null;
+            break;
+        }
+    }
+
+    // Process the argument if it is not null
+    if (failsafeFindCharactersRaw !== null) {
+        const failsafeCharactersFound = failsafeFindCharactersRaw.split(",")
+            .map(char => char.replace(/"/g, "").trim());
+        return failsafeCharactersFound.length > 0 ? failsafeCharactersFound : null;
+    }
+
+    // Return null if no valid argument or empty result
+    return null;
+};
+
 const startAgents = async () => {
     const directClient = await DirectClientInterface.start();
     const args = parseArguments();
 
     let charactersArg = args.characters || args.character;
 
-    let characters = [mainCharacter];
+    // We make a failsafe attempt to find the
+    //  characters command line argument in case
+    //  the current execution context is different
+    //  from what parseArguments() expected.
+    if (!charactersArg)
+    {
+        const failsafeCharactersFound =
+            failsafeFindCharactersArg();
+
+        if (failsafeCharactersFound) {
+            // loadCharacters() expects a comma
+            //  delimited string.
+            charactersArg = failsafeCharactersFound.join(",");
+        }
+    }
+
+    let characters = [defaultCharacter];
 
     if (charactersArg) {
         characters = await loadCharacters(charactersArg);

@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
     entry: ["src/index.ts"],
     outDir: "dist",
-    sourcemap: "external",
+    sourcemap: "inline",
     clean: true,
 
     // Ensure you're targeting CommonJS
@@ -35,9 +35,5 @@ export default defineConfig({
         "@onflow/types",
         "sha3",
         "elliptic",
-    ],
-
-    footer: {
-        js: "//# sourceMappingURL=/home/rusty/Documents/GitHub/eliza/[name].js.map"
-    }
+    ]
 });

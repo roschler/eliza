@@ -1,0 +1,2429 @@
+
+> @ai16z/client-farcaster@0.1.5-alpha.5 build C:\Users\rober\Documents\GitHub\story-protocol-eliza\packages\client-farcaster
+> tsup --format esm --dts
+
+[34mCLI[39m Building entry: src/index.ts
+[34mCLI[39m Using tsconfig: tsconfig.json
+[34mCLI[39m tsup v8.3.5
+[34mCLI[39m Using tsup config: C:\Users\rober\Documents\GitHub\story-protocol-eliza\packages\client-farcaster\tsup.config.ts
+[34mCLI[39m Target: es2015
+[34mCLI[39m Cleaning output folder
+[34mESM[39m Build start
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/abi/encodeAbiParameters.js:204:20:
+      204 │         const max = 2n ** (BigInt(size) - (signed ? 1n : 0n)) - 1n;
+          ╵                     ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/abi/encodeAbiParameters.js:204:52:
+      204 │         const max = 2n ** (BigInt(size) - (signed ? 1n : 0n)) - 1n;
+          ╵                                                     ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/abi/encodeAbiParameters.js:204:57:
+      204 │         const max = 2n ** (BigInt(size) - (signed ? 1n : 0n)) - 1n;
+          ╵                                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/abi/encodeAbiParameters.js:204:64:
+      204 │         const max = 2n ** (BigInt(size) - (signed ? 1n : 0n)) - 1n;
+          ╵                                                                 ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/abi/encodeAbiParameters.js:205:36:
+      205 │         const min = signed ? -max - 1n : 0n;
+          ╵                                     ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/abi/encodeAbiParameters.js:205:41:
+      205 │         const min = signed ? -max - 1n : 0n;
+          ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/formatters/transaction.js:49:35:
+      49 │             if (transaction_.v === 0n || transaction_.v === 27n)
+         ╵                                    ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/formatters/transaction.js:49:60:
+      49 │             if (transaction_.v === 0n || transaction_.v === 27n)
+         ╵                                                             ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/formatters/transaction.js:51:35:
+      51 │             if (transaction_.v === 1n || transaction_.v === 28n)
+         ╵                                    ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/formatters/transaction.js:51:60:
+      51 │             if (transaction_.v === 1n || transaction_.v === 28n)
+         ╵                                                             ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/formatters/transaction.js:53:34:
+      53 │             if (transaction_.v >= 35n)
+         ╵                                   ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/formatters/transaction.js:54:40:
+      54 │                 return transaction_.v % 2n === 0n ? 1 : 0;
+         ╵                                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/formatters/transaction.js:54:47:
+      54 │                 return transaction_.v % 2n === 0n ? 1 : 0;
+         ╵                                                ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/signature/signatureToCompactSignature.js:22:43:
+      22 │     const yParity_ = Number(yParity ?? v - 27n);
+         ╵                                            ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:1:23:
+      1 │ export const maxInt8 = 2n ** (8n - 1n) - 1n;
+        ╵                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:1:30:
+      1 │ export const maxInt8 = 2n ** (8n - 1n) - 1n;
+        ╵                               ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:1:35:
+      1 │ export const maxInt8 = 2n ** (8n - 1n) - 1n;
+        ╵                                    ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/signature/serializeSignature.js:22:24:
+      22 │         if (v && (v === 27n || v === 28n || v >= 35n))
+         ╵                         ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/fromHex.js:80:17:
+      80 │     const max = (1n << (BigInt(size) * 8n - 1n)) - 1n;
+         ╵                  ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/parseTransaction.js:293:10:
+      293 │         : 0n;
+          ╵           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:163:31:
+      163 │             if (signature.v >= 35n) {
+          ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:1:41:
+      1 │ export const maxInt8 = 2n ** (8n - 1n) - 1n;
+        ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/signature/serializeSignature.js:22:37:
+      22 │         if (v && (v === 27n || v === 28n || v >= 35n))
+         ╵                                      ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/signature/serializeSignature.js:22:49:
+      22 │         if (v && (v === 27n || v === 28n || v >= 35n))
+         ╵                                                  ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/signature/serializeSignature.js:23:23:
+      23 │             return v % 2n === 0n ? 1 : 0;
+         ╵                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/signature/serializeSignature.js:23:30:
+      23 │             return v % 2n === 0n ? 1 : 0;
+         ╵                               ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:164:55:
+      164 │                 const inferredChainId = (signature.v - 35n) / 2n;
+          ╵                                                        ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:164:62:
+      164 │                 const inferredChainId = (signature.v - 35n) / 2n;
+          ╵                                                               ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:167:23:
+      167 │                 return 27n + (signature.v === 35n ? 0n : 1n);
+          ╵                        ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:167:46:
+      167 │                 return 27n + (signature.v === 35n ? 0n : 1n);
+          ╵                                               ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:167:52:
+      167 │                 return 27n + (signature.v === 35n ? 0n : 1n);
+          ╵                                                     ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/parseTransaction.js:300:32:
+      300 │     const chainId = Number((v - 35n) / 2n);
+          ╵                                 ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:2:24:
+      2 │ export const maxInt16 = 2n ** (16n - 1n) - 1n;
+        ╵                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/fromHex.js:80:39:
+      80 │     const max = (1n << (BigInt(size) * 8n - 1n)) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/unit/parseUnits.js:25:43:
+      25 │             integer = `${BigInt(integer) + 1n}`;
+         ╵                                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:167:57:
+      167 │                 return 27n + (signature.v === 35n ? 0n : 1n);
+          ╵                                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:171:52:
+      171 │ ...    return BigInt(chainId * 2) + BigInt(35n + signature.v - 27n);
+          ╵                                            ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:171:72:
+      171 │ ...    return BigInt(chainId * 2) + BigInt(35n + signature.v - 27n);
+          ╵                                                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:173:22:
+      173 │             const v = 27n + (signature.v === 27n ? 0n : 1n);
+          ╵                       ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:173:45:
+      173 │             const v = 27n + (signature.v === 27n ? 0n : 1n);
+          ╵                                              ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:173:51:
+      173 │             const v = 27n + (signature.v === 27n ? 0n : 1n);
+          ╵                                                    ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:173:56:
+      173 │             const v = 27n + (signature.v === 27n ? 0n : 1n);
+          ╵                                                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:211:18:
+      211 │         if (v === 0n)
+          ╵                   ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:213:18:
+      213 │         if (v === 1n)
+          ╵                   ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/toHex.js:128:24:
+      128 │             maxValue = (1n << (BigInt(size) * 8n - 1n)) - 1n;
+          ╵                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/parseTransaction.js:300:39:
+      300 │     const chainId = Number((v - 35n) / 2n);
+          ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/fromHex.js:80:44:
+      80 │     const max = (1n << (BigInt(size) * 8n - 1n)) - 1n;
+         ╵                                             ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:2:31:
+      2 │ export const maxInt16 = 2n ** (16n - 1n) - 1n;
+        ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/unit/parseUnits.js:41:43:
+      41 │             integer = `${BigInt(integer) + 1n}`;
+         ╵                                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/serializeTransaction.js:215:21:
+      215 │         return v === 27n ? '0x' : toHex(1);
+          ╵                      ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/toHex.js:128:46:
+      128 │             maxValue = (1n << (BigInt(size) * 8n - 1n)) - 1n;
+          ╵                                               ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/parseTransaction.js:303:19:
+      303 │     else if (v !== 27n && v !== 28n)
+          ╵                    ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/fromHex.js:80:51:
+      80 │     const max = (1n << (BigInt(size) * 8n - 1n)) - 1n;
+         ╵                                                    ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:2:37:
+      2 │ export const maxInt16 = 2n ** (16n - 1n) - 1n;
+        ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/toHex.js:128:51:
+      128 │             maxValue = (1n << (BigInt(size) * 8n - 1n)) - 1n;
+          ╵                                                    ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/toHex.js:128:58:
+      128 │             maxValue = (1n << (BigInt(size) * 8n - 1n)) - 1n;
+          ╵                                                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/toHex.js:130:23:
+      130 │             maxValue = 2n ** (BigInt(size) * 8n) - 1n;
+          ╵                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/toHex.js:130:45:
+      130 │             maxValue = 2n ** (BigInt(size) * 8n) - 1n;
+          ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/toHex.js:130:51:
+      130 │             maxValue = 2n ** (BigInt(size) * 8n) - 1n;
+          ╵                                                    ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/toHex.js:135:74:
+      135 │ ...ue = typeof maxValue === 'bigint' && signed ? -maxValue - 1n : 0;
+          ╵                                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/toHex.js:146:45:
+      146 │ ... `0x${(signed && value < 0 ? (1n << BigInt(size * 8)) + BigInt...
+          ╵                                  ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/parseTransaction.js:303:32:
+      303 │     else if (v !== 27n && v !== 28n)
+          ╵                                 ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/parseTransaction.js:308:30:
+      308 │     transaction.yParity = v % 2n === 0n ? 1 : 0;
+          ╵                               ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/parseTransaction.js:308:37:
+      308 │     transaction.yParity = v % 2n === 0n ? 1 : 0;
+          ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/parseTransaction.js:342:69:
+      342 │ ...ture[0] === '0x' || hexToBigInt(signature[0]) === 0n ? 27n : 28n;
+          ╵                                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/parseTransaction.js:342:74:
+      342 │ ...ture[0] === '0x' || hexToBigInt(signature[0]) === 0n ? 27n : 28n;
+          ╵                                                           ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/parseTransaction.js:342:80:
+      342 │ ...ture[0] === '0x' || hexToBigInt(signature[0]) === 0n ? 27n : 28n;
+          ╵                                                                 ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/transaction/parseTransaction.js:347:23:
+      347 │         yParity: v === 27n ? 0 : 1,
+          ╵                        ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/utils/encoding/fromHex.js:83:64:
+      83 │     return value - BigInt(`0x${'f'.padStart(size * 2, 'f')}`) - 1n;
+         ╵                                                                 ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:2:43:
+      2 │ export const maxInt16 = 2n ** (16n - 1n) - 1n;
+        ╵                                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:3:24:
+      3 │ export const maxInt24 = 2n ** (24n - 1n) - 1n;
+        ╵                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:3:31:
+      3 │ export const maxInt24 = 2n ** (24n - 1n) - 1n;
+        ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:3:37:
+      3 │ export const maxInt24 = 2n ** (24n - 1n) - 1n;
+        ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:3:43:
+      3 │ export const maxInt24 = 2n ** (24n - 1n) - 1n;
+        ╵                                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:4:24:
+      4 │ export const maxInt32 = 2n ** (32n - 1n) - 1n;
+        ╵                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:4:31:
+      4 │ export const maxInt32 = 2n ** (32n - 1n) - 1n;
+        ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:4:37:
+      4 │ export const maxInt32 = 2n ** (32n - 1n) - 1n;
+        ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:4:43:
+      4 │ export const maxInt32 = 2n ** (32n - 1n) - 1n;
+        ╵                                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:5:24:
+      5 │ export const maxInt40 = 2n ** (40n - 1n) - 1n;
+        ╵                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:5:31:
+      5 │ export const maxInt40 = 2n ** (40n - 1n) - 1n;
+        ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:5:37:
+      5 │ export const maxInt40 = 2n ** (40n - 1n) - 1n;
+        ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:5:43:
+      5 │ export const maxInt40 = 2n ** (40n - 1n) - 1n;
+        ╵                                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:6:24:
+      6 │ export const maxInt48 = 2n ** (48n - 1n) - 1n;
+        ╵                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:6:31:
+      6 │ export const maxInt48 = 2n ** (48n - 1n) - 1n;
+        ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:6:37:
+      6 │ export const maxInt48 = 2n ** (48n - 1n) - 1n;
+        ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:6:43:
+      6 │ export const maxInt48 = 2n ** (48n - 1n) - 1n;
+        ╵                                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:7:24:
+      7 │ export const maxInt56 = 2n ** (56n - 1n) - 1n;
+        ╵                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:7:31:
+      7 │ export const maxInt56 = 2n ** (56n - 1n) - 1n;
+        ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:7:37:
+      7 │ export const maxInt56 = 2n ** (56n - 1n) - 1n;
+        ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:7:43:
+      7 │ export const maxInt56 = 2n ** (56n - 1n) - 1n;
+        ╵                                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:8:24:
+      8 │ export const maxInt64 = 2n ** (64n - 1n) - 1n;
+        ╵                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:8:31:
+      8 │ export const maxInt64 = 2n ** (64n - 1n) - 1n;
+        ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:8:37:
+      8 │ export const maxInt64 = 2n ** (64n - 1n) - 1n;
+        ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:8:43:
+      8 │ export const maxInt64 = 2n ** (64n - 1n) - 1n;
+        ╵                                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:9:24:
+      9 │ export const maxInt72 = 2n ** (72n - 1n) - 1n;
+        ╵                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:9:31:
+      9 │ export const maxInt72 = 2n ** (72n - 1n) - 1n;
+        ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:9:37:
+      9 │ export const maxInt72 = 2n ** (72n - 1n) - 1n;
+        ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:9:43:
+      9 │ export const maxInt72 = 2n ** (72n - 1n) - 1n;
+        ╵                                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:10:24:
+      10 │ export const maxInt80 = 2n ** (80n - 1n) - 1n;
+         ╵                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:10:31:
+      10 │ export const maxInt80 = 2n ** (80n - 1n) - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:10:37:
+      10 │ export const maxInt80 = 2n ** (80n - 1n) - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:10:43:
+      10 │ export const maxInt80 = 2n ** (80n - 1n) - 1n;
+         ╵                                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:11:24:
+      11 │ export const maxInt88 = 2n ** (88n - 1n) - 1n;
+         ╵                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:11:31:
+      11 │ export const maxInt88 = 2n ** (88n - 1n) - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:11:37:
+      11 │ export const maxInt88 = 2n ** (88n - 1n) - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:11:43:
+      11 │ export const maxInt88 = 2n ** (88n - 1n) - 1n;
+         ╵                                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:12:24:
+      12 │ export const maxInt96 = 2n ** (96n - 1n) - 1n;
+         ╵                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:12:31:
+      12 │ export const maxInt96 = 2n ** (96n - 1n) - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:12:37:
+      12 │ export const maxInt96 = 2n ** (96n - 1n) - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:12:43:
+      12 │ export const maxInt96 = 2n ** (96n - 1n) - 1n;
+         ╵                                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:13:25:
+      13 │ export const maxInt104 = 2n ** (104n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:13:32:
+      13 │ export const maxInt104 = 2n ** (104n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:13:39:
+      13 │ export const maxInt104 = 2n ** (104n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:13:45:
+      13 │ export const maxInt104 = 2n ** (104n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:14:25:
+      14 │ export const maxInt112 = 2n ** (112n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:14:32:
+      14 │ export const maxInt112 = 2n ** (112n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:14:39:
+      14 │ export const maxInt112 = 2n ** (112n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:14:45:
+      14 │ export const maxInt112 = 2n ** (112n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:15:25:
+      15 │ export const maxInt120 = 2n ** (120n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:15:32:
+      15 │ export const maxInt120 = 2n ** (120n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:15:39:
+      15 │ export const maxInt120 = 2n ** (120n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:15:45:
+      15 │ export const maxInt120 = 2n ** (120n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:16:25:
+      16 │ export const maxInt128 = 2n ** (128n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:16:32:
+      16 │ export const maxInt128 = 2n ** (128n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:16:39:
+      16 │ export const maxInt128 = 2n ** (128n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:16:45:
+      16 │ export const maxInt128 = 2n ** (128n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:17:25:
+      17 │ export const maxInt136 = 2n ** (136n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:17:32:
+      17 │ export const maxInt136 = 2n ** (136n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:17:39:
+      17 │ export const maxInt136 = 2n ** (136n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:17:45:
+      17 │ export const maxInt136 = 2n ** (136n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:18:25:
+      18 │ export const maxInt144 = 2n ** (144n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:18:32:
+      18 │ export const maxInt144 = 2n ** (144n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:18:39:
+      18 │ export const maxInt144 = 2n ** (144n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:18:45:
+      18 │ export const maxInt144 = 2n ** (144n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:19:25:
+      19 │ export const maxInt152 = 2n ** (152n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:19:32:
+      19 │ export const maxInt152 = 2n ** (152n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:19:39:
+      19 │ export const maxInt152 = 2n ** (152n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:19:45:
+      19 │ export const maxInt152 = 2n ** (152n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:20:25:
+      20 │ export const maxInt160 = 2n ** (160n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:20:32:
+      20 │ export const maxInt160 = 2n ** (160n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:20:39:
+      20 │ export const maxInt160 = 2n ** (160n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:20:45:
+      20 │ export const maxInt160 = 2n ** (160n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:21:25:
+      21 │ export const maxInt168 = 2n ** (168n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:21:32:
+      21 │ export const maxInt168 = 2n ** (168n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:21:39:
+      21 │ export const maxInt168 = 2n ** (168n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:21:45:
+      21 │ export const maxInt168 = 2n ** (168n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:22:25:
+      22 │ export const maxInt176 = 2n ** (176n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/watchContractEvent.js:75:50:
+      75 │                 previousBlockNumber = fromBlock - 1n;
+         ╵                                                   ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/watchContractEvent.js:113:65:
+      113 │                                 fromBlock: previousBlockNumber + 1n,
+          ╵                                                                  ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:22:32:
+      22 │ export const maxInt176 = 2n ** (176n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:22:39:
+      22 │ export const maxInt176 = 2n ** (176n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:22:45:
+      22 │ export const maxInt176 = 2n ** (176n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:23:25:
+      23 │ export const maxInt184 = 2n ** (184n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:23:32:
+      23 │ export const maxInt184 = 2n ** (184n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:23:39:
+      23 │ export const maxInt184 = 2n ** (184n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:23:45:
+      23 │ export const maxInt184 = 2n ** (184n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:24:25:
+      24 │ export const maxInt192 = 2n ** (192n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:24:32:
+      24 │ export const maxInt192 = 2n ** (192n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:24:39:
+      24 │ export const maxInt192 = 2n ** (192n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:24:45:
+      24 │ export const maxInt192 = 2n ** (192n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:25:25:
+      25 │ export const maxInt200 = 2n ** (200n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:25:32:
+      25 │ export const maxInt200 = 2n ** (200n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:25:39:
+      25 │ export const maxInt200 = 2n ** (200n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:25:45:
+      25 │ export const maxInt200 = 2n ** (200n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:26:25:
+      26 │ export const maxInt208 = 2n ** (208n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:26:32:
+      26 │ export const maxInt208 = 2n ** (208n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:26:39:
+      26 │ export const maxInt208 = 2n ** (208n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:26:45:
+      26 │ export const maxInt208 = 2n ** (208n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:27:25:
+      27 │ export const maxInt216 = 2n ** (216n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:27:32:
+      27 │ export const maxInt216 = 2n ** (216n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:27:39:
+      27 │ export const maxInt216 = 2n ** (216n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:27:45:
+      27 │ export const maxInt216 = 2n ** (216n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:28:25:
+      28 │ export const maxInt224 = 2n ** (224n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:28:32:
+      28 │ export const maxInt224 = 2n ** (224n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:28:39:
+      28 │ export const maxInt224 = 2n ** (224n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:28:45:
+      28 │ export const maxInt224 = 2n ** (224n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:29:25:
+      29 │ export const maxInt232 = 2n ** (232n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:29:32:
+      29 │ export const maxInt232 = 2n ** (232n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:29:39:
+      29 │ export const maxInt232 = 2n ** (232n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:29:45:
+      29 │ export const maxInt232 = 2n ** (232n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:30:25:
+      30 │ export const maxInt240 = 2n ** (240n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:30:32:
+      30 │ export const maxInt240 = 2n ** (240n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:30:39:
+      30 │ export const maxInt240 = 2n ** (240n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:30:45:
+      30 │ export const maxInt240 = 2n ** (240n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:31:25:
+      31 │ export const maxInt248 = 2n ** (248n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:31:32:
+      31 │ export const maxInt248 = 2n ** (248n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:31:39:
+      31 │ export const maxInt248 = 2n ** (248n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:31:45:
+      31 │ export const maxInt248 = 2n ** (248n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:32:25:
+      32 │ export const maxInt256 = 2n ** (256n - 1n) - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:32:32:
+      32 │ export const maxInt256 = 2n ** (256n - 1n) - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:32:39:
+      32 │ export const maxInt256 = 2n ** (256n - 1n) - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:32:45:
+      32 │ export const maxInt256 = 2n ** (256n - 1n) - 1n;
+         ╵                                              ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:33:25:
+      33 │ export const minInt8 = -(2n ** (8n - 1n));
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:33:32:
+      33 │ export const minInt8 = -(2n ** (8n - 1n));
+         ╵                                 ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:33:37:
+      33 │ export const minInt8 = -(2n ** (8n - 1n));
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:34:26:
+      34 │ export const minInt16 = -(2n ** (16n - 1n));
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:34:33:
+      34 │ export const minInt16 = -(2n ** (16n - 1n));
+         ╵                                  ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:34:39:
+      34 │ export const minInt16 = -(2n ** (16n - 1n));
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:35:26:
+      35 │ export const minInt24 = -(2n ** (24n - 1n));
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:35:33:
+      35 │ export const minInt24 = -(2n ** (24n - 1n));
+         ╵                                  ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:35:39:
+      35 │ export const minInt24 = -(2n ** (24n - 1n));
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:36:26:
+      36 │ export const minInt32 = -(2n ** (32n - 1n));
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:36:33:
+      36 │ export const minInt32 = -(2n ** (32n - 1n));
+         ╵                                  ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:36:39:
+      36 │ export const minInt32 = -(2n ** (32n - 1n));
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:37:26:
+      37 │ export const minInt40 = -(2n ** (40n - 1n));
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:37:33:
+      37 │ export const minInt40 = -(2n ** (40n - 1n));
+         ╵                                  ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:37:39:
+      37 │ export const minInt40 = -(2n ** (40n - 1n));
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:38:26:
+      38 │ export const minInt48 = -(2n ** (48n - 1n));
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:38:33:
+      38 │ export const minInt48 = -(2n ** (48n - 1n));
+         ╵                                  ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:38:39:
+      38 │ export const minInt48 = -(2n ** (48n - 1n));
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:39:26:
+      39 │ export const minInt56 = -(2n ** (56n - 1n));
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:39:33:
+      39 │ export const minInt56 = -(2n ** (56n - 1n));
+         ╵                                  ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:39:39:
+      39 │ export const minInt56 = -(2n ** (56n - 1n));
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/estimateGas.js:116:31:
+      116 │                 }).catch(() => 100000n);
+          ╵                                ~~~~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/estimateGas.js:117:23:
+      117 │                 return 2n * BigInt(estimate);
+          ╵                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/estimateGas.js:119:68:
+      119 │ ...     estimate += estimates.reduce((acc, curr) => acc + curr, 0n);
+          ╵                                                                 ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:40:26:
+      40 │ export const minInt64 = -(2n ** (64n - 1n));
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:40:33:
+      40 │ export const minInt64 = -(2n ** (64n - 1n));
+         ╵                                  ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:40:39:
+      40 │ export const minInt64 = -(2n ** (64n - 1n));
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:41:26:
+      41 │ export const minInt72 = -(2n ** (72n - 1n));
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:41:33:
+      41 │ export const minInt72 = -(2n ** (72n - 1n));
+         ╵                                  ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:41:39:
+      41 │ export const minInt72 = -(2n ** (72n - 1n));
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:42:26:
+      42 │ export const minInt80 = -(2n ** (80n - 1n));
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:42:33:
+      42 │ export const minInt80 = -(2n ** (80n - 1n));
+         ╵                                  ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:42:39:
+      42 │ export const minInt80 = -(2n ** (80n - 1n));
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:43:26:
+      43 │ export const minInt88 = -(2n ** (88n - 1n));
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:43:33:
+      43 │ export const minInt88 = -(2n ** (88n - 1n));
+         ╵                                  ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:43:39:
+      43 │ export const minInt88 = -(2n ** (88n - 1n));
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:44:26:
+      44 │ export const minInt96 = -(2n ** (96n - 1n));
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:44:33:
+      44 │ export const minInt96 = -(2n ** (96n - 1n));
+         ╵                                  ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:44:39:
+      44 │ export const minInt96 = -(2n ** (96n - 1n));
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:45:27:
+      45 │ export const minInt104 = -(2n ** (104n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:45:34:
+      45 │ export const minInt104 = -(2n ** (104n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:45:41:
+      45 │ export const minInt104 = -(2n ** (104n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:46:27:
+      46 │ export const minInt112 = -(2n ** (112n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:46:34:
+      46 │ export const minInt112 = -(2n ** (112n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:46:41:
+      46 │ export const minInt112 = -(2n ** (112n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:47:27:
+      47 │ export const minInt120 = -(2n ** (120n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:47:34:
+      47 │ export const minInt120 = -(2n ** (120n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:47:41:
+      47 │ export const minInt120 = -(2n ** (120n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:48:27:
+      48 │ export const minInt128 = -(2n ** (128n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:48:34:
+      48 │ export const minInt128 = -(2n ** (128n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:48:41:
+      48 │ export const minInt128 = -(2n ** (128n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:49:27:
+      49 │ export const minInt136 = -(2n ** (136n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:49:34:
+      49 │ export const minInt136 = -(2n ** (136n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:49:41:
+      49 │ export const minInt136 = -(2n ** (136n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:50:27:
+      50 │ export const minInt144 = -(2n ** (144n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:50:34:
+      50 │ export const minInt144 = -(2n ** (144n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:50:41:
+      50 │ export const minInt144 = -(2n ** (144n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:51:27:
+      51 │ export const minInt152 = -(2n ** (152n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:51:34:
+      51 │ export const minInt152 = -(2n ** (152n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:51:41:
+      51 │ export const minInt152 = -(2n ** (152n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:52:27:
+      52 │ export const minInt160 = -(2n ** (160n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:52:34:
+      52 │ export const minInt160 = -(2n ** (160n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:52:41:
+      52 │ export const minInt160 = -(2n ** (160n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:53:27:
+      53 │ export const minInt168 = -(2n ** (168n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:53:34:
+      53 │ export const minInt168 = -(2n ** (168n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:53:41:
+      53 │ export const minInt168 = -(2n ** (168n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:54:27:
+      54 │ export const minInt176 = -(2n ** (176n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:54:34:
+      54 │ export const minInt176 = -(2n ** (176n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:54:41:
+      54 │ export const minInt176 = -(2n ** (176n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:55:27:
+      55 │ export const minInt184 = -(2n ** (184n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:55:34:
+      55 │ export const minInt184 = -(2n ** (184n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:55:41:
+      55 │ export const minInt184 = -(2n ** (184n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:56:27:
+      56 │ export const minInt192 = -(2n ** (192n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:56:34:
+      56 │ export const minInt192 = -(2n ** (192n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:56:41:
+      56 │ export const minInt192 = -(2n ** (192n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:57:27:
+      57 │ export const minInt200 = -(2n ** (200n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:57:34:
+      57 │ export const minInt200 = -(2n ** (200n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:57:41:
+      57 │ export const minInt200 = -(2n ** (200n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:58:27:
+      58 │ export const minInt208 = -(2n ** (208n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:58:34:
+      58 │ export const minInt208 = -(2n ** (208n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:58:41:
+      58 │ export const minInt208 = -(2n ** (208n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:59:27:
+      59 │ export const minInt216 = -(2n ** (216n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:59:34:
+      59 │ export const minInt216 = -(2n ** (216n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:59:41:
+      59 │ export const minInt216 = -(2n ** (216n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:60:27:
+      60 │ export const minInt224 = -(2n ** (224n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:60:34:
+      60 │ export const minInt224 = -(2n ** (224n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:60:41:
+      60 │ export const minInt224 = -(2n ** (224n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:61:27:
+      61 │ export const minInt232 = -(2n ** (232n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:61:34:
+      61 │ export const minInt232 = -(2n ** (232n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:61:41:
+      61 │ export const minInt232 = -(2n ** (232n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:62:27:
+      62 │ export const minInt240 = -(2n ** (240n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:62:34:
+      62 │ export const minInt240 = -(2n ** (240n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:62:41:
+      62 │ export const minInt240 = -(2n ** (240n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:63:27:
+      63 │ export const minInt248 = -(2n ** (248n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:63:34:
+      63 │ export const minInt248 = -(2n ** (248n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:63:41:
+      63 │ export const minInt248 = -(2n ** (248n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:64:27:
+      64 │ export const minInt256 = -(2n ** (256n - 1n));
+         ╵                            ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:64:34:
+      64 │ export const minInt256 = -(2n ** (256n - 1n));
+         ╵                                   ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:64:41:
+      64 │ export const minInt256 = -(2n ** (256n - 1n));
+         ╵                                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:65:24:
+      65 │ export const maxUint8 = 2n ** 8n - 1n;
+         ╵                         ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:65:30:
+      65 │ export const maxUint8 = 2n ** 8n - 1n;
+         ╵                               ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:65:35:
+      65 │ export const maxUint8 = 2n ** 8n - 1n;
+         ╵                                    ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:66:25:
+      66 │ export const maxUint16 = 2n ** 16n - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:66:31:
+      66 │ export const maxUint16 = 2n ** 16n - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:66:37:
+      66 │ export const maxUint16 = 2n ** 16n - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:67:25:
+      67 │ export const maxUint24 = 2n ** 24n - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:67:31:
+      67 │ export const maxUint24 = 2n ** 24n - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:67:37:
+      67 │ export const maxUint24 = 2n ** 24n - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:68:25:
+      68 │ export const maxUint32 = 2n ** 32n - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:68:31:
+      68 │ export const maxUint32 = 2n ** 32n - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:68:37:
+      68 │ export const maxUint32 = 2n ** 32n - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:69:25:
+      69 │ export const maxUint40 = 2n ** 40n - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:69:31:
+      69 │ export const maxUint40 = 2n ** 40n - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:69:37:
+      69 │ export const maxUint40 = 2n ** 40n - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:70:25:
+      70 │ export const maxUint48 = 2n ** 48n - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:70:31:
+      70 │ export const maxUint48 = 2n ** 48n - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:70:37:
+      70 │ export const maxUint48 = 2n ** 48n - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:71:25:
+      71 │ export const maxUint56 = 2n ** 56n - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:71:31:
+      71 │ export const maxUint56 = 2n ** 56n - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:71:37:
+      71 │ export const maxUint56 = 2n ** 56n - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:72:25:
+      72 │ export const maxUint64 = 2n ** 64n - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:72:31:
+      72 │ export const maxUint64 = 2n ** 64n - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:72:37:
+      72 │ export const maxUint64 = 2n ** 64n - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:73:25:
+      73 │ export const maxUint72 = 2n ** 72n - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:73:31:
+      73 │ export const maxUint72 = 2n ** 72n - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:73:37:
+      73 │ export const maxUint72 = 2n ** 72n - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:74:25:
+      74 │ export const maxUint80 = 2n ** 80n - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:74:31:
+      74 │ export const maxUint80 = 2n ** 80n - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:74:37:
+      74 │ export const maxUint80 = 2n ** 80n - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:75:25:
+      75 │ export const maxUint88 = 2n ** 88n - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:75:31:
+      75 │ export const maxUint88 = 2n ** 88n - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:75:37:
+      75 │ export const maxUint88 = 2n ** 88n - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:76:25:
+      76 │ export const maxUint96 = 2n ** 96n - 1n;
+         ╵                          ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:76:31:
+      76 │ export const maxUint96 = 2n ** 96n - 1n;
+         ╵                                ~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:76:37:
+      76 │ export const maxUint96 = 2n ** 96n - 1n;
+         ╵                                      ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:77:26:
+      77 │ export const maxUint104 = 2n ** 104n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:77:32:
+      77 │ export const maxUint104 = 2n ** 104n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:77:39:
+      77 │ export const maxUint104 = 2n ** 104n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:78:26:
+      78 │ export const maxUint112 = 2n ** 112n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:78:32:
+      78 │ export const maxUint112 = 2n ** 112n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:78:39:
+      78 │ export const maxUint112 = 2n ** 112n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:79:26:
+      79 │ export const maxUint120 = 2n ** 120n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:79:32:
+      79 │ export const maxUint120 = 2n ** 120n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:79:39:
+      79 │ export const maxUint120 = 2n ** 120n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:80:26:
+      80 │ export const maxUint128 = 2n ** 128n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:80:32:
+      80 │ export const maxUint128 = 2n ** 128n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:80:39:
+      80 │ export const maxUint128 = 2n ** 128n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:81:26:
+      81 │ export const maxUint136 = 2n ** 136n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:81:32:
+      81 │ export const maxUint136 = 2n ** 136n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:81:39:
+      81 │ export const maxUint136 = 2n ** 136n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:82:26:
+      82 │ export const maxUint144 = 2n ** 144n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:82:32:
+      82 │ export const maxUint144 = 2n ** 144n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:82:39:
+      82 │ export const maxUint144 = 2n ** 144n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:83:26:
+      83 │ export const maxUint152 = 2n ** 152n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:83:32:
+      83 │ export const maxUint152 = 2n ** 152n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:83:39:
+      83 │ export const maxUint152 = 2n ** 152n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:84:26:
+      84 │ export const maxUint160 = 2n ** 160n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:84:32:
+      84 │ export const maxUint160 = 2n ** 160n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:84:39:
+      84 │ export const maxUint160 = 2n ** 160n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:85:26:
+      85 │ export const maxUint168 = 2n ** 168n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:85:32:
+      85 │ export const maxUint168 = 2n ** 168n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:85:39:
+      85 │ export const maxUint168 = 2n ** 168n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:86:26:
+      86 │ export const maxUint176 = 2n ** 176n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:86:32:
+      86 │ export const maxUint176 = 2n ** 176n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:86:39:
+      86 │ export const maxUint176 = 2n ** 176n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:87:26:
+      87 │ export const maxUint184 = 2n ** 184n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:87:32:
+      87 │ export const maxUint184 = 2n ** 184n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:87:39:
+      87 │ export const maxUint184 = 2n ** 184n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:88:26:
+      88 │ export const maxUint192 = 2n ** 192n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:88:32:
+      88 │ export const maxUint192 = 2n ** 192n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:88:39:
+      88 │ export const maxUint192 = 2n ** 192n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:89:26:
+      89 │ export const maxUint200 = 2n ** 200n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:89:32:
+      89 │ export const maxUint200 = 2n ** 200n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:89:39:
+      89 │ export const maxUint200 = 2n ** 200n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:90:26:
+      90 │ export const maxUint208 = 2n ** 208n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:90:32:
+      90 │ export const maxUint208 = 2n ** 208n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:90:39:
+      90 │ export const maxUint208 = 2n ** 208n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:91:26:
+      91 │ export const maxUint216 = 2n ** 216n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:91:32:
+      91 │ export const maxUint216 = 2n ** 216n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:91:39:
+      91 │ export const maxUint216 = 2n ** 216n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:92:26:
+      92 │ export const maxUint224 = 2n ** 224n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:92:32:
+      92 │ export const maxUint224 = 2n ** 224n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:92:39:
+      92 │ export const maxUint224 = 2n ** 224n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:93:26:
+      93 │ export const maxUint232 = 2n ** 232n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:93:32:
+      93 │ export const maxUint232 = 2n ** 232n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:93:39:
+      93 │ export const maxUint232 = 2n ** 232n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:94:26:
+      94 │ export const maxUint240 = 2n ** 240n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:94:32:
+      94 │ export const maxUint240 = 2n ** 240n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:94:39:
+      94 │ export const maxUint240 = 2n ** 240n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:95:26:
+      95 │ export const maxUint248 = 2n ** 248n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:95:32:
+      95 │ export const maxUint248 = 2n ** 248n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:95:39:
+      95 │ export const maxUint248 = 2n ** 248n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:96:26:
+      96 │ export const maxUint256 = 2n ** 256n - 1n;
+         ╵                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:96:32:
+      96 │ export const maxUint256 = 2n ** 256n - 1n;
+         ╵                                 ~~~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/constants/number.js:96:39:
+      96 │ export const maxUint256 = 2n ** 256n - 1n;
+         ╵                                        ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/estimateMaxPriorityFeePerGas.js:66:35:
+      66 │         if (maxPriorityFeePerGas < 0n)
+         ╵                                    ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/estimateMaxPriorityFeePerGas.js:67:19:
+      67 │             return 0n;
+         ╵                    ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/getTransactionConfirmations.js:37:15:
+      37 │         return 0n;
+         ╵                ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/getTransactionConfirmations.js:38:50:
+      38 │     return blockNumber - transactionBlockNumber + 1n;
+         ╵                                                   ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/waitForTransactionReceipt.js:83:68:
+      83 │ ...          blockNumber - receipt.blockNumber + 1n < confirmations))
+         ╵                                                  ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/waitForTransactionReceipt.js:108:64:
+      108 │ ...         blockNumber - receipt.blockNumber + 1n < confirmations))
+          ╵                                                 ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/waitForTransactionReceipt.js:148:72:
+      148 │ ...         blockNumber - receipt.blockNumber + 1n < confirmations))
+          ╵                                                 ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/waitForTransactionReceipt.js:156:65:
+      156 │ ...                           replacementTransaction.value === 0n) {
+          ╵                                                                ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/watchBlockNumber.js:63:55:
+      63 │ ...        for (let i = prevBlockNumber + 1n; i < blockNumber; i++) {
+         ╵                                           ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/watchEvent.js:75:50:
+      75 │                 previousBlockNumber = fromBlock - 1n;
+         ╵                                                   ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/watchEvent.js:113:65:
+      113 │                                 fromBlock: previousBlockNumber + 1n,
+          ╵                                                                  ~~
+
+X [ERROR] Big integer literals are not available in the configured target environment ("es2015")
+
+    ../../node_modules/viem/_esm/actions/public/watchBlocks.js:68:57:
+      68 │ ...     for (let i = prevBlock?.number + 1n; i < block.number; i++) {
+         ╵                                          ~~
+
+[31mESM[39m [31mBuild failed[39m
+[31mError: Build failed with 399 errors:
+../../node_modules/viem/_esm/actions/public/estimateGas.js:116:31: ERROR: Big integer literals are not available in the configured target environment ("es2015")
+../../node_modules/viem/_esm/actions/public/estimateGas.js:117:23: ERROR: Big integer literals are not available in the configured target environment ("es2015")
+../../node_modules/viem/_esm/actions/public/estimateGas.js:119:68: ERROR: Big integer literals are not available in the configured target environment ("es2015")
+../../node_modules/viem/_esm/actions/public/estimateMaxPriorityFeePerGas.js:66:35: ERROR: Big integer literals are not available in the configured target environment ("es2015")
+../../node_modules/viem/_esm/actions/public/estimateMaxPriorityFeePerGas.js:67:19: ERROR: Big integer literals are not available in the configured target environment ("es2015")
+...
+    at failureErrorWithLog (C:\Users\rober\Documents\GitHub\story-protocol-eliza\node_modules\esbuild\lib\main.js:1476:15)
+    at C:\Users\rober\Documents\GitHub\story-protocol-eliza\node_modules\esbuild\lib\main.js:945:25
+    at runOnEndCallbacks (C:\Users\rober\Documents\GitHub\story-protocol-eliza\node_modules\esbuild\lib\main.js:1316:45)
+    at buildResponseToResult (C:\Users\rober\Documents\GitHub\story-protocol-eliza\node_modules\esbuild\lib\main.js:943:7)
+    at C:\Users\rober\Documents\GitHub\story-protocol-eliza\node_modules\esbuild\lib\main.js:970:16
+    at responseCallbacks.<computed> (C:\Users\rober\Documents\GitHub\story-protocol-eliza\node_modules\esbuild\lib\main.js:622:9)
+    at handleIncomingPacket (C:\Users\rober\Documents\GitHub\story-protocol-eliza\node_modules\esbuild\lib\main.js:677:12)
+    at Socket.readFromStdout (C:\Users\rober\Documents\GitHub\story-protocol-eliza\node_modules\esbuild\lib\main.js:600:7)
+    at Socket.emit (node:events:513:28)
+    at addChunk (node:internal/streams/readable:559:12)[39m
+[34mDTS[39m Build start
+[32mDTS[39m ⚡️ Build success in 3441ms
+[32mDTS[39m [1mdist\index.d.ts [22m[32m2.62 KB[39m
+C:\Users\rober\Documents\GitHub\story-protocol-eliza\packages\client-farcaster:
+ ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL  @ai16z/client-farcaster@0.1.5-alpha.5 build: `tsup --format esm --dts`
+Exit status 1

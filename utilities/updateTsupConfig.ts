@@ -7,12 +7,11 @@ const { namedTypes, builders, visit } = recast.types;
 
 // --------------------------- Configuration ---------------------------
 
-// Set this to the absolute base path where source maps will be referenced from.
-const DIR_SOURCE_MAP_BASE_PATH = ""; // TODO: Set this to your desired absolute path
-const SOURCE_MAP_URL = `${DIR_SOURCE_MAP_BASE_PATH}/[name].js.map`;
+// Set this to your absolute base path. For example, the monorepo "packages" directory:
+const DIR_SOURCE_MAP_BASE_PATH = "/home/rusty/Documents/GitHub/eliza/packages"; // TODO: Set this if needed
 
-// New requirement: Use a const variable for sourcemap value
-const sourceMapVal = "external"; // 'inline', 'external', or another valid value
+// Use a const variable for the sourcemap value
+const sourceMapVal = "inline"; // Could be "inline", "external", etc.
 
 // --------------------------- Helper Functions ---------------------------
 
@@ -67,8 +66,10 @@ async function backupFile(filePath: string) {
 /**
  * Processes a single tsup configuration file:
  * - Parses the file into an AST.
- * - Ensures `sourcemap` is set using the `sourceMapVal` variable.
- * - Ensures a `footer` property as an object with a `js` field for the sourceMappingURL.
+ * - Dynamically determines the workspace name from the filePath.
+ * - Constructs a SOURCE_MAP_URL using the workspace name and appending "/dist/[name].js.map".
+ * - Ensures `sourcemap` is set using `sourceMapVal`.
+ * - Ensures `footer` is an object with a `js` field referencing the dynamically built SOURCE_MAP_URL.
  * - Creates a backup before writing changes back.
  *
  * @param filePath - The path to the tsup configuration file.
@@ -89,8 +90,27 @@ async function processTsupConfig(filePath: string) {
             },
         });
 
-        let sourcemapModified = false; // Tracks if changes are made
+        // Extract the workspace name from the file path
+        // Example: /home/rusty/Documents/GitHub/eliza/packages/plugin-aptos/tsup.config.ts
+        // workspaceName = "plugin-aptos"
+        const workspaceName = path.basename(path.dirname(filePath));
 
+        // Build a workspace-specific SOURCE_MAP_URL
+        // For example: /home/rusty/Documents/GitHub/eliza/packages/plugin-aptos/dist/[name].js.map
+        const SOURCE_MAP_URL = `${DIR_SOURCE_MAP_BASE_PATH}/${workspaceName}/dist/[name].js.map`;
+
+        let contentsModified = false; // Tracks if changes are made
+
+        // This function returns TRUE if the given AST node matches
+        //  the given property name, FALSE if not.
+        function isPropNameMatch(prop: ObjectProperty, propName: string): boolean {
+            const retVal = namedTypes.Identifier.check(prop.key) && prop.key.name === propName ||
+            prop.value?.value === propName;
+
+            return retVal;
+        }
+
+        // VISIT PASS 1: Modify existing properties as needed, but don't filter out node properties.
         visit(ast, {
             visitCallExpression(path) {
                 const { node } = path;
@@ -106,27 +126,26 @@ async function processTsupConfig(filePath: string) {
                     if (args.length === 1 && namedTypes.ObjectExpression.check(args[0])) {
                         const configObject = args[0];
 
-                        // Filter properties to only include ones that are Property or ObjectProperty
-                        const configProps = configObject.properties.filter((p): p is recast.types.namedTypes.Property | recast.types.namedTypes.ObjectProperty => {
-                            return namedTypes.Property.check(p) || namedTypes.ObjectProperty.check(p);
+                        // Filter properties to only include Property or ObjectProperty nodes
+                        let configProps = configObject.properties.filter(
+                            (prop): prop is recast.types.namedTypes.Property | recast.types.namedTypes.ObjectProperty => {
+                            return namedTypes.Property.check(prop) || namedTypes.ObjectProperty.check(prop);
                         });
 
                         // Modify existing sourcemap or footer if they exist
                         for (const prop of configProps) {
                             // Check if this is the 'sourcemap' property
                             if (
-                                (namedTypes.Identifier.check(prop.key) && prop.key.name === "sourcemap") ||
-                                (namedTypes.Literal.check(prop.key) && prop.key.value === "sourcemap")
+                                isPropNameMatch(prop, "sourcemap")
                             ) {
                                 prop.value = builders.literal(sourceMapVal);
-                                sourcemapModified = true;
+                                contentsModified = true;
                                 console.log(`🔧 Modified sourcemap setting in ${filePath} to '${sourceMapVal}'`);
                             }
 
                             // Check if this is the 'footer' property
                             if (
-                                (namedTypes.Identifier.check(prop.key) && prop.key.name === "footer") ||
-                                (namedTypes.Literal.check(prop.key) && prop.key.value === "footer")
+                                isPropNameMatch(prop, "footer")
                             ) {
                                 // `footer` must be an object with a `js` field
                                 const footerObject = builders.objectExpression([
@@ -137,16 +156,15 @@ async function processTsupConfig(filePath: string) {
                                 ]);
 
                                 prop.value = footerObject;
-                                sourcemapModified = true;
-                                console.log(`🔧 Modified footer to an object with js field in ${filePath}`);
+                                contentsModified = true;
+                                console.log(`🔧 Modified footer to use ${SOURCE_MAP_URL} in ${filePath}`);
                             }
                         }
 
                         // Check if 'sourcemap' property exists after modifications
                         const hasSourcemap = configProps.some(
                             (prop) =>
-                                (namedTypes.Identifier.check(prop.key) && prop.key.name === "sourcemap") ||
-                                (namedTypes.Literal.check(prop.key) && prop.key.value === "sourcemap")
+                                isPropNameMatch(prop, "sourcemap")
                         );
 
                         if (!hasSourcemap) {
@@ -156,18 +174,19 @@ async function processTsupConfig(filePath: string) {
                                     builders.literal(sourceMapVal)
                                 )
                             );
-                            sourcemapModified = true;
+                            contentsModified = true;
                             console.log(`🔧 Added sourcemap: "${sourceMapVal}" to ${filePath}`);
                         }
 
                         // Check if 'footer' property exists after modifications
                         const hasFooter = configProps.some(
                             (prop) =>
-                                (namedTypes.Identifier.check(prop.key) && prop.key.name === "footer") ||
-                                (namedTypes.Literal.check(prop.key) && prop.key.value === "footer")
+                                isPropNameMatch(prop, "footer")
                         );
 
-                        if (!hasFooter) {
+                        // If we are not using "inline" source maps and the
+                        //  config file does not have a footer, add one.
+                        if (sourceMapVal !== "inline" && !hasFooter) {
                             // Create footer as an object with a js field
                             const footerObject = builders.objectExpression([
                                 builders.objectProperty(
@@ -182,8 +201,8 @@ async function processTsupConfig(filePath: string) {
                                     footerObject
                                 )
                             );
-                            sourcemapModified = true;
-                            console.log(`🔧 Added footer as an object with a js field to ${filePath}`);
+                            contentsModified = true;
+                            console.log(`🔧 Added footer with ${SOURCE_MAP_URL} to ${filePath}`);
                         }
 
                         return false; // Stop traversing this defineConfig call
@@ -194,7 +213,30 @@ async function processTsupConfig(filePath: string) {
             },
         });
 
-        if (sourcemapModified) {
+        // VISIT PASS 2: Filter out unwanted properties, if required.
+        if (sourceMapVal === "inline") {
+            visit(ast, {
+                visitObjectExpression(path) {
+                    const {node} = path;
+
+                    // Filter properties to remove the "footer" property
+                    node.properties = node.properties.filter((prop) => {
+
+                        const bKeepProperty = !isPropNameMatch(prop, "footer");
+
+                        if (!bKeepProperty)
+                            // We have changed the tree.
+                            contentsModified = true;
+
+                        return bKeepProperty;
+                    });
+
+                    return false; // Stop traversal here
+                },
+            });
+        }
+
+        if (contentsModified) {
             // Create a backup before writing changes
             await backupFile(filePath);
 
