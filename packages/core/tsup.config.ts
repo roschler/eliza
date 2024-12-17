@@ -8,6 +8,7 @@ export default defineConfig({
 
     // Ensure you're targeting CommonJS
     format: ["esm"],
+    tsconfig: "tsconfig.json", // Ensure tsconfig is used
 
     external: [
         "dotenv", // Externalize dotenv to prevent bundling

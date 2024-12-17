@@ -15,14 +15,19 @@
         "forceConsistentCasingInFileNames": false,
         "allowImportingTsExtensions": true,
         "declaration": true,
-        "emitDeclarationOnly": true,
+        "emitDeclarationOnly": false,
         "resolveJsonModule": true,
         "noImplicitAny": false,
         "allowJs": true,
         "checkJs": false,
         "noEmitOnError": false,
         "moduleDetection": "force",
-        "allowArbitraryExtensions": true
+        "allowArbitraryExtensions": true,
+
+
+
+        "sourceMap": true,
+        "inlineSources": true
     },
     "include": [
         "src/**/*"
