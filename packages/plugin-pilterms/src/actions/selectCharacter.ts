@@ -9,6 +9,7 @@ import {
     type State, generateText,
 } from "@ai16z/eliza";
 import { pickLicenseTemplate } from "../templates";
+import {ActorActionDetails} from "../system/types.ts";
 
 export { pickLicenseTemplate };
 
@@ -25,6 +26,45 @@ const ACTION_NAME_SELECT_CHARACTER_TATE = "SELECT_CHARACTER_TATE";
 const ACTION_NAME_SELECT_CHARACTER_TRUMP = "SELECT_CHARACTER_TRUMP";
 
 // -------------------------- END  : ACTION NAMES for CHARACTERS ------------------------
+
+// section_
+
+/**
+ * Type representing a string or null.
+ */
+type StringOrNull = string | null;
+
+// -------------------------- BEGIN: HELPER FUNCTIONS ------------------------
+
+/**
+ * Given a State object, extract, if any, the name found in the
+ *  last request to select a new character.  Note, the request
+ *  MUST be found in the most recent message. (i.e. - The most
+ *  recent message that carries the "(just now)" time prefix).
+ *
+ * @param state - The state variable that contains the message
+ *  data we will inspect.
+ *
+ * @returns - Returns NULL if a most recent select character action
+ *  could not be found.  Otherwise, the name of the character
+ *  found in that command is returned, lowercase.
+ */
+function extractLastSelectCharacterActionName(state: State): StringOrNull
+{
+    // Get the most recent select character details.
+    const x = ActorActionDetails.extractRecentActorAction(state.recentMessages);
+
+    if (!x)
+        // None found.
+        return null;
+
+    // Get the name of the character to switch to.
+    const targetCharacterNameLowercase =
+        ActorActionDetails.extractLastSelectCharacterActionName()
+
+}
+
+// -------------------------- END  : HELPER FUNCTIONS ------------------------
 
 // -------------------- BEGIN: ACTION, SELECT CHARACTER ------------
 
@@ -47,7 +87,7 @@ export const selectCharacterAction = {
 
         elizaLogger.log(`Starting SELECT CHARACTER handler...`);
 
-        const characterName = 'NONCE_CHARACTER_TATE';
+        let characterName = "":
 
         try {
             // initialize or update state
@@ -57,6 +97,15 @@ export const selectCharacterAction = {
                 state = (await runtime.composeState(message)) as State;
             } else {
                 state = await runtime.updateRecentMessageState(state);
+            }
+
+            // Extract the specified character name from the most recent message
+            //  from the pickLicense actor.
+            const lastActorActionDetailsObj =
+                ActorActionDetails.extractRecentActorAction(state.recentMessages);
+
+            if (lastActorActionDetailsObj) {
+                characterName = lastActorActionDetailsObj.targetCharacterName;
             }
 
             if (bVerbose) {
