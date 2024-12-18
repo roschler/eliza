@@ -2,6 +2,7 @@ export * from "./actions/pickLicense";
 export * from "./types";
 
 import type { Plugin } from "@ai16z/eliza";
+import {selectCharacterAction} from "./actions/selectCharacter.ts";
 import { pilTermsInterviewAction } from "./actions/pickLicense";
 
 export const pilTermsPlugin: Plugin = {
@@ -10,7 +11,7 @@ export const pilTermsPlugin: Plugin = {
     providers: [],
     evaluators: [],
     services: [],
-    actions: [pilTermsInterviewAction],
+    actions: [pilTermsInterviewAction, selectCharacterAction],
 };
 
 export default pilTermsPlugin;
