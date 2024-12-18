@@ -54,6 +54,7 @@ import readline from "readline";
 import { fileURLToPath } from "url";
 import yargs from "yargs";
 import pilTermsPlugin from "@ai16z/plugin-pilterms";
+import {DIR_DATA, initializeDatabase, prepareDatabase} from "./database-helpers.ts";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
@@ -277,34 +278,6 @@ export function getTokenForProvider(
     }
 }
 
-function initializeDatabase(dataDir: string) {
-    if (process.env.POSTGRES_URL) {
-        elizaLogger.info("Initializing PostgreSQL connection...");
-        const db = new PostgresDatabaseAdapter({
-            connectionString: process.env.POSTGRES_URL,
-            parseInputs: true,
-        });
-
-        // Test the connection
-        db.init()
-            .then(() => {
-                elizaLogger.success(
-                    "Successfully connected to PostgreSQL database"
-                );
-            })
-            .catch((error) => {
-                elizaLogger.error("Failed to connect to PostgreSQL:", error);
-            });
-
-        return db;
-    } else {
-        const filePath =
-            process.env.SQLITE_FILE ?? path.resolve(dataDir, "db.sqlite");
-        // ":memory:";
-        const db = new SqliteDatabaseAdapter(new Database(filePath));
-        return db;
-    }
-}
 
 export async function initializeClients(
     character: Character,
@@ -447,6 +420,15 @@ function intializeDbCache(character: Character, db: IDatabaseCacheAdapter) {
     return cache;
 }
 
+/**
+ * Start an agent using the specified character and client.
+ *
+ * @param character - The desired character.
+ * @param directClient - The desired direct client.
+ *
+ * @return {Promise<any[]>}  - Returns an array of the
+ *  available clients for use with this agent.
+ */
 async function startAgent(character: Character, directClient) {
     let db: IDatabaseAdapter & IDatabaseCacheAdapter;
     try {
@@ -454,24 +436,22 @@ async function startAgent(character: Character, directClient) {
         character.username ??= character.name;
 
         const token = getTokenForProvider(character.modelProvider, character);
-        const dataDir = path.join(__dirname, "../data");
 
-        if (!fs.existsSync(dataDir)) {
-            fs.mkdirSync(dataDir, { recursive: true });
-        }
+        // Prepare a shared database for use for this agent.
+        db = await prepareDatabase();
 
-        db = initializeDatabase(dataDir) as IDatabaseAdapter &
-            IDatabaseCacheAdapter;
-
-        await db.init();
-
+        // Create a cache for the database to speed up database operations.
         const cache = intializeDbCache(character, db);
+
+        // Create an AgentRuntime object to represent the agent.
         const runtime = createAgent(character, db, cache, token);
 
         await runtime.initialize();
 
         const clients = await initializeClients(character, runtime);
 
+        // Register the agent so the rest of the code base can interact with
+        //  it easily.
         directClient.registerAgent(runtime);
 
         return clients;

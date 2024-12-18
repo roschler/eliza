@@ -1,0 +1,15 @@
+// Some general notes about the Eliza architecture.  Not official documentation.
+
+LOGGING
+
+Use elizaLogger.debug() to log messages that will only appear when the agent is launched in debug mode (i.e. - setting the DEBUG environment variable.  See the monorepo top level package.json file).
+
+CHARACTERS
+
+The characters, if any, used by the current agent are specified with the --characters command line argument:
+
+--characters="characters/trump.character.json, characters/sppicklicense.character.json"
+
+You specify one or more comma-delimited relative paths to the character files you want your agent to use.  The first one in the list is the one that is initially active.  An agent runtime is created for each agent (see startAgents()).
+
+Active character: Initially the first character, if any, listed in the --characters argument is active.  At least at the time that this wa written that is how the direct client configures things at startup.  If you look at most of the handlers in the code (e.g. - evaluators, providers, etc.) they are passed an instance of IAgentRuntime as the first parameter to the function.  That is the object that contains the active character.

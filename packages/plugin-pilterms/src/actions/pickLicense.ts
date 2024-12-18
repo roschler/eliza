@@ -67,7 +67,7 @@ export const pilTermsInterviewAction = {
             });
 
             if (bVerbose) {
-                elizaLogger.log(`${errPrefix}Making pick license LLM call with context: `, context);
+                elizaLogger.log(`${errPrefix}Getting available licenses from STORY PROTOCOL plugin: `, context);
             }
 
             // Make the LLM call.
@@ -82,9 +82,10 @@ export const pilTermsInterviewAction = {
                 elizaLogger.log(`${errPrefix}Response received: `, response);
             }
 
-            // if license terms were already attached
+            // Test Story Protocol plugin
             callback?.({
-                text: `${errPrefix}Not implemented yet but pizza is nice!`,
+                text: `${errPrefix}Test Story Protocol license retrieval.`,
+                action: "GET_AVAILABLE_LICENSE"
             });
             return true;
         } catch (e) {

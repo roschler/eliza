@@ -39,13 +39,16 @@ export class GetAvailableLicensesAction {
     async getAvailableLicenses(
         params: GetAvailableLicensesParams
     ): Promise<GetAvailableLicensesResponse> {
+
+        const fetchUrl = `${API_URL}/${RESOURCE_TYPE.IP_LICENSE_DETAILS}`;
+
         elizaLogger.log(
             "Fetching from",
-            `${API_URL}/${RESOURCE_TYPE.IP_LICENSE_DETAILS}`
+            fetchUrl
         );
 
         const response = await fetch(
-            `${API_URL}/${RESOURCE_TYPE.IP_LICENSE_DETAILS}`,
+            fetchUrl,
             {
                 method: "POST",
                 headers: {
