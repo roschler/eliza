@@ -36,34 +36,6 @@ type StringOrNull = string | null;
 
 // -------------------------- BEGIN: HELPER FUNCTIONS ------------------------
 
-/**
- * Given a State object, extract, if any, the name found in the
- *  last request to select a new character.  Note, the request
- *  MUST be found in the most recent message. (i.e. - The most
- *  recent message that carries the "(just now)" time prefix).
- *
- * @param state - The state variable that contains the message
- *  data we will inspect.
- *
- * @returns - Returns NULL if a most recent select character action
- *  could not be found.  Otherwise, the name of the character
- *  found in that command is returned, lowercase.
- */
-function extractLastSelectCharacterActionName(state: State): StringOrNull
-{
-    // Get the most recent select character details.
-    const x = ActorActionDetails.extractRecentActorAction(state.recentMessages);
-
-    if (!x)
-        // None found.
-        return null;
-
-    // Get the name of the character to switch to.
-    const targetCharacterNameLowercase =
-        ActorActionDetails.extractLastSelectCharacterActionName()
-
-}
-
 // -------------------------- END  : HELPER FUNCTIONS ------------------------
 
 // -------------------- BEGIN: ACTION, SELECT CHARACTER ------------
@@ -87,7 +59,7 @@ export const selectCharacterAction = {
 
         elizaLogger.log(`Starting SELECT CHARACTER handler...`);
 
-        let characterName = "":
+        let characterName = "";
 
         try {
             // initialize or update state
@@ -102,10 +74,10 @@ export const selectCharacterAction = {
             // Extract the specified character name from the most recent message
             //  from the pickLicense actor.
             const lastActorActionDetailsObj =
-                ActorActionDetails.extractRecentActorAction(state.recentMessages);
+                ActorActionDetails.extractRecentActorAction(state);
 
             if (lastActorActionDetailsObj) {
-                characterName = lastActorActionDetailsObj.targetCharacterName;
+                characterName = lastActorActionDetailsObj.nameOfDesiredCharacter;
             }
 
             if (bVerbose) {

@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
     entry: ["src/index.ts"],
     outDir: "dist",
-    sourcemap: "inline",
+    sourcemap: true,
     clean: true,
 
     // Ensure you're targeting CommonJS
@@ -19,5 +19,9 @@ export default defineConfig({
         "http",
         "agentkeepalive",
         // Add other modules you want to externalize
-    ]
+    ],
+
+    footer: {
+        js: "//# sourceMappingURL=/home/rusty/Documents/GitHub/eliza/packages/adapter-sqljs/dist/index.js.map"
+    }
 });

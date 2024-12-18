@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
     entry: ["src/index.ts"],
     outDir: "dist",
-    sourcemap: "inline",
+    sourcemap: true,
     clean: true,
 
     // Ensure you're targeting CommonJS
@@ -20,5 +20,9 @@ export default defineConfig({
         "agentkeepalive",
         "uuid",
         // Add other modules you want to externalize
-    ]
+    ],
+
+    footer: {
+        js: "//# sourceMappingURL=/home/rusty/Documents/GitHub/eliza/packages/adapter-supabase/dist/index.js.map"
+    }
 });

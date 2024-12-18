@@ -23,11 +23,9 @@
         "noEmitOnError": false,
         "moduleDetection": "force",
         "allowArbitraryExtensions": true,
-
-
-
-        "sourceMap": true,
-        "inlineSources": true
+        // Do not compete with tsup for source map settings!
+        // "sourceMap": true,
+        // "inlineSources": true
     },
     "include": [
         "src/**/*"

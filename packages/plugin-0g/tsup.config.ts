@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
     entry: ["src/index.ts"],
     outDir: "dist",
-    sourcemap: "inline",
+    sourcemap: true,
     clean: true,
 
     // Ensure you're targeting CommonJS
@@ -12,5 +12,9 @@ export default defineConfig({
     external: [
         "@0glabs/0g-ts-sdk",
         // Add other modules you want to externalize
-    ]
+    ],
+
+    footer: {
+        js: "//# sourceMappingURL=/home/rusty/Documents/GitHub/eliza/packages/plugin-0g/dist/index.js.map"
+    }
 });

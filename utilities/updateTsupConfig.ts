@@ -8,40 +8,65 @@ const { namedTypes, builders, visit } = recast.types;
 // --------------------------- Configuration ---------------------------
 
 // Set this to your absolute base path. For example, the monorepo "packages" directory:
-const DIR_SOURCE_MAP_BASE_PATH = "/home/rusty/Documents/GitHub/eliza/packages"; // TODO: Set this if needed
+const DIR_SOURCE_MAP_BASE_PATH_PACKAGES = "/home/rusty/Documents/GitHub/eliza/packages";
+const DIR_SOURCE_MAP_BASE_PATH_AGENT = "/home/rusty/Documents/GitHub/eliza";
 
 // Use a const variable for the sourcemap value
-const sourceMapVal = "inline"; // Could be "inline", "external", etc.
+const sourceMapVal = true; // Could be "inline", "external", etc.
+
+// This variable must hold the name of the workspace directory that holds the
+//  app workspace, which is the workspace that consumes the workspaces in the
+//  "packages" workspaces.
+const appWorkSpaceName = "agent";
 
 // --------------------------- Helper Functions ---------------------------
 
 /**
- * Validates the DIR_SOURCE_MAP_BASE_PATH.
+ * Validates the DIR_SOURCE_MAP_BASE_PATH_PACKAGES.
  * - Throws an error if the path is empty.
  * - Throws an error if the path does not exist or is not a directory.
  */
 async function validateSourceMapBasePath() {
-    if (!DIR_SOURCE_MAP_BASE_PATH) {
+    if (!appWorkSpaceName) {
         throw new Error(
-            "❌ ERROR: DIR_SOURCE_MAP_BASE_PATH is empty. Please set it to an absolute path."
+            "❌ ERROR: appWorkSpaceName is empty. Please set it the name of the main app workspace (see that workspace's 'name' field in its package.json file."
+        );
+    }
+
+    if (!DIR_SOURCE_MAP_BASE_PATH_AGENT) {
+        throw new Error(
+            "❌ ERROR: DIR_SOURCE_MAP_BASE_PATH_AGENT is empty. Please set it to an absolute path."
+        );
+    }
+
+    if (!DIR_SOURCE_MAP_BASE_PATH_PACKAGES) {
+        throw new Error(
+            "❌ ERROR: DIR_SOURCE_MAP_BASE_PATH_PACKAGES is empty. Please set it to an absolute path."
         );
     }
 
     try {
-        const stats = await fs.stat(DIR_SOURCE_MAP_BASE_PATH);
+        const stats = await fs.stat(DIR_SOURCE_MAP_BASE_PATH_AGENT);
         if (!stats.isDirectory()) {
             throw new Error(
-                `❌ ERROR: DIR_SOURCE_MAP_BASE_PATH (${DIR_SOURCE_MAP_BASE_PATH}) exists but is not a directory.`
+                `❌ ERROR: DIR_SOURCE_MAP_BASE_PATH (${DIR_SOURCE_MAP_BASE_PATH_AGENT}) exists but is not a directory.`
+            );
+        }
+
+        const stats_2 = await fs.stat(DIR_SOURCE_MAP_BASE_PATH_PACKAGES);
+        if (!stats.isDirectory()) {
+            throw new Error(
+                `❌ ERROR: DIR_SOURCE_MAP_BASE_PATH (${DIR_SOURCE_MAP_BASE_PATH_PACKAGES}) exists but is not a directory.`
             );
         }
     } catch (err: any) {
         if (err.code === "ENOENT") {
             throw new Error(
-                `❌ ERROR: DIR_SOURCE_MAP_BASE_PATH (${DIR_SOURCE_MAP_BASE_PATH}) does not exist.`
+                `❌ ERROR: DIR_SOURCE_MAP_BASE_PATH (${DIR_SOURCE_MAP_BASE_PATH_PACKAGES}) does not exist.`
             );
         } else {
             throw new Error(
-                `❌ ERROR: Unable to access DIR_SOURCE_MAP_BASE_PATH (${DIR_SOURCE_MAP_BASE_PATH}): ${err.message}`
+                `❌ ERROR: Unable to access DIR_SOURCE_MAP_BASE_PATH (${DIR_SOURCE_MAP_BASE_PATH_PACKAGES}): ${err.message}`
             );
         }
     }
@@ -95,9 +120,17 @@ async function processTsupConfig(filePath: string) {
         // workspaceName = "plugin-aptos"
         const workspaceName = path.basename(path.dirname(filePath));
 
+        // Determine the correct absolute path based on whether or not
+        //  we are processing the main app workspace, or one of the
+        //  packages workspaces.
+        const basePathDir =
+            workspaceName === appWorkSpaceName
+                ? DIR_SOURCE_MAP_BASE_PATH_AGENT
+                : DIR_SOURCE_MAP_BASE_PATH_PACKAGES;
+
         // Build a workspace-specific SOURCE_MAP_URL
         // For example: /home/rusty/Documents/GitHub/eliza/packages/plugin-aptos/dist/[name].js.map
-        const SOURCE_MAP_URL = `${DIR_SOURCE_MAP_BASE_PATH}/${workspaceName}/dist/[name].js.map`;
+        const SOURCE_MAP_URL = `${basePathDir}/${workspaceName}/dist/index.js.map`;
 
         let contentsModified = false; // Tracks if changes are made
 
@@ -286,7 +319,7 @@ async function findAndProcessConfigs(dir: string) {
 
 /**
  * Main function:
- * - Validates DIR_SOURCE_MAP_BASE_PATH.
+ * - Validates DIR_SOURCE_MAP_BASE_PATH_PACKAGES.
  * - Initiates the search from the current working directory.
  * - Processes all tsup config files found.
  */
@@ -295,7 +328,7 @@ async function main() {
         console.log(`🚀 Validating DIR_SOURCE_MAP_BASE_PATH...`);
         await validateSourceMapBasePath();
 
-        console.log(`✅ DIR_SOURCE_MAP_BASE_PATH is set to: ${DIR_SOURCE_MAP_BASE_PATH}`);
+        console.log(`✅ DIR_SOURCE_MAP_BASE_PATH is set to: ${DIR_SOURCE_MAP_BASE_PATH_PACKAGES}`);
         const startDir = process.cwd();
         console.log(`🚀 Searching for tsup.config.js/ts in ${startDir}`);
 

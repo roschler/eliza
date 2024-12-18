@@ -1,12 +1,51 @@
 // Some types we use throughout our plugin.
 
+import {State} from "@ai16z/eliza";
+
 export type BooleanOrNull = boolean | null;
 export type NumberOrNull = number | null;
 export type StringOrNull = string | null;
 
 // -------------------------- BEGIN: HELPER FUNCTIONS ------------------------
 
+/**
+ * Extracts the character name from a SELECT CHARACTER action
+ *  name.
+ *
+ * The function expects an action name in the format:
+ *
+ *     SELECT_CHARACTER_<character name in uppercase>
+ *
+ *      For example: SELECT_CHARACTER_TRUMP
+ *
+ * If the pattern matches, it returns the character name
+ *  in lowercase. Otherwise, it returns null.
+ *
+ * @param theActionName - The input string to extract the
+ *  character name from.
+ *
+ * @returns The extracted character name in lowercase, or NULL if no
+ *  match is found.
+ */
+function extractDesiredCharacterNameFromActionName(theActionName: string): StringOrNull {
+    // Define a regular expression with the following components:
+    // \(SELECT_CHARACTER_    => Matches "(SELECT_CHARACTER_"
+    // ([A-Z]+)               => Captures one or more uppercase letters as the character name
+    // \)                     => Matches the closing parenthesis ")"
+    // $                      => Ensures the string ends here
+    const regex = /SELECT_CHARACTER_([A-Z]+)$/;
 
+    // Execute the regex on the input string
+    const match = theActionName.match(regex);
+
+    // If a match is found, return the captured group in lowercase
+    if (match && match[1]) {
+        return match[1].trim().toLowerCase();
+    }
+
+    // If no match is found, return null
+    return null;
+}
 
 /**
  * Extracts the character name from a formatted string.
@@ -22,7 +61,7 @@ export type StringOrNull = string | null;
  * @param str - The input string to extract the character name from.
  * @returns The extracted character name in lowercase, or null if no match is found.
  */
-function extractSelectCharacterName(str: string): StringOrNull {
+function extractDesiredCharacterNameFromRecentMessage(str: string): StringOrNull {
     // Define a regular expression with the following components:
     // ^PickLicense           => Ensures the string starts with "PickLicense"
     // .*?                    => Non-greedy match for any characters in between
@@ -37,7 +76,7 @@ function extractSelectCharacterName(str: string): StringOrNull {
 
     // If a match is found, return the captured group in lowercase
     if (match && match[1]) {
-        return match[1].toLowerCase();
+        return match[1].trim().toLowerCase();
     }
 
     // If no match is found, return null
@@ -59,7 +98,7 @@ type ActorActionDetailsOrNull = ActorActionDetails | null;
 export class ActorActionDetails {
     public refCode: string;
     public actorName: string;
-    public targetCharacterName: string;
+    public nameOfDesiredCharacter: string;
     public sentenceFound: string;
     public actionName: string;
 
@@ -79,9 +118,9 @@ export class ActorActionDetails {
 
         // Get the target actor name from the action name and then
         //  lowercase and trim it.
-        this.targetCharacterName = extractSelectCharacterName(this.actionName) ?? "";
+        this.nameOfDesiredCharacter = extractDesiredCharacterNameFromActionName(this.actionName) ?? "";
 
-        this.targetCharacterName = this.targetCharacterName.trim().toLowerCase();
+        this.nameOfDesiredCharacter = this.nameOfDesiredCharacter.trim().toLowerCase();
     }
 
     /**
@@ -93,10 +132,12 @@ export class ActorActionDetails {
      * If a valid match is found and all captured fields are non-empty, it returns an instance of ActorActionDetails.
      * Otherwise, it returns null after logging appropriate warnings.
      *
-     * @param str - The input string to extract actor action details from.
-     * @returns An instance of ActorActionDetails if extraction is successful and all fields are non-empty; otherwise, null.
+     * @param state - The state object for the current chat volley.
+     *
+     * @returns An instance of ActorActionDetails if extraction is
+     *  successful and all fields are non-empty; otherwise, null.
      */
-    public static extractRecentActorAction(str: string): ActorActionDetailsOrNull {
+    public static extractRecentActorAction(state: State): ActorActionDetailsOrNull {
         /**
          * Regular Expression Breakdown:
          * ^\(just now\)          => Asserts that the line starts with "(just now)"
@@ -119,8 +160,8 @@ export class ActorActionDetails {
         let match: RegExpExecArray | null;
         let lastMatch: RegExpExecArray | null = null;
 
-        // Iterate through all matches to find the last one
-        while ((match = regex.exec(str)) !== null) {
+        // Find the most recent message.
+        while ((match = regex.exec(state.recentMessages)) !== null) {
             lastMatch = match;
         }
 
@@ -162,16 +203,6 @@ export class ActorActionDetails {
         );
 
         return actorActionDetails;
-    }
-
-    public static extractRecentSelectCharacterName(str: string) : StringOrNull {
-        const actorActorDetailsObj =
-            this.extractRecentActorAction(str);
-
-        if (actorActorDetailsObj)
-            // Return the target character's name found in the select
-            //  character action.
-            return actorActorDetailsObj.
     }
 }
 

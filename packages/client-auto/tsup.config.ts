@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
     entry: ["src/index.ts"],
     outDir: "dist",
-    sourcemap: "inline",
+    sourcemap: true,
     clean: true,
 
     // Ensure you're targeting CommonJS
@@ -26,5 +26,9 @@ export default defineConfig({
         "rpc-websockets",
         "@solana/web3.js",
         // Add other modules you want to externalize
-    ]
+    ],
+
+    footer: {
+        js: "//# sourceMappingURL=/home/rusty/Documents/GitHub/eliza/packages/client-auto/dist/index.js.map"
+    }
 });

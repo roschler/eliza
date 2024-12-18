@@ -3,7 +3,10 @@ import { defineConfig } from "tsup";
 export default defineConfig({
     entry: ["src/index.ts"],
     outDir: "dist",
-    sourcemap: "inline",
+
+    // Do not enable source maps here or we will end up with two
+    //  source map URLs, since tsup is doing the same thing.
+    // sourcemap: true,
     clean: true,
 
     // Ensure you're targeting CommonJS
@@ -20,5 +23,11 @@ export default defineConfig({
         "agentkeepalive",
         "uuid",
         // Add other modules you want to externalize
-    ]
+    ],
+
+    footer: {
+        js: "//# sourceMappingURL=/home/rusty/Documents/GitHub/eliza/packages/adapter-postgres/dist/index.js.map"
+    },
+
+    sourcemap: true
 });

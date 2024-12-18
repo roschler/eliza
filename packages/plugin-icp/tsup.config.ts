@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
     entry: ["src/index.ts"],
     outDir: "dist",
-    sourcemap: "inline",
+    sourcemap: true,
     clean: true,
 
     // Ensure you're targeting CommonJS
@@ -18,5 +18,9 @@ export default defineConfig({
         "https",
         "http",
         "agentkeepalive",
-    ]
+    ],
+
+    footer: {
+        js: "//# sourceMappingURL=/home/rusty/Documents/GitHub/eliza/packages/plugin-icp/dist/index.js.map"
+    }
 });
