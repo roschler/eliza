@@ -6,9 +6,7 @@ Use elizaLogger.debug() to log messages that will only appear when the agent is 
 
 MESSAGE TEMPLATES
 
-Each character JSON file has a "template:" field. This is where you put the template that is used to build the prompt to the LLM.  Any words surrounded by double braces (e.g. - {{recentMessages}}) is a substitution variable.  When you call composeContext(), the values found in the current state of the system needed byt he message template will be merged into that template to create the final LLM prompt.  Note, the current state data is found in the "state" variable passed to the action handler,
-
-NOTE: If you omit the "template:" field the system will use the default message template, which attempts to combine the main elements of a character (e.g. - "bio", "lore", "examples", etc.) along with the recent message history to converse with the user.
+Each character JSON file has a "system:" field. This is where you put the template that is used to build the prompt to the LLM.  Any words surrounded by double braces (e.g. - {{recentMessages}}) is a substitution variable.  When you call composeContext(), the values found in the current state of the system needed byt he message template will be merged into that template to create the final LLM prompt.  Note, the current state data is found in the "state" variable passed to the action handler,
 
 CHARACTERS
 
@@ -23,3 +21,11 @@ Active character: Initially the first character, if any, listed in the --charact
 CHARACTER TO AGENT RELATIONSHIP
 
 When Eliza starts up, it creates an agent for each character specified in the --characters command line argument.  Therefore, the idea of switching characters actually means switching agents (AgentRuntime instances), and specifically, switching to the agent that was started with the desired character.
+
+ACTIONS
+
+An action handler returns a true/false response.  Do not expect an action to be able to emit a { text: <text>, action: <action> } message and expect it to be processed when using the callback?() function.  That processing is an artifact of the client.  For example, see the "/message" server route in the direct client.
+
+MEMORIES
+
+Actions that want to trigger other actions must copy the memory creation and action triggering code like that found in the direct client.  processActions() is what actually makes the calls to the target action handlers belonging to the actions found in the last response.s

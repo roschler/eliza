@@ -1,3 +1,5 @@
+import {elizaLogger} from "./utils.ts";
+
 const jsonBlockPattern = /```json\n([\s\S]*?)\n```/;
 
 export const messageCompletionFooter = `\nResponse format should be formatted in a JSON block like this:
@@ -115,6 +117,8 @@ export function parseJSONObjectFromText(
 
     if (jsonBlockMatch) {
         try {
+            elizaLogger.debug(`Parsing JSON object: `, jsonBlockMatch[1]);
+
             jsonData = JSON.parse(jsonBlockMatch[1]);
         } catch (e) {
             console.error("Error parsing JSON:", e);

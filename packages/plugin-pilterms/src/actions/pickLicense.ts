@@ -6,7 +6,7 @@ import {
     ModelClass,
     type IAgentRuntime,
     type Memory,
-    type State, generateText,
+    type State, generateText, generateMessageResponse,
 } from "@ai16z/eliza";
 import { pickLicenseTemplate } from "../templates";
 
@@ -35,7 +35,7 @@ export const pilTermsInterviewAction = {
     ): Promise<boolean> => {
         const errPrefix = `(pickLicense::handler) `;
 
-        elizaLogger.log(`Starting ${ACTION_NAME_STORY_PROTOCOL_INTERVIEW} handler...`);
+        elizaLogger.log(`DEPRECATED: Starting ${ACTION_NAME_STORY_PROTOCOL_INTERVIEW} handler...`);
 
         try {
             // initialize or update state
@@ -55,23 +55,21 @@ export const pilTermsInterviewAction = {
                 template: pickLicenseTemplate,
             });
 
+            /*
             const content = await generateObjectDEPRECATED({
                 runtime,
                 context: pilTermsContext,
                 modelClass: ModelClass.SMALL,
             });
+            */
 
             const context = composeContext({
                 state,
                 template: pickLicenseTemplate,
             });
 
-            if (bVerbose) {
-                elizaLogger.log(`${errPrefix}Getting available licenses from STORY PROTOCOL plugin: `, context);
-            }
-
-            // Make the LLM call.
-            const response = await generateText({
+            // Make the LLM call. The expected response is a JSON response.
+            const jsonResponse = await generateMessageResponse({
                 runtime,
                 context,
                 modelClass: ModelClass.LARGE,
@@ -79,7 +77,36 @@ export const pilTermsInterviewAction = {
 
             if (bVerbose) {
                 // Process the response.
-                elizaLogger.log(`${errPrefix}Response received: `, response);
+                elizaLogger.log(`${errPrefix}Response object received: `, jsonResponse);
+            }
+
+            if (jsonResponse  && jsonResponse.hasOwnProperty("text") && jsonResponse.hasOwnProperty("action")) {
+                if (bVerbose) {
+                    // Process the response.
+                    elizaLogger.log(`${errPrefix}Emitting response received as it.`);
+                }
+
+                // Return the response.
+                return false;
+            } else {
+                if (bVerbose) {
+                    // Process the response.
+                    elizaLogger.log(`${errPrefix}Response object was invalid.  Asking user to try again.`);
+                }
+
+                // Unknown JSON object response.
+                return false;
+            }
+
+            /*
+            const response = await generateText({
+                runtime,
+                context,
+                modelClass: ModelClass.LARGE,
+            });
+
+            if (bVerbose) {
+                elizaLogger.log(`${errPrefix}Getting available licenses from STORY PROTOCOL plugin: `, context);
             }
 
             // Test Story Protocol plugin
@@ -87,7 +114,7 @@ export const pilTermsInterviewAction = {
                 text: `${errPrefix}Test Story Protocol license retrieval.`,
                 action: "GET_AVAILABLE_LICENSE"
             });
-            return true;
+             */
         } catch (e) {
             const errMsg =
                 `${errPrefix}Error executing PilTerms dialog control: ${e.message}`;
