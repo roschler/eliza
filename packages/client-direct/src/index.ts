@@ -3,11 +3,12 @@ import cors from "cors";
 import express, { Request as ExpressRequest } from "express";
 import multer, { File } from "multer";
 import {
+    AgentRuntimeOrNull,
     buildCharacterNameForRelationship,
     buildFullRelationshipId,
     elizaLogger,
     generateCaption,
-    generateImage
+    generateImage, UUID
 } from "@ai16z/eliza";
 import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
@@ -64,6 +65,108 @@ export interface SimliClientConfig {
     videoRef: any;
     audioRef: any;
 }
+
+/**
+ * This function checks to see if the given room ID +
+ *  user ID combination has been assigned a particular
+ *  agent.
+ *
+ * @param roomId - The ID of the current room.
+ * @param userId - The ID of the user.
+ * @param agentObj - An agent object.
+ *
+ * @returns - If the given agent is assigned to the
+ *  given user in the given room, the AgentRuntime
+ *  object for that agent will be returned.  Otherwise,
+ *  null will be returned.
+ */
+async function isRelated(roomId: UUID, userId: UUID, agentObj: AgentRuntime): Promise<AgentRuntimeOrNull> {
+    const characterName =
+        agentObj.character.name;
+
+    if (characterName.length > 0) {
+        // We build a full user ID from the current room ID
+        //  and the current user ID, so the relationship
+        //  between the user and the specified character
+        //  is local to the current room.  This allows
+        //  the user to be serviced by other characters
+        //  in other rooms they may be participating in.
+        const fullUserId =
+            buildFullRelationshipId(roomId, userId);
+
+        // We adorn the character name with a constant prefix
+        //  so that we don't accidentally confuse a character
+        //  name with a user ID.
+        const fullCharacterName =
+            buildCharacterNameForRelationship(characterName);
+
+        // Same for the specified character.
+        const fullCharacterId =
+            buildFullRelationshipId(roomId, fullCharacterName);
+
+        // Search for a relationship between the user and the selected character.
+        //  runtime.databaseAdapter.createRelationship().  ALWAYS put
+        // the user before the character!
+        const relationshipObjOrNull =
+            await agentObj.databaseAdapter.getRelationship(
+                {
+                    userA: fullUserId,
+                    userB: fullCharacterId
+                }
+            );
+
+        // If a relationship exists, we stop searching
+        //  immediately and use the "assigned" agent,
+        //  since it has the name of the character that
+        //  a request was made to switch to via a
+        //  SELECT_CHARACTER_* action occurrence.
+        const bIsRelated = relationshipObjOrNull !== null;
+
+        if (bIsRelated)
+            return agentObj;
+    }
+
+    return null;
+}
+
+/**
+ * This function searches the agents registry to see if a particular
+ *  agent was assigned to the given user in the given room.
+ *
+ * @param roomId - The ID of the current room.
+ * @param userId - The ID of the user.
+ * @param agentsMap - A map of the available agents.
+ */
+async function findAgentAssignedToUser(
+        roomId: UUID,
+        userId: UUID,
+        agentsMap: Map<string, AgentRuntime>): Promise<AgentRuntimeOrNull> {
+
+    // Create an array of Promises for the database asynchronous calls
+    const promises: Promise<AgentRuntimeOrNull>[] = [];
+
+    for (const agentObj of agentsMap.values()) {
+        // Push each asynchronous call into the promises array
+        promises.push(
+            isRelated(roomId, userId, agentObj)
+        );
+    }
+
+    const results = await Promise.all(promises);
+
+    // Take the first agent assigned, if any assignments exist,
+    //  and return it.  Or return NULL if no assignment exists.
+    let agentFoundOrNull: AgentRuntimeOrNull = null;
+
+    // Find the first result that is an AgentRuntime object
+    agentFoundOrNull =
+        results.find(
+            (result: AgentRuntimeOrNull): result is AgentRuntime => result !== null) || null;
+
+    return agentFoundOrNull;
+}
+
+
 export class DirectClient {
     public app: express.Application;
     private agents: Map<string, AgentRuntime>;
@@ -171,54 +274,15 @@ export class DirectClient {
                 // Iterate the available agents to see if any of them
                 //  have a relationship with the current user in the
                 //  current room.
+                const overrideRuntimeOrNull =
+                    await findAgentAssignedToUser(roomId, userId, this.agents);
 
-                runtime = Array.from(this.agents.values()).find(
-                    (agentObj) => {
-                        const characterName =
-                            agentObj.character.name;
+                if (overrideRuntimeOrNull instanceof AgentRuntime) {
+                    console.debug(`User assigned the following agent with CHARACTER name: ${overrideRuntimeOrNull.character.name}`);
 
-                        if (characterName.length > 0) {
-                            // We build a full user ID from the current room ID
-                            //  and the current user ID, so the relationship
-                            //  between the user and the specified character
-                            //  is local to the current room.  This allows
-                            //  the user to be serviced by other characters
-                            //  in other rooms they may be participating in.
-                            const fullUserId =
-                                buildFullRelationshipId(roomId, userId);
-
-                            // We adorn the character name with a constant prefix
-                            //  so that we don't accidentally confuse a character
-                            //  name with a user ID.
-                            const fullCharacterName =
-                                buildCharacterNameForRelationship(characterName);
-
-                            // Same for the specified character.
-                            const fullCharacterId =
-                                buildFullRelationshipId(roomId, fullCharacterName);
-
-                            // Search for a relationship between the user and the selected character.
-                            //  runtime.databaseAdapter.createRelationship().  ALWAYS put
-                            // the user before the character!
-                            const bIsRelated =
-                                runtime.databaseAdapter.getRelationship(
-                                    {
-                                        userA: fullUserId,
-                                        userB: fullCharacterId
-                                    }
-                                ) != null;
-
-                            // If a relationship exists, we stop searching
-                            //  immediately and use the "assigned" agent,
-                            //  since it has the name of the character that
-                            //  a request was made to switch to via a
-                            //  SELECT_CHARACTER_* action occurrence.
-                            return bIsRelated;
-                        } else {
-                            return false;
-                        }
-                    }
-                );
+                    // Override the selected agent.
+                    runtime = overrideRuntimeOrNull;
+                }
 
                 // -------------------------- END  : CHARACTER/AGENT SWITCH HANDLING ------------------------
 

@@ -110,7 +110,7 @@ export function buildCharacterNameForRelationship(characterName: string): string
  * - `userId` is empty after trimming.
  * - `roomId` and `userId` have the same value after trimming.
  */
-export function buildFullRelationshipId(roomId: string, userId: string): string {
+export function buildFullRelationshipId(roomId: string, userId: string): UUID {
     // Trim the inputs
     const trimmedRoomId = roomId.trim();
     const trimmedUserId = userId.trim();
@@ -140,7 +140,8 @@ export function buildFullRelationshipId(roomId: string, userId: string): string 
      * Construct the full relationship ID in the format: `<trimmedRoomId>::<trimmedUserId>`.
      */
     const fullRelationshipId = `${trimmedRoomId}::${trimmedUserId}`;
-    return fullRelationshipId;
+
+    return fullRelationshipId as UUID;
 }
 
 // -------------------------- END  : RELATIONSHIPS ------------------------
