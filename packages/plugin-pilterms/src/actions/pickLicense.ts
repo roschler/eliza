@@ -14,7 +14,7 @@ export { pickLicenseTemplate };
 
 const bVerbose = true;
 
-const ACTION_NAME_STORY_PROTOCOL_INTERVIEW = 'STORY_PROTOCOL_INTERVIEW';
+const ACTION_NAME_PILTERMS = 'PILTERMS';
 
 // -------------------- BEGIN: ACTION, Dialog Control ------------
 
@@ -24,7 +24,7 @@ const ACTION_NAME_STORY_PROTOCOL_INTERVIEW = 'STORY_PROTOCOL_INTERVIEW';
  *  control based on the decided context.
  */
 export const pilTermsInterviewAction = {
-    name: ACTION_NAME_STORY_PROTOCOL_INTERVIEW,
+    name: ACTION_NAME_PILTERMS,
     description: "Manages the conversation control in regards to picking the best Story Protocol license for the user's digital asset, filling out the necessary fields for the license terms once the license has been chosen, and then crafting a Story Protocol plugin action so that the Story Protocol plugin registers the user's digital asset with the selected license and necessary parameter values.",
     handler: async (
         runtime: IAgentRuntime,
@@ -35,7 +35,7 @@ export const pilTermsInterviewAction = {
     ): Promise<boolean> => {
         const errPrefix = `(pickLicense::handler) `;
 
-        elizaLogger.log(`DEPRECATED: Starting ${ACTION_NAME_STORY_PROTOCOL_INTERVIEW} handler...`);
+        elizaLogger.log(`DEPRECATED: Starting ${ACTION_NAME_PILTERMS} handler...`);
 
         try {
             // initialize or update state

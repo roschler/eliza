@@ -249,6 +249,17 @@ export class DirectClient {
                     req.body.roomId ?? "default-room-" + agentId
                 );
                 const userId = stringToUuid(req.body.userId ?? "user");
+                const userInput = req.body.text.trim();
+
+                // TODO: Until we create a more sophisticated way to reset a session
+                //  with a user to the "start" condition, we look for a simple "reset"
+                //  statement to do this.  If found then we do not override the
+                //  the default choice which in the direct client, is the first
+                //  available agent.
+                const bIsResetCommand = userInput === 'reset';
+
+                if (bIsResetCommand)
+                    elizaLogger.debug(`Direct client message route received a RESET instruction.`);
 
                 let runtime = this.agents.get(agentId);
 
@@ -268,20 +279,24 @@ export class DirectClient {
 
                 // -------------------------- BEGIN: CHARACTER/AGENT SWITCH HANDLING ------------------------
 
-                // Check if a character assignment relationship was created for the
-                //  current room ID + user ID pair.
+                // TODO: We need a more nuanced way to reset a session than this.
+                if (!bIsResetCommand) {
 
-                // Iterate the available agents to see if any of them
-                //  have a relationship with the current user in the
-                //  current room.
-                const overrideRuntimeOrNull =
-                    await findAgentAssignedToUser(roomId, userId, this.agents);
+                    // Check if a character assignment relationship was created for the
+                    //  current room ID + user ID pair.
 
-                if (overrideRuntimeOrNull instanceof AgentRuntime) {
-                    console.debug(`User assigned the following agent with CHARACTER name: ${overrideRuntimeOrNull.character.name}`);
+                    // Iterate the available agents to see if any of them
+                    //  have a relationship with the current user in the
+                    //  current room.
+                    const overrideRuntimeOrNull =
+                        await findAgentAssignedToUser(roomId, userId, this.agents);
 
-                    // Override the selected agent.
-                    runtime = overrideRuntimeOrNull;
+                    if (overrideRuntimeOrNull instanceof AgentRuntime) {
+                        console.debug(`User assigned the following agent with CHARACTER name: ${overrideRuntimeOrNull.character.name}`);
+
+                        // Override the selected agent.
+                        runtime = overrideRuntimeOrNull;
+                    }
                 }
 
                 // -------------------------- END  : CHARACTER/AGENT SWITCH HANDLING ------------------------
