@@ -215,6 +215,16 @@ In response to the user's latest input, you must output a JSON object like this:
 }
 ```
 
+Or, and this is critical, if the user says "reset", then you should output a JSON object exactly like this:
+```json
+{
+    text: "Let's start again.",
+    action: "SELECT_CHARACTER_SPSTART"
+}
+```
+
+Only outupt one or the other JSON object, not both.
+
 Following is your recent chat history with the user, and at the very end is their current user input, which you should use to update your knowledge.
 
 {{recentMessages}}

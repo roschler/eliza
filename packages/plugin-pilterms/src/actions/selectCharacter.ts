@@ -6,7 +6,7 @@ import {
     ModelClass,
     type IAgentRuntime,
     type Memory,
-    type State, generateText, buildFullRelationshipId,
+    type State, generateText, buildFullRelationshipId, buildCharacterNameForRelationship,
 } from "@ai16z/eliza";
 import { pickLicenseTemplate } from "../templates";
 import {ActorActionDetails} from "../system/types.ts";
@@ -43,13 +43,7 @@ export function findUserIdInState(state: State, ignoreUserNames: string[] = ["Pi
 
 // -------------------------- BEGIN: ACTION NAMES for CHARACTERS ------------------------
 
-// Update this list of constants when the names of characters
-//  used changes.  Remember to update the action name and
-//  similes properties appropriately!
-
-const ACTION_NAME_SELECT_CHARACTER_SPPICKLICENSE = "SELECT_CHARACTER_SPPICKLICENSE";
-const ACTION_NAME_SELECT_CHARACTER_TATE = "SELECT_CHARACTER_TATE";
-const ACTION_NAME_SELECT_CHARACTER_TRUMP = "SELECT_CHARACTER_TRUMP";
+const ACTION_NAME_SELECT_CHARACTER_ANY = "SELECT_CHARACTER_CHARACTER_NAME";
 
 // -------------------------- END  : ACTION NAMES for CHARACTERS ------------------------
 
@@ -73,7 +67,7 @@ type StringOrNull = string | null;
  *  should be routed to.
  */
 export const selectCharacterAction = {
-    name: ACTION_NAME_SELECT_CHARACTER_SPPICKLICENSE,
+    name: ACTION_NAME_SELECT_CHARACTER_ANY,
     description: "Watches for SELECT CHARACTER actions and updates the current context so that the current client can change the active character to the selected one.",
     handler: async (
         runtime: IAgentRuntime,
@@ -171,8 +165,12 @@ export const selectCharacterAction = {
     },
     // No examples needed.
     examples: [],
-    // Put the other SELECT ACTION constants here.
-    similes: [ACTION_NAME_SELECT_CHARACTER_TATE, ACTION_NAME_SELECT_CHARACTER_TRUMP],
+    // REMEMBER: Put the names of all the characters your app uses here,
+    //  in SELECT_CHARACTER_<name> format!  The <name> value MUST
+    //  be the name found in the "name:" field found in the
+    //  character JSON file.  This allows the select character action to
+    //  be triggered whenever an LLM emits a SELECT_CHARACTER_* action.
+    similes: ["SELECT_CHARACTER_SPSTART", "SELECT_CHARACTER_SPPICKLICENSE", "SELECT_CHARACTER_SPHANDLELICENSE"],
 };
 
 
