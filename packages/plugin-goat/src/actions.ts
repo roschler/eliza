@@ -128,11 +128,12 @@ function composeParameterContext<TWalletClient extends WalletClient>(
     tool: DeferredTool<TWalletClient>,
     state: State
 ): string {
-    const contextTemplate = `{{recentMessages}}
+    const contextTemplate =
+        `{{recentMessages}}
 
-Given the recent messages, extract the following information for the action "${tool.name}":
-${addParametersToDescription("", tool.parameters)}
-`;
+        Given the recent messages, extract the following information for the action "${tool.name}":
+        ${addParametersToDescription("", tool.parameters)}
+        `;
     return composeContext({ state, template: contextTemplate });
 }
 

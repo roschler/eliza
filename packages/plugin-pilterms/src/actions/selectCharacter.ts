@@ -67,9 +67,10 @@ type StringOrNull = string | null;
 // -------------------- BEGIN: ACTION, SELECT CHARACTER ------------
 
 /**
- * This action is the top level dialog control action.  It
- *  decides what context is the active context where to route
- *  control based on the decided context.
+ * This action creates a relationship between the current
+ *  room ID + user ID pair, and the current room ID + active character ID,
+ *  so that the client knows to what agent/character the next chat volley
+ *  should be routed to.
  */
 export const selectCharacterAction = {
     name: ACTION_NAME_SELECT_CHARACTER_SPPICKLICENSE,

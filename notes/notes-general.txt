@@ -4,6 +4,10 @@ LOGGING
 
 Use elizaLogger.debug() to log messages that will only appear when the agent is launched in debug mode (i.e. - setting the DEBUG environment variable.  See the monorepo top level package.json file).
 
+MESSAGE TEMPLATES
+
+Each character JSON file has a "template:" field. This is where you put the template that is used to build the prompt to the LLM.  Any words surrounded by double braces (e.g. - {{recentMessages}}) is a substitution variable.  When you call composeContext(), the values found in the current state of the system needed byt he message template will be merged into that template to create the final LLM prompt.  Note, the current state data is found in the "state" variable passed to the action handler,
+
 CHARACTERS
 
 The characters, if any, used by the current agent are specified with the --characters command line argument:
