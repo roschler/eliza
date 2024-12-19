@@ -157,6 +157,21 @@ export class DirectClient {
                     return;
                 }
 
+                // -------------------------- BEGIN: CHARACTER/AGENT SWITCH HANDLING ------------------------
+
+                // If a relationship between the current user, in the current room, and a specific
+                //  agent's character has been recorded, due to a SELECT_CHARACTER_* action
+                //  occurrence, select that agent now if it still exists.
+                const existingRelationsship =
+                    runtime.databaseAdapter.getRelationship(
+                        // ALWAYS specify the user ID first!
+                        userA:
+                    )
+
+
+
+                // -------------------------- END  : CHARACTER/AGENT SWITCH HANDLING ------------------------
+
                 await runtime.ensureConnection(
                     userId,
                     roomId,

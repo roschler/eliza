@@ -2,6 +2,7 @@
 
 import * as fs from 'fs';
 import { StringOrNull } from "./types"
+import {State} from "@ai16z/eliza";
 
 // The strategy has changed from using environment variables to using the AWS Secrets Manager.
 //  So the get environment variable functions actually look for a secrets object first and
@@ -251,3 +252,110 @@ export function appendEosCharIfNotPresent(str: string): string {
 	const eosChars = ['.', '!', '?'];
 	return eosChars.includes(str.trim().slice(-1)) ? str : `${str}.`;
 }
+
+// -------------------------- BEGIN: RELATIONSHIPS ------------------------
+
+/**
+ * Builds a standardized character name for a relationship.  The character
+ *  names are the names found as the first string in a the dotted string
+ *  name that forms a character JSON primary file name.
+ *
+ * @param characterName - The name of the character. Must be a non-empty
+ *  string after trimming.
+ *
+ * @returns A string in the format: `character::<trimmedCharacterName>`.
+ *
+ * @throws {Error} If:
+ * - `characterName` is empty after trimming.
+ */
+export function buildCharacterNameForRelationship(characterName: string): string {
+    // Trim the input
+    const trimmedCharacterName = characterName.trim();
+
+    /**
+     * Validate that `characterName` is a non-empty string after trimming.
+     */
+    if (!trimmedCharacterName) {
+        throw new Error("The 'characterName' parameter must be a non-empty string after trimming.");
+    }
+
+    /**
+     * Construct the full character name for the relationship in the format: `character::<trimmedCharacterName>`.
+     */
+    const fullCharacterNameForRelationship = `character->${trimmedCharacterName}`;
+    return fullCharacterNameForRelationship;
+}
+
+/**
+ * Builds a full relationship ID by combining a room ID and a user ID.
+ *
+ * @param roomId - The ID of the room. Must be a non-empty string after trimming.
+ * @param userId - The ID of the user. Must be a non-empty string after trimming.
+ *
+ * @returns A string in the format: `<trimmedRoomId>::<trimmedUserId>`.
+ *
+ * @throws {Error} If:
+ * - `roomId` is empty after trimming.
+ * - `userId` is empty after trimming.
+ * - `roomId` and `userId` have the same value after trimming.
+ */
+export function buildFullRelationshipId(roomId: string, userId: string): string {
+    // Trim the inputs
+    const trimmedRoomId = roomId.trim();
+    const trimmedUserId = userId.trim();
+
+    /**
+     * Validate that `roomId` is a non-empty string after trimming.
+     */
+    if (!trimmedRoomId) {
+        throw new Error("The 'roomId' parameter must be a non-empty string after trimming.");
+    }
+
+    /**
+     * Validate that `userId` is a non-empty string after trimming.
+     */
+    if (!trimmedUserId) {
+        throw new Error("The 'userId' parameter must be a non-empty string after trimming.");
+    }
+
+    /**
+     * Ensure that `roomId` and `userId` are not the same.
+     */
+    if (trimmedRoomId === trimmedUserId) {
+        throw new Error("The 'roomId' and 'userId' parameters must not have the same value.");
+    }
+
+    /**
+     * Construct the full relationship ID in the format: `<trimmedRoomId>::<trimmedUserId>`.
+     */
+    const fullRelationshipId = `${trimmedRoomId}::${trimmedUserId}`;
+    return fullRelationshipId;
+}
+
+/**
+ * Finds the first actor in the state's `actorsData` array whose name is
+ *  not in the `ignoreUserNames` list and returns their `id` field. If no
+ *  such actor is found, returns `null`.
+ *
+ * @param state - The state object containing the `actorsData` array.
+ * @param ignoreUserNames - An array of names to ignore during the s
+ *  earch. Defaults to `["PickLicense"]`.
+ *
+ * @returns The `id` of the first matching actor or `null` if no match
+ *  is found.
+ */
+export function findUserIdInState(state: State, ignoreUserNames: string[] = ["PickLicense"]): StringOrNull {
+    // Validate input
+    if (!state || !Array.isArray(state.actorsData)) {
+        throw new Error("The 'state' parameter must be an object with an 'actorsData' array.");
+    }
+
+    // Find the first actor whose name is not in the ignore list
+    const matchingActor = state.actorsData.find(actor => !ignoreUserNames.includes(actor.name));
+
+    // Return the actor's ID if found, otherwise return null
+    return matchingActor ? matchingActor.id : null;
+}
+
+
+// -------------------------- END  : RELATIONSHIPS ------------------------

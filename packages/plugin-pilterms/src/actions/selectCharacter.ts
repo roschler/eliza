@@ -10,6 +10,11 @@ import {
 } from "@ai16z/eliza";
 import { pickLicenseTemplate } from "../templates";
 import {ActorActionDetails} from "../system/types.ts";
+import {
+    buildCharacterNameForRelationship,
+    buildFullRelationshipId,
+    findUserIdInState
+} from "../system/common-routines.ts";
 
 export { pickLicenseTemplate };
 
@@ -78,10 +83,45 @@ export const selectCharacterAction = {
 
             if (lastActorActionDetailsObj) {
                 characterName = lastActorActionDetailsObj.nameOfDesiredCharacter;
-            }
 
-            if (bVerbose) {
-                elizaLogger.log(`${errPrefix}Setting ACTIVE CHARACTER to character named: ${characterName}`);
+                if (bVerbose) {
+                    elizaLogger.log(`${errPrefix}Setting ACTIVE CHARACTER to character named: ${characterName}`);
+                }
+
+                const roomId = state.roomId;
+
+                // Find the user ID in the current "state"'s actors
+                //  array.
+                const userId = findUserIdInState(state);
+
+                // We build a full user ID from the current room ID
+                //  and the current user ID, so the relationship
+                //  between the user and the specified character
+                //  is local to the current room.  This allows
+                //  the user to be serviced by other characters
+                //  in other rooms they may be participating in.
+                const fullUserId =
+                    buildFullRelationshipId(roomId, userId);
+
+                // We adorn the character name with a constant prefix
+                //  so that we don't accidentally confuse a character
+                //  name with a user ID.
+                const fullCharacterName =
+                    buildCharacterNameForRelationship(characterName);
+
+                // Same for the specified character.
+                const fullCharacterId =
+                    buildFullRelationshipId(roomId, fullCharacterName);
+
+                // Create a relationship between the user and the selected character.
+                //  runtime.databaseAdapter.createRelationship().  ALWAYS put
+                // the user before the character!
+                runtime.databaseAdapter.createRelationship(
+                    {
+                        userA: fullUserId,
+                        userB: fullCharacterId
+                    }
+                );
             }
 
             // Test Story Protocol plugin
