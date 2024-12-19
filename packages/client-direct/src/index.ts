@@ -2,7 +2,13 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import express, { Request as ExpressRequest } from "express";
 import multer, { File } from "multer";
-import { elizaLogger, generateCaption, generateImage } from "@ai16z/eliza";
+import {
+    buildCharacterNameForRelationship,
+    buildFullRelationshipId,
+    elizaLogger,
+    generateCaption,
+    generateImage
+} from "@ai16z/eliza";
 import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
 import { messageCompletionFooter } from "@ai16z/eliza";
@@ -159,16 +165,60 @@ export class DirectClient {
 
                 // -------------------------- BEGIN: CHARACTER/AGENT SWITCH HANDLING ------------------------
 
-                // If a relationship between the current user, in the current room, and a specific
-                //  agent's character has been recorded, due to a SELECT_CHARACTER_* action
-                //  occurrence, select that agent now if it still exists.
-                const existingRelationsship =
-                    runtime.databaseAdapter.getRelationship(
-                        // ALWAYS specify the user ID first!
-                        userA:
-                    )
+                // Check if a character assignment relationship was created for the
+                //  current room ID + user ID pair.
 
+                // Iterate the available agents to see if any of them
+                //  have a relationship with the current user in the
+                //  current room.
 
+                runtime = Array.from(this.agents.values()).find(
+                    (agentObj) => {
+                        const characterName =
+                            agentObj.character.name;
+
+                        if (characterName.length > 0) {
+                            // We build a full user ID from the current room ID
+                            //  and the current user ID, so the relationship
+                            //  between the user and the specified character
+                            //  is local to the current room.  This allows
+                            //  the user to be serviced by other characters
+                            //  in other rooms they may be participating in.
+                            const fullUserId =
+                                buildFullRelationshipId(roomId, userId);
+
+                            // We adorn the character name with a constant prefix
+                            //  so that we don't accidentally confuse a character
+                            //  name with a user ID.
+                            const fullCharacterName =
+                                buildCharacterNameForRelationship(characterName);
+
+                            // Same for the specified character.
+                            const fullCharacterId =
+                                buildFullRelationshipId(roomId, fullCharacterName);
+
+                            // Search for a relationship between the user and the selected character.
+                            //  runtime.databaseAdapter.createRelationship().  ALWAYS put
+                            // the user before the character!
+                            const bIsRelated =
+                                runtime.databaseAdapter.getRelationship(
+                                    {
+                                        userA: fullUserId,
+                                        userB: fullCharacterId
+                                    }
+                                ) != null;
+
+                            // If a relationship exists, we stop searching
+                            //  immediately and use the "assigned" agent,
+                            //  since it has the name of the character that
+                            //  a request was made to switch to via a
+                            //  SELECT_CHARACTER_* action occurrence.
+                            return bIsRelated;
+                        } else {
+                            return false;
+                        }
+                    }
+                );
 
                 // -------------------------- END  : CHARACTER/AGENT SWITCH HANDLING ------------------------
 

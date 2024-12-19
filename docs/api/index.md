@@ -139,6 +139,8 @@
 - [getRelationship](functions/getRelationship.md)
 - [getRelationships](functions/getRelationships.md)
 - [formatRelationships](functions/formatRelationships.md)
+- [buildCharacterNameForRelationship](functions/buildCharacterNameForRelationship.md)
+- [buildFullRelationshipId](functions/buildFullRelationshipId.md)
 - [findNearestEnvFile](functions/findNearestEnvFile.md)
 - [configureSettings](functions/configureSettings.md)
 - [loadEnvConfig](functions/loadEnvConfig.md)

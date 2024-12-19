@@ -6,19 +6,40 @@ import {
     ModelClass,
     type IAgentRuntime,
     type Memory,
-    type State, generateText,
+    type State, generateText, buildFullRelationshipId,
 } from "@ai16z/eliza";
 import { pickLicenseTemplate } from "../templates";
 import {ActorActionDetails} from "../system/types.ts";
-import {
-    buildCharacterNameForRelationship,
-    buildFullRelationshipId,
-    findUserIdInState
-} from "../system/common-routines.ts";
 
 export { pickLicenseTemplate };
 
 const bVerbose = true;
+
+
+/**
+ * Finds the first actor in the state's `actorsData` array whose name is
+ *  not in the `ignoreUserNames` list and returns their `id` field. If no
+ *  such actor is found, returns `null`.
+ *
+ * @param state - The state object containing the `actorsData` array.
+ * @param ignoreUserNames - An array of names to ignore during the s
+ *  earch. Defaults to `["PickLicense"]`.
+ *
+ * @returns The `id` of the first matching actor or `null` if no match
+ *  is found.
+ */
+export function findUserIdInState(state: State, ignoreUserNames: string[] = ["PickLicense"]): StringOrNull {
+    // Validate input
+    if (!state || !Array.isArray(state.actorsData)) {
+        throw new Error("The 'state' parameter must be an object with an 'actorsData' array.");
+    }
+
+    // Find the first actor whose name is not in the ignore list
+    const matchingActor = state.actorsData.find(actor => !ignoreUserNames.includes(actor.name));
+
+    // Return the actor's ID if found, otherwise return null
+    return matchingActor ? matchingActor.id : null;
+}
 
 // -------------------------- BEGIN: ACTION NAMES for CHARACTERS ------------------------
 

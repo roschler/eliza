@@ -13,3 +13,7 @@ The characters, if any, used by the current agent are specified with the --chara
 You specify one or more comma-delimited relative paths to the character files you want your agent to use.  The first one in the list is the one that is initially active.  An agent runtime is created for each agent (see startAgents()).
 
 Active character: Initially the first character, if any, listed in the --characters argument is active.  At least at the time that this wa written that is how the direct client configures things at startup.  If you look at most of the handlers in the code (e.g. - evaluators, providers, etc.) they are passed an instance of IAgentRuntime as the first parameter to the function.  That is the object that contains the active character.
+
+CHARACTER TO AGENT RELATIONSHIP
+
+When Eliza starts up, it creates an agent for each character specified in the --characters command line argument.  Therefore, the idea of switching characters actually means switching agents (AgentRuntime instances).
