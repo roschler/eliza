@@ -30,7 +30,9 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 export const messageHandlerTemplate =
     // {{goals}}
-    `# Action Examples
+    `
+#
+# Action Examples
 {{actionExamples}}
 (Action examples are for reference only. Do not use the information from them in your response.)
 
@@ -341,9 +343,17 @@ export class DirectClient {
                     agentName: runtime.character.name,
                 });
 
+                // If the character has its own message template, use that instead.
+                let useTemplate = messageHandlerTemplate;
+
+                if (runtime.character.messageTemplate && runtime.character.messageTemplate.trim().length > 0) {
+                    elizaLogger.debug(`OVERRIDING message template with CHARACTER defined message template.`);
+                    useTemplate = runtime.character.messageTemplate.trim();
+                }
+
                 const context = composeContext({
                     state,
-                    template: messageHandlerTemplate,
+                    template: useTemplate,
                 });
 
                 const response = await generateMessageResponse({

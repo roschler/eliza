@@ -24,4 +24,4 @@ Configuration options for generating objects.
 
 ## Defined in
 
-[packages/core/src/generation.ts:1121](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1121)
+[packages/core/src/generation.ts:1125](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1125)

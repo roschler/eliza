@@ -29,3 +29,17 @@ An action handler returns a true/false response.  Do not expect an action to be 
 MEMORIES
 
 Actions that want to trigger other actions must copy the memory creation and action triggering code like that found in the direct client.  processActions() is what actually makes the calls to the target action handlers belonging to the actions found in the last response.s
+
+ELIZA'S BUILDING THE CONTEXT (LLM PROMPT) STRATEGY
+
+Actions: Eliza appears to scan all the plugins available at the point of runtime execution, and builds examples from the action description by taking the "description: "" of the action and appending the action "name:" to it in parentheses.
+
+MESSAGE TEMPLATES
+
+Message templates MUST produce a JSON object like the following, which is the generic message completion footer:
+
+```json
+{ "user": "{{agentName}}", "text": "string", "action": "string" }
+```
+
+If not, the system will loop retrying over and over (file a GitHub issue on this).

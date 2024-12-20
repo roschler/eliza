@@ -24,4 +24,4 @@ An object parsed from the JSON string if successful; otherwise, null or the resu
 
 ## Defined in
 
-[packages/core/src/parsing.ts:109](https://github.com/roschler/eliza/blob/main/packages/core/src/parsing.ts#L109)
+[packages/core/src/parsing.ts:111](https://github.com/roschler/eliza/blob/main/packages/core/src/parsing.ts#L111)

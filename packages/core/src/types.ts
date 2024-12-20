@@ -635,6 +635,12 @@ export type Character = {
     /** Optional model endpoint override */
     modelEndpointOverride?: string;
 
+    /**
+     * Characters can override the default message template by providing
+     *  their own.
+     */
+    messageTemplate?: string;
+
     /** Optional prompt templates */
     templates?: {
         goalsTemplate?: string;

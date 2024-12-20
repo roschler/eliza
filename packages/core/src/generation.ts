@@ -460,6 +460,10 @@ export async function generateText({
             }
         }
 
+        elizaLogger.debug("--------->>>>>>>>> BEGIN: LLM RESPONSE <<<<<<<<<---------");
+        elizaLogger.debug(response);
+        elizaLogger.debug("--------->>>>>>>>> END  : LLM RESPONSE <<<<<<<<<---------");
+
         return response;
     } catch (error) {
         elizaLogger.error("Error in generateText:", error);

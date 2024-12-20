@@ -14,7 +14,7 @@ Unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:520](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L520)
+[packages/core/src/types.ts:526](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L526)
 
 ***
 
@@ -26,4 +26,4 @@ Associated account
 
 #### Defined in
 
-[packages/core/src/types.ts:523](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L523)
+[packages/core/src/types.ts:529](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L529)

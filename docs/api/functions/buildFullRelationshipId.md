@@ -2,7 +2,7 @@
 
 # Function: buildFullRelationshipId()
 
-> **buildFullRelationshipId**(`roomId`, `userId`): `string`
+> **buildFullRelationshipId**(`roomId`, `userId`): [`UUID`](../type-aliases/UUID.md)
 
 Builds a full relationship ID by combining a room ID and a user ID.
 
@@ -18,7 +18,7 @@ The ID of the user. Must be a non-empty string after trimming.
 
 ## Returns
 
-`string`
+[`UUID`](../type-aliases/UUID.md)
 
 A string in the format: `<trimmedRoomId>::<trimmedUserId>`.
 

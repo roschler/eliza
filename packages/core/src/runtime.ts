@@ -839,6 +839,8 @@ Text: ${attachment.text}
             )
             .join("\n");
 
+        elizaLogger.debug(`Charcter LORE id: `, this.character.lore);
+
         // randomly get 3 bits of lore and join them into a paragraph, divided by \n
         let lore = "";
         // Assuming this.lore is an array of lore bits
@@ -849,6 +851,8 @@ Text: ${attachment.text}
             const selectedLore = shuffledLore.slice(0, 10);
             lore = selectedLore.join("\n");
         }
+
+        elizaLogger.debug(`LORE elements used: `, lore);
 
         const formattedCharacterPostExamples = this.character.postExamples
             .sort(() => 0.5 - Math.random())
@@ -958,7 +962,9 @@ Text: ${attachment.text}
             actorsData
         );
 
-        // if bio is a string, use it. if its an array, pick one at random
+        elizaLogger.debug(`Character BIO is: `, this.character.bio);
+
+        // if bio is a string, use it. if it's an array, pick one at random
         let bio = this.character.bio || "";
         if (Array.isArray(bio)) {
             // get three random bio strings and join them with " "
@@ -967,6 +973,8 @@ Text: ${attachment.text}
                 .slice(0, 3)
                 .join(" ");
         }
+
+        elizaLogger.debug(`BIO elements used: `, bio);
 
         const knowledegeData = await knowledge.get(this, message);
 

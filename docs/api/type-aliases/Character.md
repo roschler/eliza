@@ -50,6 +50,13 @@ Image model provider to use, if different from modelProvider
 
 Optional model endpoint override
 
+### messageTemplate?
+
+> `optional` **messageTemplate**: `string`
+
+Characters can override the default message template by providing
+ their own.
+
 ### templates?
 
 > `optional` **templates**: `object`
@@ -342,4 +349,4 @@ Optional Twitter profile
 
 ## Defined in
 
-[packages/core/src/types.ts:610](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L610)
+[packages/core/src/types.ts:616](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L616)

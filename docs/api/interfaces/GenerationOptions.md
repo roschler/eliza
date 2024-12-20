@@ -12,7 +12,7 @@ Configuration options for generating objects with a model.
 
 #### Defined in
 
-[packages/core/src/generation.ts:1091](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1091)
+[packages/core/src/generation.ts:1095](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1095)
 
 ***
 
@@ -22,7 +22,7 @@ Configuration options for generating objects with a model.
 
 #### Defined in
 
-[packages/core/src/generation.ts:1092](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1092)
+[packages/core/src/generation.ts:1096](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1096)
 
 ***
 
@@ -32,7 +32,7 @@ Configuration options for generating objects with a model.
 
 #### Defined in
 
-[packages/core/src/generation.ts:1093](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1093)
+[packages/core/src/generation.ts:1097](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1097)
 
 ***
 
@@ -42,7 +42,7 @@ Configuration options for generating objects with a model.
 
 #### Defined in
 
-[packages/core/src/generation.ts:1094](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1094)
+[packages/core/src/generation.ts:1098](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1098)
 
 ***
 
@@ -52,7 +52,7 @@ Configuration options for generating objects with a model.
 
 #### Defined in
 
-[packages/core/src/generation.ts:1095](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1095)
+[packages/core/src/generation.ts:1099](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1099)
 
 ***
 
@@ -62,7 +62,7 @@ Configuration options for generating objects with a model.
 
 #### Defined in
 
-[packages/core/src/generation.ts:1096](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1096)
+[packages/core/src/generation.ts:1100](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1100)
 
 ***
 
@@ -72,7 +72,7 @@ Configuration options for generating objects with a model.
 
 #### Defined in
 
-[packages/core/src/generation.ts:1097](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1097)
+[packages/core/src/generation.ts:1101](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1101)
 
 ***
 
@@ -82,7 +82,7 @@ Configuration options for generating objects with a model.
 
 #### Defined in
 
-[packages/core/src/generation.ts:1098](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1098)
+[packages/core/src/generation.ts:1102](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1102)
 
 ***
 
@@ -92,4 +92,4 @@ Configuration options for generating objects with a model.
 
 #### Defined in
 
-[packages/core/src/generation.ts:1099](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1099)
+[packages/core/src/generation.ts:1103](https://github.com/roschler/eliza/blob/main/packages/core/src/generation.ts#L1103)
