@@ -47,3 +47,6 @@ If not, the system will loop retrying over and over with the following error:
 ["፧ parsedContent is null, retrying"]
 
 
+GITHUB ISSUES TO FILE:
+
+The retry loop in generation.ts should have a max retry count value and associated break loop code to avoid a bad template running up a user's paid generative AI service account.

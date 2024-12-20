@@ -817,7 +817,9 @@ export async function generateMessageResponse({
                             user: runtime.character.name,
                             text: response,
                             action: "NONE"
-                        }
+                        } as Content;
+
+                    elizaLogger.debug(`parsedContent is NULL.  Replacing it with: `, parsedContent);
                 } else {
                     // We are not in debug mode.  Retry the generation call
                     //  to see if the LLM produces a proper JSON object this
