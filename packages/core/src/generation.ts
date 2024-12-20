@@ -806,12 +806,18 @@ export async function generateMessageResponse({
             });
 
             // try parsing the response as JSON.
+            elizaLogger.debug(`Parsing LLM response...`);
+
             let parsedContent = parseJSONObjectFromText(response) as Content;
+
+            elizaLogger.debug(`Parsed content is: `, parsedContent);
 
             // If we are debug mode, put the response in an object that has
             //  fields set so that you can see the response in the logs.
             if (!parsedContent) {
-                if (this.verbose) {
+                if (elizaLogger.verbose) {
+                    elizaLogger.debug(`parsedContent is unassigned.  Replacing it now...`);
+
                     parsedContent =
                         {
                             user: runtime.character.name,
