@@ -71,6 +71,10 @@ export async function generateText({
         model: modelClass,
     });
 
+    elizaLogger.debug("--------->>>>>>>>> BEGIN: CONTEXT <<<<<<<<<---------");
+    elizaLogger.debug(context);
+    elizaLogger.debug("--------->>>>>>>>> END  : CONTEXT <<<<<<<<<---------");
+
     const provider = runtime.modelProvider;
     const endpoint =
         runtime.character.modelEndpointOverride || models[provider].endpoint;
