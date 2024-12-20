@@ -42,4 +42,8 @@ Message templates MUST produce a JSON object like the following, which is the ge
 { "user": "{{agentName}}", "text": "string", "action": "string" }
 ```
 
-If not, the system will loop retrying over and over (file a GitHub issue on this).
+If not, the system will loop retrying over and over with the following error:
+
+["፧ parsedContent is null, retrying"]
+
+

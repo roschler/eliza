@@ -805,11 +805,26 @@ export async function generateMessageResponse({
                 modelClass,
             });
 
-            // try parsing the response as JSON, if null then try again
-            const parsedContent = parseJSONObjectFromText(response) as Content;
+            // try parsing the response as JSON.
+            let parsedContent = parseJSONObjectFromText(response) as Content;
+
+            // If we are debug mode, put the response in an object that has
+            //  fields set so that you can see the response in the logs.
             if (!parsedContent) {
-                elizaLogger.debug("parsedContent is null, retrying");
-                continue;
+                if (this.verbose) {
+                    parsedContent =
+                        {
+                            user: runtime.character.name,
+                            text: response,
+                            action: "NONE"
+                        }
+                } else {
+                    // We are not in debug mode.  Retry the generation call
+                    //  to see if the LLM produces a proper JSON object this
+                    //  time.
+                    elizaLogger.debug("parsedContent is null, retrying");
+                    continue;
+                }
             }
 
             return parsedContent;
