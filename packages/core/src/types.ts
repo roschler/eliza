@@ -610,6 +610,91 @@ export enum Clients {
     TELEGRAM = "telegram",
     FARCASTER = "farcaster",
 }
+
+/**
+ * A single piece of information that belongs to a
+ *  BillOfMaterials object.
+ */
+export type BillOfMaterialsLineItem = {
+
+    /** The name of the field.  E.g. - "minting fee". **/
+    name: string;
+
+    /** The type of the field.  E.g. - "string", or "number", etc. **/
+    type: string;
+
+    /** The question to ask the user to get the desired value from them. **/
+    prompt: string;
+
+    /**
+     * If FALSE, then the character will ask the user for the field value
+     *   but will accept an empty answer as a response.  If TRUE, then
+     *   the character will keep trying to get an answer until successful,
+     *   or the user abandons the chat.
+     */
+    isOptional: boolean;
+
+    // -------------------------- BEGIN: RUNTIME VALUES ------------------------
+
+    // These values are not expected to have values when the
+    //  character is initialized, but will be filled in during
+    //  the character's chat with the user.
+
+    /**
+     * If TRUE, then the question has been asked already.  If isOptional
+     *  is TRUE, then the prompt will not be asked again.
+     *  If FALSE, then the prompt will be asked regardless.
+     */
+    isAsked?: boolean;
+
+    // -------------------------- END  : RUNTIME VALUES ------------------------
+
+    // -------------------------- BEGIN: STRING TYPE ONLY ------------------------
+
+    // The following fields only apply to string type line items.
+
+    // Optional field that if present, must be an array of string values.
+    //  If present, then if the user's response value is not in the list
+    //  the character will try again to get a valid value.
+    listOfValidValues?: string[];
+
+    // -------------------------- END  : STRING TYPE ONLY ------------------------
+
+    // -------------------------- BEGIN: NUMERIC TYPE ONLY ------------------------
+
+    // The following fields only apply to numeric type line items.
+
+    /**
+     * If present and has the value TRUE, then the character will work to
+     *  obtain, and only accept, an integer value.
+     */
+    isInteger?: boolean;
+
+    /**
+     * If present, then the character will only accept a number value that
+     *  is greater than or equal to this value.  This value MUST be less
+     *  than the maxVal value if that value exists.
+     */
+    minVal?: number;
+
+    /**
+     * If present, then the character will only accept a number value that
+     *  is less than or equal to this value.  This value MUST be greater
+     *  than the minVal value if that value exists.
+     */
+    maxVal?: number;
+
+    // -------------------------- END  : NUMERIC TYPE ONLY ------------------------
+}
+
+/**
+ * An array of BillOfMaterialsLineItem objects that a character
+ *  will attempt to, or must obtain from the user.
+ */
+export type BillOfMaterials = {
+    lineItems: BillOfMaterialsLineItem[];
+}
+
 /**
  * Configuration for an agent character
  */
@@ -634,6 +719,22 @@ export type Character = {
 
     /** Optional model endpoint override */
     modelEndpointOverride?: string;
+
+    /**
+     * An optional bill-of-materials.  This is a list of data elements
+     *  the character attempts to, or must obtain from the user to
+     *  complete a task.  Should be a JSON object in string format
+     *  that if present, will be parsed into a JSON object when the
+     *  character is loaded.  The JSON object should be an array
+     *  of BillOfMaterialsLineItem objects.
+     */
+    billOfMaterialsJsonStr?: string;
+
+    /**
+     * If billOfMaterialsJsonStr has a value when the character is loaded,
+     *  then it will be parsed, then validated, into this field.
+     */
+    billOfMaterials?: BillOfMaterials;
 
     /**
      * Characters can override the default message template by providing

@@ -1,3 +1,5 @@
 // Todo list
 
+- SPSTART message template is not outputting a proper JSON object when the user just wants to chat.
+
 - Refine each of the participating characters in our team of agents Eliza app and perfect each of the relevant fields in those JSON files.
