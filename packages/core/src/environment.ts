@@ -62,6 +62,21 @@ const PluginSchema = z.object({
     clients: z.array(z.any()).optional(),
 });
 
+const BillOfMaterialsLineItemSchema = z.object({
+    name: z.string(),
+    type: z.string(),
+    prompt: z.string(),
+    isOptional: z.boolean(),
+    listOfValidValues: z.string().optional(),
+    isInteger: z.number().optional(),
+    minVal: z.number().optional(),
+    maxVal: z.number().optional(),
+});
+
+const BillOfMaterialsSchema = z.object({
+    lineItems: z.array(BillOfMaterialsLineItemSchema),
+});
+
 // Main Character schema
 export const CharacterSchema = z.object({
     id: z.string().uuid().optional(),
@@ -124,6 +139,9 @@ export const CharacterSchema = z.object({
             nicknames: z.array(z.string()).optional(),
         })
         .optional(),
+    messageTemplate: z.string().optional(),
+    billOfMaterialsJsonStr: z.string().optional(),
+    billOfMaterials: z.array(BillOfMaterialsSchema).optional(),
 });
 
 // Type inference

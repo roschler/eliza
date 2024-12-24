@@ -634,21 +634,6 @@ export type BillOfMaterialsLineItem = {
      */
     isOptional: boolean;
 
-    // -------------------------- BEGIN: RUNTIME VALUES ------------------------
-
-    // These values are not expected to have values when the
-    //  character is initialized, but will be filled in during
-    //  the character's chat with the user.
-
-    /**
-     * If TRUE, then the question has been asked already.  If isOptional
-     *  is TRUE, then the prompt will not be asked again.
-     *  If FALSE, then the prompt will be asked regardless.
-     */
-    isAsked?: boolean;
-
-    // -------------------------- END  : RUNTIME VALUES ------------------------
-
     // -------------------------- BEGIN: STRING TYPE ONLY ------------------------
 
     // The following fields only apply to string type line items.
@@ -688,14 +673,6 @@ export type BillOfMaterialsLineItem = {
 }
 
 /**
- * An array of BillOfMaterialsLineItem objects that a character
- *  will attempt to, or must obtain from the user.
- */
-export type BillOfMaterials = {
-    lineItems: BillOfMaterialsLineItem[];
-}
-
-/**
  * Configuration for an agent character
  */
 export type Character = {
@@ -732,9 +709,12 @@ export type Character = {
 
     /**
      * If billOfMaterialsJsonStr has a value when the character is loaded,
-     *  then it will be parsed, then validated, into this field.
+     *  then it will be parsed, then validated, into this field.  This
+     *  optional field contains a list of the materials that comprise a
+     *  character's bill of materials.  If present, it will contain
+     *  an array of BillOfMaterialsLineItem objcts.
      */
-    billOfMaterials?: BillOfMaterials;
+    billOfMaterials?: BillOfMaterialsLineItem[];
 
     /**
      * Characters can override the default message template by providing
