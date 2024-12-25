@@ -140,7 +140,6 @@ export const CharacterSchema = z.object({
         })
         .optional(),
     messageTemplate: z.string().optional(),
-    billOfMaterialsJsonStr: z.string().optional(),
     billOfMaterials: z.array(BillOfMaterialsSchema).optional(),
 });
 

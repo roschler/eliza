@@ -698,21 +698,11 @@ export type Character = {
     modelEndpointOverride?: string;
 
     /**
-     * An optional bill-of-materials.  This is a list of data elements
-     *  the character attempts to, or must obtain from the user to
-     *  complete a task.  Should be a JSON object in string format
-     *  that if present, will be parsed into a JSON object when the
-     *  character is loaded.  The JSON object should be an array
-     *  of BillOfMaterialsLineItem objects.
-     */
-    billOfMaterialsJsonStr?: string;
-
-    /**
      * If billOfMaterialsJsonStr has a value when the character is loaded,
      *  then it will be parsed, then validated, into this field.  This
      *  optional field contains a list of the materials that comprise a
      *  character's bill of materials.  If present, it will contain
-     *  an array of BillOfMaterialsLineItem objcts.
+     *  an array of BillOfMaterialsLineItem objects.
      */
     billOfMaterials?: BillOfMaterialsLineItem[];
 

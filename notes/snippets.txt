@@ -1,0 +1,11 @@
+
+    /**
+     * An optional bill-of-materials.  This is a list of data elements
+     *  the character attempts to, or must obtain from the user to
+     *  complete a task.  Should be a JSON object in string format
+     *  that if present, will be parsed into a JSON object when the
+     *  character is loaded.  The JSON object should be an array
+     *  of BillOfMaterialsLineItem objects.
+     */
+    billOfMaterialsJsonStr?: string;
+
