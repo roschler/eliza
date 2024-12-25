@@ -26,6 +26,7 @@ import { settings } from "@ai16z/eliza";
 import { createApiRouter } from "./api.ts";
 import * as fs from "fs";
 import * as path from "path";
+import {processFileOrUrlReferences} from "./process-external-references.ts";
 const upload = multer({ storage: multer.memoryStorage() });
 
 export const messageHandlerTemplate =
@@ -302,6 +303,15 @@ export class DirectClient {
                 }
 
                 // -------------------------- END  : CHARACTER/AGENT SWITCH HANDLING ------------------------
+
+                // -------------------------- BEGIN: HOT-LOAD CHARACTER CONTENT ------------------------
+
+                // This code process all the character fields that have "file:", "http:", or "https:"
+                //  prefixes and replaces the field content with the results of a file load or
+                //  HTTP/HTTPS fetch call.
+                await processFileOrUrlReferences(runtime.character);
+
+                // -------------------------- END  : HOT-LOAD CHARACTER CONTENT ------------------------
 
                 await runtime.ensureConnection(
                     userId,

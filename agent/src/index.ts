@@ -63,87 +63,6 @@ export const wait = (minTime: number = 1000, maxTime: number = 3000) => {
     return new Promise((resolve) => setTimeout(resolve, waitTime));
 };
 
-export function parseArguments(): {
-    character?: string;
-    characters?: string;
-} {
-    try {
-        return yargs(process.argv.slice(3))
-            .option("character", {
-                type: "string",
-                description: "Path to the character JSON file",
-            })
-            .option("characters", {
-                type: "string",
-                description:
-                    "Comma separated list of paths to character JSON files",
-            })
-            .parseSync();
-    } catch (error) {
-        elizaLogger.error("Error parsing arguments:", error);
-        return {};
-    }
-}
-
-function tryLoadFile(filePath: string): string | null {
-    try {
-        return fs.readFileSync(filePath, "utf8");
-    } catch (e) {
-        return null;
-    }
-}
-
-function isAllStrings(arr: unknown[]): boolean {
-    return Array.isArray(arr) && arr.every((item) => typeof item === "string");
-}
-
-/**
- * Processes a character object to resolve "file:" references in its properties,
- *  replacing the content of those properties with the content found in the
- *  referenced file path in the property value.
- *
- * @param character - An object whose properties are to be evaluated.
- *                   If a property value is a string starting with "file:",
- *                   it is treated as a file reference, the file is loaded,
- *                   and the property value is replaced with the file's content.
- * @throws Will throw an error if the provided character is not an object.
- * @throws Will throw an error if a property has an invalid "file:" reference
- *         with an empty path.
- */
-function processFileReferences(character: object): void {
-    // Validate that the input is a non-null object
-    if (typeof character !== 'object' || character === null) {
-        throw new Error("The provided character is not a valid object.");
-    }
-
-    // Iterate over all properties of the character object
-    for (const propName in character) {
-        if (Object.prototype.hasOwnProperty.call(character, propName)) {
-            const propValue = (character as Record<string, any>)[propName];
-
-            // Check if the property value is a string starting with "file:"
-            if (typeof propValue === 'string' && propValue.startsWith("file:")) {
-                // Extract the file path by removing the "file:" prefix
-                const filePath = propValue.substring("file:".length);
-
-                // Ensure the file path is not empty
-                if (!filePath) {
-                    throw new Error(`Property \"${propName}\" has an invalid file reference with an empty path.`);
-                }
-
-                // Log the resolution process
-                elizaLogger.debug(
-                    `Resolving \"file:\" reference found in character property named (\"${propName}\") using file path: ${filePath}`
-                );
-
-                // Load the file content and assign it back to the property
-                const fileContent = tryLoadFile(filePath);
-                (character as Record<string, any>)[propName] = fileContent;
-            }
-        }
-    }
-}
-
 /**
  * Load the characters specified by the user for the system, using
  *  defaults if none were specified.
@@ -231,16 +150,8 @@ export async function loadCharacters(
                     character.plugins = importedPlugins;
                 }
 
-                // -------------------------- BEGIN: PROCESS ANY FILE REFERENCES ------------------------
-
-
-                // Replace the content of any properties in the character object
-                //  that have "file:" references, with the content found in
-                //  the referenced file.
-                processFileReferences(character);
-
-                // -------------------------- END  : PROCESS ANY FILE REFERENCES ------------------------
-
+                // Move processFileOrUrlReferences() to the client to facilitate
+                //  hot-load character content.
                 loadedCharacters.push(character);
                 elizaLogger.info(
                     `Successfully loaded character from: ${resolvedPath}`
