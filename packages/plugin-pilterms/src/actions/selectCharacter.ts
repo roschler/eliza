@@ -6,7 +6,11 @@ import {
     ModelClass,
     type IAgentRuntime,
     type Memory,
-    type State, generateText, buildFullRelationshipId, buildCharacterNameForRelationship,
+    type State,
+    generateText,
+    buildFullRelationshipId,
+    buildCharacterNameForRelationship,
+    removeAllUserToCharacterRelationships, setExclusiveUserToCharacterRelationship,
 } from "@ai16z/eliza";
 import {
     isRelated
@@ -123,21 +127,7 @@ export const selectCharacterAction = {
                 } else {
                     // -------------------------- BEGIN: CREATE NEW USER/CHARACTER RELATIONSHIP ------------------------
 
-                    // Remove any relationships between the user and an agent/character
-                    //  in the current room.
-                    await removeAllUserToCharacterRelationships(roomId, userId);
-
-                    await setExclusiveUserToCharacterRelationship(roomId, runtime);
-
-                    // Create a relationship between the user and the selected character.
-                    //  runtime.databaseAdapter.createRelationship().  ALWAYS put
-                    // the user before the character!
-                    runtime.databaseAdapter.createRelationship(
-                        {
-                            userA: fullUserId,
-                            userB: fullCharacterId
-                        }
-                    );
+                    await setExclusiveUserToCharacterRelationship(roomId, userId, runtime, ??)
 
                     // -------------------------- END  : CREATE NEW USER/CHARACTER RELATIONSHIP ------------------------
                 }
