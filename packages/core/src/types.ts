@@ -719,6 +719,16 @@ export type Character = {
     billOfMaterials?: BillOfMaterialsLineItem[];
 
     /**
+     * This field if present and is equal to FALSE,
+     *  will suppress the default behavior of characters
+     *  whereby all of their goals are completely reset
+     *  when the first get control.  If the field is not
+     *  present, or it is TRUE, then the goals will be
+     *  reset when the character first receives control.
+     */
+    resetGoalsOnInitialActivation?: boolean;
+
+    /**
      * Characters can override the default message template by providing
      *  their own.
      */
