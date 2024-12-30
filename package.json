@@ -7,7 +7,7 @@
         "start:client": "pnpm --dir client start --isRoot",
         "start:debug": "cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --filter \"@ai16z/agent\" start --isRoot",
         "start:debug_tsx_1": "cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --filter \"@ai16z/agent\" --characters=\"characters/sppicklicense.character.json\" start --isRoot",
-        "start:debug_tsx": "cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --filter \"@ai16z/agent\" exec tsx --enable-source-maps --no-opt --inspect=9229 --inspect-brk src/index.ts --characters=\"characters/spstart.character.json, characters/sppicklicense.character.json, characters/sphandlelicense.character.json\" --isRoot",
+        "start:debug_tsx": "cross-env NODE_ENV=development VERBOSE=true DEBUG=eliza:* pnpm --filter \"@ai16z/agent\" exec tsx --enable-source-maps --no-opt --inspect=9229 --inspect-brk src/index.ts --characters=\"characters/sppicklicense.character.json, characters/spstart.character.json, characters/sphandlelicense.character.json\" --isRoot",
         "dev": "bash ./scripts/dev.sh",
         "lint": "bash ./scripts/lint.sh",
         "prettier-check": "npx prettier --check .",
