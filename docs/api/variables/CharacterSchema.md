@@ -106,6 +106,10 @@ Main Character schema
 
 > **billOfMaterials**: `ZodOptional`\<`ZodArray`\<`ZodObject`\<`object`, `"strip"`, `ZodTypeAny`, `object`, `object`\>, `"many"`\>\>
 
+### resetGoalsOnInitialActivation
+
+> **resetGoalsOnInitialActivation**: `ZodOptional`\<`ZodBoolean`\>
+
 ## Defined in
 
-[packages/core/src/environment.ts:81](https://github.com/roschler/eliza/blob/main/packages/core/src/environment.ts#L81)
+[packages/core/src/environment.ts:82](https://github.com/roschler/eliza/blob/main/packages/core/src/environment.ts#L82)

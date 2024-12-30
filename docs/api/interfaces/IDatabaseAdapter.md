@@ -14,7 +14,7 @@ Database instance
 
 #### Defined in
 
-[packages/core/src/types.ts:824](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L824)
+[packages/core/src/types.ts:846](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L846)
 
 ## Methods
 
@@ -30,7 +30,7 @@ Optional initialization
 
 #### Defined in
 
-[packages/core/src/types.ts:827](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L827)
+[packages/core/src/types.ts:849](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L849)
 
 ***
 
@@ -46,7 +46,7 @@ Close database connection
 
 #### Defined in
 
-[packages/core/src/types.ts:830](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L830)
+[packages/core/src/types.ts:852](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L852)
 
 ***
 
@@ -66,7 +66,7 @@ Get account by ID
 
 #### Defined in
 
-[packages/core/src/types.ts:833](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L833)
+[packages/core/src/types.ts:855](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L855)
 
 ***
 
@@ -86,7 +86,7 @@ Create new account
 
 #### Defined in
 
-[packages/core/src/types.ts:836](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L836)
+[packages/core/src/types.ts:858](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L858)
 
 ***
 
@@ -120,7 +120,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:839](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L839)
+[packages/core/src/types.ts:861](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L861)
 
 ***
 
@@ -138,7 +138,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:849](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L849)
+[packages/core/src/types.ts:871](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L871)
 
 ***
 
@@ -162,7 +162,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:851](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L851)
+[packages/core/src/types.ts:873](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L873)
 
 ***
 
@@ -192,7 +192,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:857](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L857)
+[packages/core/src/types.ts:879](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L879)
 
 ***
 
@@ -218,7 +218,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:866](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L866)
+[packages/core/src/types.ts:888](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L888)
 
 ***
 
@@ -238,7 +238,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:873](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L873)
+[packages/core/src/types.ts:895](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L895)
 
 ***
 
@@ -270,7 +270,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:875](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L875)
+[packages/core/src/types.ts:897](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L897)
 
 ***
 
@@ -292,7 +292,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:885](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L885)
+[packages/core/src/types.ts:907](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L907)
 
 ***
 
@@ -324,7 +324,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:890](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L890)
+[packages/core/src/types.ts:912](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L912)
 
 ***
 
@@ -346,7 +346,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:902](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L902)
+[packages/core/src/types.ts:924](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L924)
 
 ***
 
@@ -366,7 +366,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:908](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L908)
+[packages/core/src/types.ts:930](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L930)
 
 ***
 
@@ -386,7 +386,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:910](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L910)
+[packages/core/src/types.ts:932](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L932)
 
 ***
 
@@ -408,7 +408,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:912](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L912)
+[packages/core/src/types.ts:934](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L934)
 
 ***
 
@@ -436,7 +436,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:918](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L918)
+[packages/core/src/types.ts:940](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L940)
 
 ***
 
@@ -454,7 +454,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:926](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L926)
+[packages/core/src/types.ts:948](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L948)
 
 ***
 
@@ -472,7 +472,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:928](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L928)
+[packages/core/src/types.ts:950](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L950)
 
 ***
 
@@ -490,7 +490,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:930](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L930)
+[packages/core/src/types.ts:952](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L952)
 
 ***
 
@@ -508,7 +508,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:932](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L932)
+[packages/core/src/types.ts:954](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L954)
 
 ***
 
@@ -526,7 +526,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:934](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L934)
+[packages/core/src/types.ts:956](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L956)
 
 ***
 
@@ -544,7 +544,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:936](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L936)
+[packages/core/src/types.ts:958](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L958)
 
 ***
 
@@ -562,7 +562,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:938](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L938)
+[packages/core/src/types.ts:960](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L960)
 
 ***
 
@@ -580,7 +580,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:940](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L940)
+[packages/core/src/types.ts:962](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L962)
 
 ***
 
@@ -598,7 +598,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:942](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L942)
+[packages/core/src/types.ts:964](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L964)
 
 ***
 
@@ -618,7 +618,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:944](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L944)
+[packages/core/src/types.ts:966](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L966)
 
 ***
 
@@ -638,7 +638,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:946](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L946)
+[packages/core/src/types.ts:968](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L968)
 
 ***
 
@@ -656,7 +656,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:948](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L948)
+[packages/core/src/types.ts:970](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L970)
 
 ***
 
@@ -674,7 +674,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:950](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L950)
+[packages/core/src/types.ts:972](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L972)
 
 ***
 
@@ -694,7 +694,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:952](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L952)
+[packages/core/src/types.ts:974](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L974)
 
 ***
 
@@ -716,7 +716,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:957](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L957)
+[packages/core/src/types.ts:979](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L979)
 
 ***
 
@@ -738,7 +738,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:963](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L963)
+[packages/core/src/types.ts:985](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L985)
 
 ***
 
@@ -760,7 +760,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:965](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L965)
+[packages/core/src/types.ts:987](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L987)
 
 ***
 
@@ -780,4 +780,4 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:970](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L970)
+[packages/core/src/types.ts:992](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L992)

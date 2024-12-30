@@ -734,12 +734,12 @@ export class SqlJsDatabaseAdapter
         return relationship;
     }
 
-    async removeRelationship(userA: UUID, userB: UUID, roomId: UUID): Promise<boolean> {
+    async removeRelationship(params: {userA: UUID, userB: UUID, roomId: UUID}): Promise<boolean> {
         try {
             const sql =
                 "DELETE FROM relationships WHERE (userA = ? AND userB = ?) OR (userA = ? AND userB = ?) AND roomId = ?";
             const stmt = this.db.prepare(sql);
-            stmt.run([userA, userB, userB, userA, roomId]);
+            stmt.run([params.userA, params.userB, params.userB, params.userA, params.roomId]);
             stmt.free();
             return true;
         } catch (error) {

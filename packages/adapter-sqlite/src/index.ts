@@ -663,11 +663,11 @@ export class SqliteDatabaseAdapter
         );
     }
 
-    async removeRelationship(userA: UUID, userB: UUID, roomId: UUID): Promise<boolean> {
+    async removeRelationship(params: {userA: UUID, userB: UUID, roomId: UUID}): Promise<boolean> {
         try {
             const sql =
                 "DELETE FROM relationships WHERE (userA = ? AND userB = ?) OR (userA = ? AND userB = ?) AND roomId = ?";
-            this.db.prepare(sql).run(userA, userB, userB, userA, roomId);
+            this.db.prepare(sql).run(params.userA, params.userB, params.userB, params.userA, params.roomId);
             return true;
         } catch (error) {
             console.log("Error removing relationship", error);

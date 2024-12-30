@@ -984,6 +984,8 @@ export interface IDatabaseAdapter {
 
     createRelationship(params: { userA: UUID; userB: UUID }): Promise<boolean>;
 
+    removeRelationship(params: {userA: UUID, userB: UUID, roomId: UUID}): Promise<boolean>;
+
     getRelationship(params: {
         userA: UUID;
         userB: UUID;
@@ -1261,3 +1263,18 @@ export type KnowledgeItem = {
     id: UUID;
     content: Content;
 };
+
+/**
+ * Simple type to bind together the full user and character ID pair
+ *  that comprises a user to agent/character relationship.
+ */
+export type FullUserIdCharacterIdPair = {
+    // The full user ID comprised of the room ID prefixed to the
+    //  user ID with a delimiter.
+    fullUserId: UUID;
+    // The full character ID comprised of the room ID prefixed to the
+    //  character name with a delimiter.  The character name is wrapped
+    //  by a constant prefix and then encased in parentheses to avoid
+    //  potential conflicts with other ID types.
+    fullCharacterId: UUID;
+}

@@ -45,23 +45,16 @@ import { aptosPlugin, TransferAptosToken } from "@ai16z/plugin-aptos";
 import { flowPlugin } from "@ai16z/plugin-flow";
 import { storyPlugin } from "@ai16z/plugin-story";
 import { teePlugin } from "@ai16z/plugin-tee";
-import Database from "better-sqlite3";
 import fs from "fs";
 import path from "path";
 import readline from "readline";
 import { fileURLToPath } from "url";
-import yargs from "yargs";
 import pilTermsPlugin from "@ai16z/plugin-pilterms";
-import {DIR_DATA, initializeDatabase, prepareDatabase} from "./database-helpers.ts";
+import {prepareDatabase} from "./database-helpers.ts";
+import {isAllStrings, parseArguments, tryLoadFile} from "./utils.ts";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
-
-export const wait = (minTime: number = 1000, maxTime: number = 3000) => {
-    const waitTime =
-        Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
-    return new Promise((resolve) => setTimeout(resolve, waitTime));
-};
 
 /**
  * Load the characters specified by the user for the system, using

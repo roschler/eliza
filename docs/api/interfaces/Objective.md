@@ -39,3 +39,16 @@ Whether objective is completed
 #### Defined in
 
 [packages/core/src/types.ts:99](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L99)
+
+***
+
+### resultData?
+
+> `optional` **resultData**: `object`
+
+The optional data object that is the result of the objective
+  being completed.
+
+#### Defined in
+
+[packages/core/src/types.ts:104](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L104)

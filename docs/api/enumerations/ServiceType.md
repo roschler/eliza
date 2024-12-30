@@ -10,7 +10,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1222](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1222)
+[packages/core/src/types.ts:1244](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1244)
 
 ***
 
@@ -20,7 +20,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1223](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1223)
+[packages/core/src/types.ts:1245](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1245)
 
 ***
 
@@ -30,7 +30,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1224](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1224)
+[packages/core/src/types.ts:1246](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1246)
 
 ***
 
@@ -40,7 +40,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1225](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1225)
+[packages/core/src/types.ts:1247](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1247)
 
 ***
 
@@ -50,7 +50,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1226](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1226)
+[packages/core/src/types.ts:1248](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1248)
 
 ***
 
@@ -60,7 +60,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1227](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1227)
+[packages/core/src/types.ts:1249](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1249)
 
 ***
 
@@ -70,7 +70,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1228](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1228)
+[packages/core/src/types.ts:1250](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1250)
 
 ***
 
@@ -80,4 +80,4 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1229](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1229)
+[packages/core/src/types.ts:1251](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1251)

@@ -60,6 +60,17 @@ If billOfMaterialsJsonStr has a value when the character is loaded,
  character's bill of materials.  If present, it will contain
  an array of BillOfMaterialsLineItem objects.
 
+### resetGoalsOnInitialActivation?
+
+> `optional` **resetGoalsOnInitialActivation**: `boolean`
+
+This field if present and is equal to FALSE,
+ will suppress the default behavior of characters
+ whereby all of their goals are completely reset
+ when the first get control.  If the field is not
+ present, or it is TRUE, then the goals will be
+ reset when the character first receives control.
+
 ### messageTemplate?
 
 > `optional` **messageTemplate**: `string`
@@ -359,4 +370,4 @@ Optional Twitter profile
 
 ## Defined in
 
-[packages/core/src/types.ts:678](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L678)
+[packages/core/src/types.ts:690](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L690)

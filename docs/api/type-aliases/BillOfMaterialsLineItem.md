@@ -69,6 +69,14 @@ If present, then the character will only accept a number value that
  is less than or equal to this value.  This value MUST be greater
  than the minVal value if that value exists.
 
+### unitsDescription?
+
+> `optional` **unitsDescription**: `string`
+
+If present, then this string will be appended to any numeric values
+ shown to the user (e.g. - "The minimum cost for an NFT is 1 Eth"
+ where "Eth" would be the unitsDescription value.").
+
 ## Defined in
 
-[packages/core/src/types.ts:618](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L618)
+[packages/core/src/types.ts:623](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L623)

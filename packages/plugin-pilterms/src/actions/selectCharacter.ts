@@ -113,38 +113,34 @@ export const selectCharacterAction = {
                 //  array.
                 const userId = findUserIdInState(state);
 
-                // We build a full user ID from the current room ID
-                //  and the current user ID, so the relationship
-                //  between the user and the specified character
-                //  is local to the current room.  This allows
-                //  the user to be serviced by other characters
-                //  in other rooms they may be participating in.
-                const fullUserId =
-                    buildFullRelationshipId(roomId, userId);
-
-                // We adorn the character name with a constant prefix
-                //  so that we don't accidentally confuse a character
-                //  name with a user ID.
-                const fullCharacterName =
-                    buildCharacterNameForRelationship(characterName);
-
-                // Same for the specified character.
-                const fullCharacterId =
-                    buildFullRelationshipId(roomId, fullCharacterName);
-
-                // Is there an existing relationship?
+                // Is there an existing relationship between the current user and
+                //  the currently set agent/character in the current room?
                 const bIsAlreadyRelated =
-                    await isRelated(roomId, userId, agentObj);
+                    await isRelated(roomId, userId, runtime);
 
-                // Create a relationship between the user and the selected character.
-                //  runtime.databaseAdapter.createRelationship().  ALWAYS put
-                // the user before the character!
-                runtime.databaseAdapter.createRelationship(
-                    {
-                        userA: fullUserId,
-                        userB: fullCharacterId
-                    }
-                );
+                if (bIsAlreadyRelated) {
+
+                } else {
+                    // -------------------------- BEGIN: CREATE NEW USER/CHARACTER RELATIONSHIP ------------------------
+
+                    // Remove any relationships between the user and an agent/character
+                    //  in the current room.
+                    await removeAllUserToCharacterRelationships(roomId, userId);
+
+                    await setExclusiveUserToCharacterRelationship(roomId, runtime);
+
+                    // Create a relationship between the user and the selected character.
+                    //  runtime.databaseAdapter.createRelationship().  ALWAYS put
+                    // the user before the character!
+                    runtime.databaseAdapter.createRelationship(
+                        {
+                            userA: fullUserId,
+                            userB: fullCharacterId
+                        }
+                    );
+
+                    // -------------------------- END  : CREATE NEW USER/CHARACTER RELATIONSHIP ------------------------
+                }
             }
 
             // Test Story Protocol plugin

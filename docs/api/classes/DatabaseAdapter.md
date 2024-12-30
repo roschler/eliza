@@ -1183,6 +1183,38 @@ A Promise that resolves to the Relationship object or null if not found.
 
 ***
 
+### removeRelationship()
+
+> `abstract` **removeRelationship**(`params`): `Promise`\<`boolean`\>
+
+Removes a relationship between two users if it exists.
+
+#### Parameters
+
+• **params**
+
+An object containing the UUIDs of the two users (userA and userB)
+ and the room ID where the relationship exists.
+
+• **params.userA**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
+
+• **params.userB**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
+
+• **params.roomId**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
+
+#### Returns
+
+`Promise`\<`boolean`\>
+
+A Promise that resolves to TRUE if the relationship was
+ successfully removed, or FALSE if not.
+
+#### Defined in
+
+[packages/core/src/database.ts:383](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L383)
+
+***
+
 ### getRelationships()
 
 > `abstract` **getRelationships**(`params`): `Promise`\<[`Relationship`](../interfaces/Relationship.md)[]\>
@@ -1209,7 +1241,7 @@ A Promise that resolves to an array of Relationship objects.
 
 #### Defined in
 
-[packages/core/src/database.ts:379](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L379)
+[packages/core/src/database.ts:390](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L390)
 
 ***
 
@@ -1245,4 +1277,4 @@ Will throw an error if the circuit breaker is open or if the operation fails
 
 #### Defined in
 
-[packages/core/src/database.ts:391](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L391)
+[packages/core/src/database.ts:402](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L402)

@@ -1,4 +1,5 @@
-import { IAgentRuntime, type Relationship, type UUID } from "./types.ts";
+import {FullUserIdCharacterIdPair, IAgentRuntime, type Relationship, type UUID} from "./types.ts";
+import elizaLogger from "./logger.ts";
 
 export async function createRelationship({
     runtime,
@@ -110,7 +111,7 @@ export function buildCharacterNameForRelationship(characterName: string): string
  * - `userId` is empty after trimming.
  * - `roomId` and `userId` have the same value after trimming.
  */
-export function buildFullRelationshipId(roomId: string, userId: string): UUID {
+export function buildFullRelationshipId(roomId: UUID, userId: UUID): UUID {
     // Trim the inputs
     const trimmedRoomId = roomId.trim();
     const trimmedUserId = userId.trim();
@@ -143,5 +144,60 @@ export function buildFullRelationshipId(roomId: string, userId: string): UUID {
 
     return fullRelationshipId as UUID;
 }
+
+/**
+ * Given a room ID, a user ID, and a character name (from an agent)
+ *  build the pair of IDs necessary to uniquely identify the
+ *  relationship within the given room.
+ *
+ * @param roomId - The ID of the room the relationship exists in.
+ * @param userId - The ID of the user that is bound to the agent/character.
+ * @param characterName - The name of the character as found in the character
+ *  JSON file the agent was initialized with.
+ *
+ * @returns - Returns a UUID built from the given parameters.
+ */
+export function buildRelationshipIdPair(roomId: UUID, userId: UUID, characterName: string): FullUserIdCharacterIdPair {
+    // Let the builder functions validate the input parameters.
+    const retObj: FullUserIdCharacterIdPair = {
+        fullUserId: buildFullRelationshipId(roomId, userId),
+        fullCharacterId: buildFullRelationshipId(roomId,  buildFullRelationshipId(roomId, buildCharacterNameForRelationship(characterName) as UUID))
+    }
+
+    return retObj;
+}
+
+export async function removeAllUserToCharacterRelationships(roomId: UUID, userId: UUID, agentRegistry: IAgentRuntime[]): Promise<boolean> {
+
+        for (let agentNdx = 0; agentNdx < agentRegistry.length; agentNdx++) {
+            const agentObj = agentRegistry[agentNdx];
+
+            const relationshipIdPair: FullUserIdCharacterIdPair =
+                buildRelationshipIdPair(roomId, userId, agentObj.character.name);
+
+            try {
+                const bSuccess =
+                    await agentObj.databaseAdapter.removeRelationship(
+                        {
+                            userA: relationshipIdPair.fullUserId,
+                            userB: relationshipIdPair.fullCharacterId,
+                            roomId: roomId
+                        });
+
+                if (!bSuccess) {
+                    // Relationship most likely does not exist.  Log the incident at
+                    //  DEBUG level but continue on so we remove all relevant relationships.
+                    elizaLogger.debug(`Relationship removal failed for user ID, character ID: ${relationshipIdPair.fullUserId} / ${relationshipIdPair.fullCharacterId}.  Most likely cause, no relationship existed.`);
+                }
+            } catch (error) {
+                // Relationship most likely does not exist.  Log the incident at
+                //  DEBUG level but continue on so we remove all relevant relationships.
+                elizaLogger.debug(`CATCH BLOCK - No relationship removed for user ID, character ID: ${relationshipIdPair.fullUserId} / ${relationshipIdPair.fullCharacterId}.  Error details:`, error);
+            }
+        }
+
+        return true;
+}
+
 
 // -------------------------- END  : RELATIONSHIPS ------------------------

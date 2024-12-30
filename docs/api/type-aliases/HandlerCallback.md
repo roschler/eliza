@@ -18,4 +18,4 @@ Callback function type for handlers
 
 ## Defined in
 
-[packages/core/src/types.ts:383](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L383)
+[packages/core/src/types.ts:388](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L388)

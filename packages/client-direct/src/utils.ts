@@ -27,7 +27,8 @@ export function parseArguments(): {
 export function tryLoadFile(filePath: string): string | null {
     try {
         return fs.readFileSync(filePath, "utf8");
-    } catch (e) {
+    } catch (error) {
+        elizaLogger.warn(`Unable to load file: ${filePath}.\nError details:`, error);
         return null;
     }
 }

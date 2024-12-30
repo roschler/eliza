@@ -871,12 +871,12 @@ export class PostgresDatabaseAdapter
         }, "getRelationship");
     }
 
-    async removeRelationship(userA: UUID, userB: UUID, roomId: UUID): Promise<boolean> {
+    async removeRelationship(params: { userA: UUID, userB: UUID, roomId: UUID}): Promise<boolean> {
         return this.withDatabase(async () => {
             try {
                 await this.pool.query(
                     `DELETE FROM relationships WHERE (userA = ? AND userB = ?) OR (userA = ? AND userB = ?) AND roomId = ?`,
-                    [userA, userB, userB, userA, roomId]
+                    [params.userA, params.userB, params.userB, params.userA, params.roomId]
                 );
                 return true;
             } catch (error) {
