@@ -372,6 +372,17 @@ export abstract class DatabaseAdapter<DB = any> implements IDatabaseAdapter {
     }): Promise<Relationship | null>;
 
     /**
+     * Removes a relationship between two users if it exists.
+     *
+     * @param params An object containing the UUIDs of the two users (userA and userB)
+     *  and the room ID where the relationship exists.
+     *
+     * @returns A Promise that resolves to TRUE if the relationship was
+     *  successfully removed, or FALSE if not.
+     */
+    abstract removeRelationship(params: {userA: UUID, userB: UUID, roomId: UUID}): Promise<boolean>;
+
+    /**
      * Retrieves all relationships for a specific user.
      * @param params An object containing the UUID of the user.
      * @returns A Promise that resolves to an array of Relationship objects.

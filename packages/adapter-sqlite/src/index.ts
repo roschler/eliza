@@ -248,8 +248,8 @@ export class SqliteDatabaseAdapter
 
         let sql = `
             SELECT *, vec_distance_L2(embedding, ?) AS similarity
-            FROM memories 
-            WHERE type = ? 
+            FROM memories
+            WHERE type = ?
             AND roomId = ?`;
 
         if (params.unique) {
@@ -340,24 +340,24 @@ export class SqliteDatabaseAdapter
         // First get content text and calculate Levenshtein distance
         const sql = `
             WITH content_text AS (
-                SELECT 
+                SELECT
                     embedding,
                     json_extract(
                         json(content),
                         '$.' || ? || '.' || ?
                     ) as content_text
-                FROM memories 
+                FROM memories
                 WHERE type = ?
                 AND json_extract(
                     json(content),
                     '$.' || ? || '.' || ?
                 ) IS NOT NULL
             )
-            SELECT 
+            SELECT
                 embedding,
                 length(?) + length(content_text) - (
                     length(?) + length(content_text) - (
-                        length(replace(lower(?), lower(content_text), '')) + 
+                        length(replace(lower(?), lower(content_text), '')) +
                         length(replace(lower(content_text), lower(?), ''))
                     ) / 2
                 ) as levenshtein_score
@@ -661,6 +661,18 @@ export class SqliteDatabaseAdapter
                     params.userA
                 ) as Relationship) || null
         );
+    }
+
+    async removeRelationship(userA: UUID, userB: UUID, roomId: UUID): Promise<boolean> {
+        try {
+            const sql =
+                "DELETE FROM relationships WHERE (userA = ? AND userB = ?) OR (userA = ? AND userB = ?) AND roomId = ?";
+            this.db.prepare(sql).run(userA, userB, userB, userA, roomId);
+            return true;
+        } catch (error) {
+            console.log("Error removing relationship", error);
+            return false;
+        }
     }
 
     async getRelationships(params: { userId: UUID }): Promise<Relationship[]> {
