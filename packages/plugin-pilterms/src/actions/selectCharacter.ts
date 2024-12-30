@@ -1,16 +1,9 @@
 import {
-    composeContext,
     elizaLogger,
-    generateObjectDEPRECATED,
     HandlerCallback,
-    ModelClass,
     type IAgentRuntime,
-    type Memory,
+    type Memory, setExclusiveUserToCharacterRelationship,
     type State,
-    generateText,
-    buildFullRelationshipId,
-    buildCharacterNameForRelationship,
-    removeAllUserToCharacterRelationships, setExclusiveUserToCharacterRelationship,
 } from "@ai16z/eliza";
 import {
     isRelated
@@ -131,6 +124,15 @@ export const selectCharacterAction = {
                     //  selected agent/character.  All other relationships for that user
                     //  in the current room will be broken.
                     await setExclusiveUserToCharacterRelationship(roomId, userId, runtime);
+
+                    // TODO: If the character has the resetGoalsOnInitialActivation flag
+                    //  set, then delete all existing goals and recreate the main goal
+                    //  with its objectives using the bill-of-materials line item fields.
+                    //  NOTE: Need to do this from the "reset" command code too! (See
+                    //  bIsResetCommand).
+
+                    // THEN: Modify the LLM prompt based on the needs of the agent/character's
+                    //  current goal(s).
 
                     // -------------------------- END  : CREATE NEW USER/CHARACTER RELATIONSHIP ------------------------
                 }

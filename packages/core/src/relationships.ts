@@ -197,8 +197,7 @@ export async function removeAllUserToCharacterRelationships(roomId: UUID, userId
                     await agentObj.databaseAdapter.removeRelationship(
                         {
                             userA: relationshipIdPair.fullUserId,
-                            userB: relationshipIdPair.fullCharacterId,
-                            roomId: roomId
+                            userB: relationshipIdPair.fullCharacterId
                         });
 
                 if (!bSuccess) {
@@ -215,12 +214,6 @@ export async function removeAllUserToCharacterRelationships(roomId: UUID, userId
 
         return true;
 }
-
-
-export async removeAllUserRelationshipsInRoom(roomId: UUID, userId: UUID): Promise<boolean> {
-
-}
-
 
 /**
  * Creates a relationship record that binds the given user ID to the
@@ -282,8 +275,7 @@ export async function setExclusiveUserToCharacterRelationship(
         // Remove ALL relationships the user has to any agents in the given room.
         await desiredAgent.databaseAdapter.removeAllRelationships(
             {
-                userA: fullUserToCharacterIdPair.fullUserId,
-                roomId: fullUserToCharacterIdPair.r});
+                userA: fullUserToCharacterIdPair.fullUserId});
 
         // Create a relationship between the user and the selected character.
         //  runtime.databaseAdapter.createRelationship().  ALWAYS put
