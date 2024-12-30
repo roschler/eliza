@@ -97,6 +97,11 @@ export interface Objective {
 
     /** Whether objective is completed */
     completed: boolean;
+
+    /** The optional data object that is the result of the objective
+     *   being completed.
+     */
+    resultData?: object;
 }
 
 /**
