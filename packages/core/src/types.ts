@@ -984,7 +984,9 @@ export interface IDatabaseAdapter {
 
     createRelationship(params: { userA: UUID; userB: UUID }): Promise<boolean>;
 
-    removeRelationship(params: {userA: UUID, userB: UUID, roomId: UUID}): Promise<boolean>;
+    removeRelationship(params: {userA: UUID, userB: UUID}): Promise<boolean>;
+
+    removeAllRelationships(params: { userA: UUID}): Promise<boolean>;
 
     getRelationship(params: {
         userA: UUID;

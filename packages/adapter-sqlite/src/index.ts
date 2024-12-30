@@ -663,14 +663,26 @@ export class SqliteDatabaseAdapter
         );
     }
 
-    async removeRelationship(params: {userA: UUID, userB: UUID, roomId: UUID}): Promise<boolean> {
+    async removeRelationship(params: {userA: UUID, userB: UUID}): Promise<boolean> {
         try {
             const sql =
-                "DELETE FROM relationships WHERE (userA = ? AND userB = ?) OR (userA = ? AND userB = ?) AND roomId = ?";
-            this.db.prepare(sql).run(params.userA, params.userB, params.userB, params.userA, params.roomId);
+                "DELETE FROM relationships WHERE (userA = ? AND userB = ?) OR (userA = ? AND userB = ?)";
+            this.db.prepare(sql).run(params.userA, params.userB, params.userB, params.userA);
             return true;
         } catch (error) {
             console.log("Error removing relationship", error);
+            return false;
+        }
+    }
+
+    async removeAllRelationships(params: {userA: UUID, userB: UUID}): Promise<boolean> {
+        try {
+            const sql =
+                "DELETE FROM relationships WHERE userA = ? OR userB = ?";
+            this.db.prepare(sql).run(params.userA, params.userA);
+            return true;
+        } catch (error) {
+            console.log("Error removing relationships", error);
             return false;
         }
     }

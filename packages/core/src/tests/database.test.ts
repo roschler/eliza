@@ -136,7 +136,11 @@ class MockDatabaseAdapter extends DatabaseAdapter {
         throw new Error("Method not implemented.");
     }
 
-    removeRelationship(_params: {userA: UUID, userB: UUID, roomId: UUID}): Promise<boolean> {
+    removeRelationship(_params: {userA: UUID, userB: UUID}): Promise<boolean> {
+        throw new Error("Method not implemented.");
+    }
+
+    removeAllRelationships(_params: { userA: UUID, roomId: UUID}): Promise<boolean> {
         throw new Error("Method not implemented.");
     }
 

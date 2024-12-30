@@ -871,12 +871,12 @@ export class PostgresDatabaseAdapter
         }, "getRelationship");
     }
 
-    async removeRelationship(params: { userA: UUID, userB: UUID, roomId: UUID}): Promise<boolean> {
+    async removeRelationship(params: { userA: UUID, userB: UUID}): Promise<boolean> {
         return this.withDatabase(async () => {
             try {
                 await this.pool.query(
-                    `DELETE FROM relationships WHERE (userA = ? AND userB = ?) OR (userA = ? AND userB = ?) AND roomId = ?`,
-                    [params.userA, params.userB, params.userB, params.userA, params.roomId]
+                    `DELETE FROM relationships WHERE (userA = ? AND userB = ?) OR (userA = ? AND userB = ?)`,
+                    [params.userA, params.userB, params.userB, params.userA]
                 );
                 return true;
             } catch (error) {
@@ -884,6 +884,21 @@ export class PostgresDatabaseAdapter
                 return false;
             }
         }, "removeRelationship");
+    }
+
+    async removeAllRelationships(params: { userA: UUID}): Promise<boolean> {
+        return this.withDatabase(async () => {
+            try {
+                await this.pool.query(
+                    `DELETE FROM relationships WHERE userA = ? OR userB = ?`,
+                    [params.userA, params.userA]
+                );
+                return true;
+            } catch (error) {
+                console.log("Error removing relationships", error);
+                return false;
+            }
+        }, "removeAllRelationships");
     }
 
     async getRelationships(params: { userId: UUID }): Promise<Relationship[]> {

@@ -127,7 +127,10 @@ export const selectCharacterAction = {
                 } else {
                     // -------------------------- BEGIN: CREATE NEW USER/CHARACTER RELATIONSHIP ------------------------
 
-                    await setExclusiveUserToCharacterRelationship(roomId, userId, runtime, ??)
+                    // Make an exclusive relationship between the given user ID and the
+                    //  selected agent/character.  All other relationships for that user
+                    //  in the current room will be broken.
+                    await setExclusiveUserToCharacterRelationship(roomId, userId, runtime);
 
                     // -------------------------- END  : CREATE NEW USER/CHARACTER RELATIONSHIP ------------------------
                 }

@@ -651,15 +651,34 @@ export class SupabaseDatabaseAdapter extends DatabaseAdapter {
         return true;
     }
 
-    async removeRelationship(params: { userA: UUID, userB: UUID, roomId: UUID }): Promise<boolean> {
+    async removeRelationship(params: { userA: UUID, userB: UUID}): Promise<boolean> {
         const { error } = await this.supabase
             .from("relationships")
             .delete()
             .or(
                 `(
-                roomId.eq.${params.roomId} AND userA.eq.${params.userA} AND userB.eq.${params.userB}
+                userA.eq.${params.userA} AND userB.eq.${params.userB}
             ),(
-                roomId.eq.${params.roomId} AND userA.eq.${params.userB} AND userB.eq.${params.userA}
+                userA.eq.${params.userB} AND userB.eq.${params.userA}
+            )`
+            );
+
+        if (error) {
+            console.error(`Error removing relationship: ${error.message}`);
+            return false;
+        }
+        return true;
+    }
+
+    async removeAllRelationships(params: { userA: UUID}): Promise<boolean> {
+        const { error } = await this.supabase
+            .from("relationships")
+            .delete()
+            .or(
+                `(
+                userA.eq.${params.userA}
+            ),(
+                userB.eq.${params.userA}
             )`
             );
 

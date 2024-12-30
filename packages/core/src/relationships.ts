@@ -178,6 +178,11 @@ export function buildRelationshipIdPair(roomId: UUID, userId: UUID, characterNam
  * @param agentRegistry - An array of IAgentRuntime objects that contains
  *  all the agent/character objects that were instantiated when the
  *  system was launched.
+ *
+ * @returns - Returns TRUE if the operation succeeded, FALSE if there
+ *  was an error during the operation.  Note, if no existing
+ *  relationships existed then TRUE will still be returned because
+ *  the operation is still considered successful.
  */
 export async function removeAllUserToCharacterRelationships(roomId: UUID, userId: UUID, agentRegistry: IAgentRuntime[]): Promise<boolean> {
 
@@ -210,6 +215,12 @@ export async function removeAllUserToCharacterRelationships(roomId: UUID, userId
 
         return true;
 }
+
+
+export async removeAllUserRelationshipsInRoom(roomId: UUID, userId: UUID): Promise<boolean> {
+
+}
+
 
 /**
  * Creates a relationship record that binds the given user ID to the
@@ -249,33 +260,35 @@ export async function setUserToCharacterRelationship(roomId: UUID, userId: UUID,
  * Creates an EXCLUSIVE relationship record that binds the given user ID to the
  *  character name for the character assigned to the agent object,
  *  specific to the given room ID, while removing all and any other relationships
- *  the user has to any other agents in the specified room.
+ *  the user has to anyone else in the specified room.
  *
  *  @param roomId - The ID of the current room.
  *  @param userId - The ID of the current user.
  *  @param desiredAgent - The agent/character that should be only one
  *   assigned to the user.
- *  @param agentRegistry - An array of the agents initialized for use by the
- *   system.
+ *
+ *  @returns - Returns TRUE if the operation succeeded, FALSE if not or
+ *   an error occurred.
  */
 export async function setExclusiveUserToCharacterRelationship(
         roomId: UUID,
         userId: UUID,
-        desiredAgent: IAgentRuntime,
-        agentRegistry: IAgentRuntime[]): Promise<boolean> {
+        desiredAgent: IAgentRuntime): Promise<boolean> {
 
     try {
-        // Remove ALL relationships the user has to any agents in the given room.
-
-        await removeAllUserToCharacterRelationships(roomId, userId, agentRegistry);
-
         const fullUserToCharacterIdPair =
             buildRelationshipIdPair(roomId, userId, desiredAgent.character.name);
+
+        // Remove ALL relationships the user has to any agents in the given room.
+        await desiredAgent.databaseAdapter.removeAllRelationships(
+            {
+                userA: fullUserToCharacterIdPair.fullUserId,
+                roomId: fullUserToCharacterIdPair.r});
 
         // Create a relationship between the user and the selected character.
         //  runtime.databaseAdapter.createRelationship().  ALWAYS put
         // the user before the character!
-        desiredAgent.databaseAdapter.createRelationship(
+        await desiredAgent.databaseAdapter.createRelationship(
             {
                 userA: fullUserToCharacterIdPair.fullUserId,
                 userB: fullUserToCharacterIdPair.fullCharacterId
