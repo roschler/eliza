@@ -83,7 +83,7 @@ export interface SimliClientConfig {
  *  object for that agent will be returned.  Otherwise,
  *  null will be returned.
  */
-async function isRelated(roomId: UUID, userId: UUID, agentObj: AgentRuntime): Promise<AgentRuntimeOrNull> {
+export async function isRelated(roomId: UUID, userId: UUID, agentObj: AgentRuntime): Promise<AgentRuntimeOrNull> {
     const characterName =
         agentObj.character.name;
 
@@ -133,7 +133,7 @@ async function isRelated(roomId: UUID, userId: UUID, agentObj: AgentRuntime): Pr
 }
 
 /**
- * This function searches the agents registry to see if a particular
+ * This function searches the agents registry to see if a specific
  *  agent was assigned to the given user in the given room.
  *
  * @param roomId - The ID of the current room.
@@ -283,7 +283,9 @@ export class DirectClient {
                 // -------------------------- BEGIN: CHARACTER/AGENT SWITCH HANDLING ------------------------
 
                 // TODO: We need a more nuanced way to reset a session than this.
-                if (!bIsResetCommand) {
+                if (bIsResetCommand) {
+                    elizaLogger.debug(`RESET command received.`);
+                } else {
 
                     // Check if a character assignment relationship was created for the
                     //  current room ID + user ID pair.
@@ -295,7 +297,7 @@ export class DirectClient {
                         await findAgentAssignedToUser(roomId, userId, this.agents);
 
                     if (overrideRuntimeOrNull instanceof AgentRuntime) {
-                        console.debug(`User assigned the following agent with CHARACTER name: ${overrideRuntimeOrNull.character.name}`);
+                        elizaLogger.debug(`User assigned the following agent with CHARACTER name: ${overrideRuntimeOrNull.character.name}`);
 
                         // Override the selected agent.
                         runtime = overrideRuntimeOrNull;

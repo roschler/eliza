@@ -6,6 +6,7 @@
     "types": "dist/index.d.ts",
     "dependencies": {
         "@ai16z/eliza": "workspace:*",
+        "@ai16z/client-direct": "workspace:*",
         "@ai16z/plugin-trustdb": "workspace:*",
         "@story-protocol/core-sdk": "1.2.0-rc.3",
         "tsup": "8.3.5",

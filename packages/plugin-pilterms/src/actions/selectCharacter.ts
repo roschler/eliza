@@ -8,6 +8,9 @@ import {
     type Memory,
     type State, generateText, buildFullRelationshipId, buildCharacterNameForRelationship,
 } from "@ai16z/eliza";
+import {
+    isRelated
+} from "@ai16z/client-direct";
 import { pickLicenseTemplate } from "../templates";
 import {ActorActionDetails} from "../system/types.ts";
 
@@ -22,8 +25,8 @@ const bVerbose = true;
  *  such actor is found, returns `null`.
  *
  * @param state - The state object containing the `actorsData` array.
- * @param ignoreUserNames - An array of names to ignore during the s
- *  earch. Defaults to `["PickLicense"]`.
+ * @param ignoreUserNames - An array of names to ignore during the
+ *  search. Defaults to `["PickLicense"]`.
  *
  * @returns The `id` of the first matching actor or `null` if no match
  *  is found.
@@ -128,6 +131,10 @@ export const selectCharacterAction = {
                 // Same for the specified character.
                 const fullCharacterId =
                     buildFullRelationshipId(roomId, fullCharacterName);
+
+                // Is there an existing relationship?
+                const bIsAlreadyRelated =
+                    await isRelated(roomId, userId, agentObj);
 
                 // Create a relationship between the user and the selected character.
                 //  runtime.databaseAdapter.createRelationship().  ALWAYS put
