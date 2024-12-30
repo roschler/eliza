@@ -50,6 +50,16 @@ Image model provider to use, if different from modelProvider
 
 Optional model endpoint override
 
+### billOfMaterials?
+
+> `optional` **billOfMaterials**: [`BillOfMaterialsLineItem`](BillOfMaterialsLineItem.md)[]
+
+If billOfMaterialsJsonStr has a value when the character is loaded,
+ then it will be parsed, then validated, into this field.  This
+ optional field contains a list of the materials that comprise a
+ character's bill of materials.  If present, it will contain
+ an array of BillOfMaterialsLineItem objects.
+
 ### messageTemplate?
 
 > `optional` **messageTemplate**: `string`
@@ -349,4 +359,4 @@ Optional Twitter profile
 
 ## Defined in
 
-[packages/core/src/types.ts:616](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L616)
+[packages/core/src/types.ts:678](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L678)

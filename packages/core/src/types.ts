@@ -669,6 +669,13 @@ export type BillOfMaterialsLineItem = {
      */
     maxVal?: number;
 
+    /**
+     * If present, then this string will be appended to any numeric values
+     *  shown to the user (e.g. - "The minimum cost for an NFT is 1 Eth"
+     *  where "Eth" would be the unitsDescription value.").
+     */
+    unitsDescription?: string;
+
     // -------------------------- END  : NUMERIC TYPE ONLY ------------------------
 }
 

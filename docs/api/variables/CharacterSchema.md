@@ -98,6 +98,14 @@ Main Character schema
 
 > **twitterProfile**: `ZodOptional`\<`ZodObject`\<`object`, `"strip"`, `ZodTypeAny`, `object`, `object`\>\>
 
+### messageTemplate
+
+> **messageTemplate**: `ZodOptional`\<`ZodString`\>
+
+### billOfMaterials
+
+> **billOfMaterials**: `ZodOptional`\<`ZodArray`\<`ZodObject`\<`object`, `"strip"`, `ZodTypeAny`, `object`, `object`\>, `"many"`\>\>
+
 ## Defined in
 
-[packages/core/src/environment.ts:66](https://github.com/roschler/eliza/blob/main/packages/core/src/environment.ts#L66)
+[packages/core/src/environment.ts:81](https://github.com/roschler/eliza/blob/main/packages/core/src/environment.ts#L81)

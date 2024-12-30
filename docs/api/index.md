@@ -68,6 +68,7 @@
 - [Media](type-aliases/Media.md)
 - [Client](type-aliases/Client.md)
 - [Plugin](type-aliases/Plugin.md)
+- [BillOfMaterialsLineItem](type-aliases/BillOfMaterialsLineItem.md)
 - [Character](type-aliases/Character.md)
 - [CacheOptions](type-aliases/CacheOptions.md)
 - [SearchResult](type-aliases/SearchResult.md)
