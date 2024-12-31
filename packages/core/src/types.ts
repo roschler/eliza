@@ -11,6 +11,15 @@ export type IAgentRuntimeOrNull = IAgentRuntime | null;
 export type UUID = `${string}-${string}-${string}-${string}-${string}`;
 
 /**
+ * Use this UUID for functions like getGoals() that require a room ID, but
+ *  in your application context you are not using a room ID.  For example,
+ *  in the Pilterms relationship usage paradigm, the room ID is pre-pended
+ *  to the user IDs participating in a relationship, so the room ID is not
+ *  needed as a separate input parameter.
+ */
+export const JOKER_UUID_AS_ROOMS_ID_WILDCARD = "00000000-0000-0000-0000-000000000000";
+
+/**
  * Represents the content of a message or communication
  */
 export interface Content {
