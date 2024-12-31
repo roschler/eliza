@@ -14,6 +14,7 @@ import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
 import { messageCompletionFooter } from "@ai16z/eliza";
 import { AgentRuntime } from "@ai16z/eliza";
+import { resetBomCharacterAgentGoals } from "@ai16z/plugin-pilterms";
 import {
     Content,
     Memory,
@@ -285,6 +286,10 @@ export class DirectClient {
                 // TODO: We need a more nuanced way to reset a session than this.
                 if (bIsResetCommand) {
                     elizaLogger.debug(`RESET command received.`);
+
+                    // Rebuild the character/agent's MAIN goal using its
+                    //  bill of materials content.
+                    await resetBomCharacterAgentGoals(roomId, userId, runtime);
                 } else {
 
                     // Check if a character assignment relationship was created for the

@@ -298,6 +298,4 @@ export async function setExclusiveUserToCharacterRelationship(
     return true;
 }
 
-
-
 // -------------------------- END  : RELATIONSHIPS ------------------------

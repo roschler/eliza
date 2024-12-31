@@ -45,6 +45,46 @@ export function findUserIdInState(state: State, ignoreUserNames: string[] = ["Pi
     return matchingActor ? matchingActor.id : null;
 }
 
+/**
+ * This function removes all the goals for the specified agent/character
+ *  that exist in the given room, and recreates the MAIN goal from the
+ *  agent/character's bill of materials line items.
+ *
+ * @param roomId - The ID of the target room.
+ * @param userId - The user the agent/character is chatting with.
+ * @param runtime - The current agent/character.
+ */
+export async function resetBomCharacterAgentGoals(roomId: UUID, userId: UUID, runtime: IAgentRuntime): Promise<void> {
+    elizaLogger.debug(`RESETTING main GOAL and objectives using bill of materials content for agent/character: ${runtime.character.name}`);
+
+    // Delete all existing goals for this agent/character
+    //  and recreate the main goal for this agent/character
+    //  with its objectives using the bill-of-materials line item
+    //  fields.
+    const objectivesForAgent: Objective[] =
+        await billOfMaterialsToObjectives(runtime);
+
+    // Create the objectives for the goal from the agent/character's
+    //  bill-of-materials information.
+    const newGoal: Goal =
+        {
+            // Make the name of the goal the same as the
+            //  agent/character name so we know its the
+            //  agent/character's MAIN goal.
+            name: `${runtime.character.name}`,
+            roomId: roomId,
+            userId: userId,
+            id: v4() as UUID,
+            objectives: objectivesForAgent,
+            status: GoalStatus.IN_PROGRESS
+        }
+
+    // Store the goal.
+    await runtime.databaseAdapter.createGoal(newGoal);
+
+    elizaLogger.debug(`MAIN GOAL and objectives rebuilt using the bill of materials content for agent/character: ${runtime.character.name}`);
+}
+
 // -------------------------- BEGIN: ACTION NAMES for CHARACTERS ------------------------
 
 const ACTION_NAME_SELECT_CHARACTER_ANY = "SELECT_CHARACTER_CHARACTER_NAME";
@@ -80,16 +120,30 @@ type UuidOrNull = UUID | null;
  *  no bill-of-materials content, an empty array is returned.
  */
 export async function billOfMaterialsToObjectives(runtime: IAgentRuntime): Promise<Objective[]> {
-    const objectivesForAgent = [];
+    const bomObjectivesForAgent = [];
 
     if (runtime.character.billOfMaterials && runtime.character.billOfMaterials.length > 0) {
         // Iterate the bill of materials array to create the objectives.
         for (let bomNdx = 0; bomNdx < runtime.character.billOfMaterials.length; bomNdx++) {
             const bomLineItem = runtime.character.billOfMaterials[bomNdx];
 
+            const newObjective: Objective = {
+                // Transfer over the full bill of materials line item
+                //  content, for use by the system when it creates/modifies
+                //  the LLM prompt.
+                billOfMaterialsLineItem:  bomLineItem,
+                // Use the bill of materials line item name for the description.
+                description: bomLineItem.name,
+                id: v4(),
+                completed: false,
+                resultData: undefined,
+            }
 
+            bomObjectivesForAgent.push(newObjective);
         }
     }
+
+    return bomObjectivesForAgent;
 }
 
 /**
@@ -161,28 +215,8 @@ export const selectCharacterAction = {
 
                     // Does the character have the resetGoalsOnReceivingControl flag
                     //  set?
-                    if (runtime.character.resetGoalsOnInitialActivation) {
-                        // Yes. Delete all existing goals for this agent/character
-                        //  and recreate the main goal for this agent/character
-                        //  with its objectives using the bill-of-materials line item
-                        //  fields.
-                        const objectivesForAgent: Objective[] =
-                            await billOfMaterialsToObjectives(runtime);
-
-                        // Create the objectives for the goal from the agent/character's
-                        //  bill-of-materials information.
-                        const newGoal: Goal =
-                            {
-                                name: `${runtime.character.name}`,
-                                roomId: roomId,
-                                userId: userId,
-                                id: v4() as UUID,
-                                objectives: objectivesForAgent,
-                                status: GoalStatus.IN_PROGRESS
-                            }
-
-                        // Store the goal.
-                        await runtime.databaseAdapter.createGoal(newGoal);
+                    if (runtime.character.resetGoalsOnReceivingControl) {
+                        await resetBomCharacterAgentGoals(roomId, userId, runtime);
                     }
 
                     //  TODO: Need to do this from the "reset" command code too! (See

@@ -91,6 +91,11 @@ export interface Actor {
 }
 
 /**
+ * The types allowed for the Object resultData and defaultValue properties.
+ */
+export type BillOfMaterialsResultType = string | boolean | number | object;
+
+/**
  * Represents a single objective within a goal
  */
 export interface Objective {
@@ -106,7 +111,13 @@ export interface Objective {
     /** The optional data object that is the result of the objective
      *   being completed.
      */
-    resultData?: object;
+    resultData: object;
+
+    /**
+     * If present, then this object is a bill of materials line
+     *  item objective.
+     */
+    billOfMaterialsLineItem?: BillOfMaterialsLineItem;
 }
 
 /**
@@ -635,6 +646,12 @@ export type BillOfMaterialsLineItem = {
 
     /** The question to ask the user to get the desired value from them. **/
     prompt: string;
+
+    /**
+     * The default value for the result.  If present, then the LLM
+     *  will be given this value to suggest it to the user.
+     */
+    defaultValue?: BillOfMaterialsResultType;
 
     /**
      * If FALSE, then the character will ask the user for the field value
