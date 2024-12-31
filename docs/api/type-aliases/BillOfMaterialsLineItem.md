@@ -79,4 +79,4 @@ If present, then this string will be appended to any numeric values
 
 ## Defined in
 
-[packages/core/src/types.ts:623](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L623)
+[packages/core/src/types.ts:631](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L631)

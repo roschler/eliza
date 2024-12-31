@@ -86,4 +86,4 @@ Model configurations by provider
 
 ## Defined in
 
-[packages/core/src/types.ts:199](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L199)
+[packages/core/src/types.ts:207](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L207)

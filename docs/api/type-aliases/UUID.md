@@ -8,4 +8,4 @@ Represents a UUID string in the format "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 
 ## Defined in
 
-[packages/core/src/types.ts:12](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L12)
+[packages/core/src/types.ts:11](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L11)

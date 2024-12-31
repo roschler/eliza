@@ -142,7 +142,7 @@ export const CharacterSchema = z.object({
         .optional(),
     messageTemplate: z.string().optional(),
     billOfMaterials: z.array(BillOfMaterialsSchema).optional(),
-    resetGoalsOnInitialActivation: z.boolean().optional(),
+    resetGoalsOnReceivingControl: z.boolean().optional(),
 });
 
 // Type inference

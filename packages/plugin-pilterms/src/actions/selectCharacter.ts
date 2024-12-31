@@ -1,13 +1,19 @@
 import {
     elizaLogger,
+    type Goal,
+    type Objective,
+    GoalStatus,
     HandlerCallback,
     type IAgentRuntime,
-    type Memory, setExclusiveUserToCharacterRelationship,
-    type State, UUID,
+    type Memory,
+    setExclusiveUserToCharacterRelationship,
+    type State,
+    UUID,
 } from "@ai16z/eliza";
-import { pickLicenseTemplate } from "../templates";
+import {pickLicenseTemplate} from "../templates";
 import {ActorActionDetails} from "../system/types.ts";
 import {isRelated} from "@ai16z/client-direct";
+import {v4} from "uuid";
 
 export { pickLicenseTemplate };
 
@@ -62,6 +68,29 @@ type UuidOrNull = UUID | null;
 // -------------------------- END  : HELPER FUNCTIONS ------------------------
 
 // -------------------- BEGIN: ACTION, SELECT CHARACTER ------------
+
+/**
+ * This function creates the array of objectives for an agent/character from
+ *  its bill-of-materials information (if any).
+ *
+ * @param runtime - The agent/character to build objectives for.
+ *
+ * @returns - Returns an array of objectives based on the bill-of-materials
+ *  content found in the agent/character.  If the agent/character has
+ *  no bill-of-materials content, an empty array is returned.
+ */
+export async function billOfMaterialsToObjectives(runtime: IAgentRuntime): Promise<Objective[]> {
+    const objectivesForAgent = [];
+
+    if (runtime.character.billOfMaterials && runtime.character.billOfMaterials.length > 0) {
+        // Iterate the bill of materials array to create the objectives.
+        for (let bomNdx = 0; bomNdx < runtime.character.billOfMaterials.length; bomNdx++) {
+            const bomLineItem = runtime.character.billOfMaterials[bomNdx];
+
+
+        }
+    }
+}
 
 /**
  * This action creates a relationship between the current
@@ -119,19 +148,44 @@ export const selectCharacterAction = {
                     await isRelated(roomId, userId, runtime);
 
                 if (bIsAlreadyRelated) {
-
+                    elizaLogger.debug(`ACTIVE CHARACTER (continuing): ${runtime.character.name}`);
                 } else {
                     // -------------------------- BEGIN: CREATE NEW USER/CHARACTER RELATIONSHIP ------------------------
+
+                    elizaLogger.debug(`ACTIVE CHARACTER (changing to): ${runtime.character.name}`);
 
                     // Make an exclusive relationship between the given user ID and the
                     //  selected agent/character.  All other relationships for that user
                     //  in the current room will be broken.
                     await setExclusiveUserToCharacterRelationship(roomId, userId, runtime);
 
-                    // TODO: If the character has the resetGoalsOnInitialActivation flag
-                    //  set, then delete all existing goals and recreate the main goal
-                    //  with its objectives using the bill-of-materials line item fields.
-                    //  NOTE: Need to do this from the "reset" command code too! (See
+                    // Does the character have the resetGoalsOnReceivingControl flag
+                    //  set?
+                    if (runtime.character.resetGoalsOnInitialActivation) {
+                        // Yes. Delete all existing goals for this agent/character
+                        //  and recreate the main goal for this agent/character
+                        //  with its objectives using the bill-of-materials line item
+                        //  fields.
+                        const objectivesForAgent: Objective[] =
+                            await billOfMaterialsToObjectives(runtime);
+
+                        // Create the objectives for the goal from the agent/character's
+                        //  bill-of-materials information.
+                        const newGoal: Goal =
+                            {
+                                name: `${runtime.character.name}`,
+                                roomId: roomId,
+                                userId: userId,
+                                id: v4() as UUID,
+                                objectives: objectivesForAgent,
+                                status: GoalStatus.IN_PROGRESS
+                            }
+
+                        // Store the goal.
+                        await runtime.databaseAdapter.createGoal(newGoal);
+                    }
+
+                    //  TODO: Need to do this from the "reset" command code too! (See
                     //  bIsResetCommand).
 
                     // THEN: Modify the LLM prompt based on the needs of the agent/character's

@@ -58,7 +58,7 @@
 
 - [EnvConfig](type-aliases/EnvConfig.md)
 - [CharacterConfig](type-aliases/CharacterConfig.md)
-- [AgentRuntimeOrNull](type-aliases/AgentRuntimeOrNull.md)
+- [IAgentRuntimeOrNull](type-aliases/IAgentRuntimeOrNull.md)
 - [UUID](type-aliases/UUID.md)
 - [Model](type-aliases/Model.md)
 - [Models](type-aliases/Models.md)
@@ -90,6 +90,7 @@
 - [booleanFooter](variables/booleanFooter.md)
 - [stringArrayFooter](variables/stringArrayFooter.md)
 - [settings](variables/settings.md)
+- [JOKER\_UUID\_AS\_ROOMS\_ID\_WILDCARD](variables/JOKER_UUID_AS_ROOMS_ID_WILDCARD.md)
 
 ## Functions
 

@@ -14,7 +14,7 @@ Associated user
 
 #### Defined in
 
-[packages/core/src/types.ts:368](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L368)
+[packages/core/src/types.ts:376](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L376)
 
 ***
 
@@ -26,4 +26,4 @@ Message content
 
 #### Defined in
 
-[packages/core/src/types.ts:371](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L371)
+[packages/core/src/types.ts:379](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L379)

@@ -14,7 +14,7 @@ Optional unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:93](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L93)
+[packages/core/src/types.ts:101](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L101)
 
 ***
 
@@ -26,7 +26,7 @@ Description of what needs to be achieved
 
 #### Defined in
 
-[packages/core/src/types.ts:96](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L96)
+[packages/core/src/types.ts:104](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L104)
 
 ***
 
@@ -38,7 +38,7 @@ Whether objective is completed
 
 #### Defined in
 
-[packages/core/src/types.ts:99](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L99)
+[packages/core/src/types.ts:107](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L107)
 
 ***
 
@@ -51,4 +51,4 @@ The optional data object that is the result of the objective
 
 #### Defined in
 
-[packages/core/src/types.ts:104](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L104)
+[packages/core/src/types.ts:112](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L112)

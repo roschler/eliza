@@ -9,9 +9,10 @@ GOALS:
        ID combination.
 
        STRATEGY NOTE: The getGoals() call requires a room ID.  We prepend the room ID to
-        all user and agent/character ID's so that is a hindrance.  Create a fixed UUID
-        that is all zeroes and use that "pseudo" ID when creating, getting and deleting
-        goals for our agent/characters.  Call it UUID_FOR_ALL_ROOMS.
+        all user and agent/character ID's, BUT, we still create the goal with a room ID
+        so we can remove all the goals for all characters in the same room with the
+        removeAllGoals(roomId) call.
+
 
 - SPSTART message template is not outputting a proper JSON object when the user just wants to chat.
 
