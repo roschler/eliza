@@ -28,4 +28,4 @@ If:
 
 ## Defined in
 
-[packages/core/src/relationships.ts:82](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L82)
+[packages/core/src/relationships.ts:83](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L83)

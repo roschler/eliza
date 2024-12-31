@@ -3,13 +3,11 @@ import {
     HandlerCallback,
     type IAgentRuntime,
     type Memory, setExclusiveUserToCharacterRelationship,
-    type State,
+    type State, UUID,
 } from "@ai16z/eliza";
-import {
-    isRelated
-} from "@ai16z/client-direct";
 import { pickLicenseTemplate } from "../templates";
 import {ActorActionDetails} from "../system/types.ts";
+import {isRelated} from "@ai16z/client-direct";
 
 export { pickLicenseTemplate };
 
@@ -28,7 +26,7 @@ const bVerbose = true;
  * @returns The `id` of the first matching actor or `null` if no match
  *  is found.
  */
-export function findUserIdInState(state: State, ignoreUserNames: string[] = ["PickLicense"]): StringOrNull {
+export function findUserIdInState(state: State, ignoreUserNames: string[] = ["PickLicense"]): UuidOrNull {
     // Validate input
     if (!state || !Array.isArray(state.actorsData)) {
         throw new Error("The 'state' parameter must be an object with an 'actorsData' array.");
@@ -53,6 +51,11 @@ const ACTION_NAME_SELECT_CHARACTER_ANY = "SELECT_CHARACTER_CHARACTER_NAME";
  * Type representing a string or null.
  */
 type StringOrNull = string | null;
+
+/**
+ * Type representing a string or null.
+ */
+type UuidOrNull = UUID | null;
 
 // -------------------------- BEGIN: HELPER FUNCTIONS ------------------------
 

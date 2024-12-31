@@ -8,11 +8,11 @@ Builds a full relationship ID by combining a room ID and a user ID.
 
 ## Parameters
 
-• **roomId**: `string`
+• **roomId**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
 
 The ID of the room. Must be a non-empty string after trimming.
 
-• **userId**: `string`
+• **userId**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
 
 The ID of the user. Must be a non-empty string after trimming.
 
@@ -31,4 +31,4 @@ If:
 
 ## Defined in
 
-[packages/core/src/relationships.ts:113](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L113)
+[packages/core/src/relationships.ts:114](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L114)

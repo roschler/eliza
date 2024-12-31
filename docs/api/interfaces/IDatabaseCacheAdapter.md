@@ -22,7 +22,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:996](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L996)
+[packages/core/src/types.ts:1000](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1000)
 
 ***
 
@@ -46,7 +46,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1001](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1001)
+[packages/core/src/types.ts:1005](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1005)
 
 ***
 
@@ -68,4 +68,4 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1007](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1007)
+[packages/core/src/types.ts:1011](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1011)

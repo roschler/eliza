@@ -3,7 +3,7 @@ import cors from "cors";
 import express, { Request as ExpressRequest } from "express";
 import multer, { File } from "multer";
 import {
-    AgentRuntimeOrNull,
+    IAgentRuntimeOrNull,
     buildCharacterNameForRelationship,
     buildFullRelationshipId,
     elizaLogger,
@@ -79,11 +79,11 @@ export interface SimliClientConfig {
  * @param agentObj - An agent object.
  *
  * @returns - If the given agent is assigned to the
- *  given user in the given room, the AgentRuntime
+ *  given user in the given room, the IAgentRuntime
  *  object for that agent will be returned.  Otherwise,
  *  null will be returned.
  */
-export async function isRelated(roomId: UUID, userId: UUID, agentObj: AgentRuntime): Promise<AgentRuntimeOrNull> {
+export async function isRelated(roomId: UUID, userId: UUID, agentObj: IAgentRuntime): Promise<IAgentRuntimeOrNull> {
     const characterName =
         agentObj.character.name;
 
@@ -105,7 +105,7 @@ export async function isRelated(roomId: UUID, userId: UUID, agentObj: AgentRunti
 
         // Same for the specified character.
         const fullCharacterId =
-            buildFullRelationshipId(roomId, fullCharacterName);
+            buildFullRelationshipId(roomId, fullCharacterName as UUID);
 
         // Search for a relationship between the user and the selected character.
         //  runtime.databaseAdapter.createRelationship().  ALWAYS put
@@ -143,10 +143,10 @@ export async function isRelated(roomId: UUID, userId: UUID, agentObj: AgentRunti
 async function findAgentAssignedToUser(
         roomId: UUID,
         userId: UUID,
-        agentsMap: Map<string, AgentRuntime>): Promise<AgentRuntimeOrNull> {
+        agentsMap: Map<string, AgentRuntime>): Promise<IAgentRuntimeOrNull> {
 
     // Create an array of Promises for the database asynchronous calls
-    const promises: Promise<AgentRuntimeOrNull>[] = [];
+    const promises: Promise<IAgentRuntimeOrNull>[] = [];
 
     for (const agentObj of agentsMap.values()) {
         // Push each asynchronous call into the promises array
@@ -159,12 +159,12 @@ async function findAgentAssignedToUser(
 
     // Take the first agent assigned, if any assignments exist,
     //  and return it.  Or return NULL if no assignment exists.
-    let agentFoundOrNull: AgentRuntimeOrNull = null;
+    let agentFoundOrNull: IAgentRuntimeOrNull = null;
 
     // Find the first result that is an AgentRuntime object
     agentFoundOrNull =
         results.find(
-            (result: AgentRuntimeOrNull): result is AgentRuntime => result !== null) || null;
+            (result: IAgentRuntimeOrNull): result is AgentRuntime => result !== null) || null;
 
     return agentFoundOrNull;
 }

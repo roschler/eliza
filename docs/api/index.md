@@ -74,6 +74,7 @@
 - [SearchResult](type-aliases/SearchResult.md)
 - [SearchResponse](type-aliases/SearchResponse.md)
 - [KnowledgeItem](type-aliases/KnowledgeItem.md)
+- [FullUserIdCharacterIdPair](type-aliases/FullUserIdCharacterIdPair.md)
 
 ## Variables
 
@@ -143,6 +144,10 @@
 - [formatRelationships](functions/formatRelationships.md)
 - [buildCharacterNameForRelationship](functions/buildCharacterNameForRelationship.md)
 - [buildFullRelationshipId](functions/buildFullRelationshipId.md)
+- [buildRelationshipIdPair](functions/buildRelationshipIdPair.md)
+- [removeAllUserToCharacterRelationships](functions/removeAllUserToCharacterRelationships.md)
+- [setUserToCharacterRelationship](functions/setUserToCharacterRelationship.md)
+- [setExclusiveUserToCharacterRelationship](functions/setExclusiveUserToCharacterRelationship.md)
 - [findNearestEnvFile](functions/findNearestEnvFile.md)
 - [configureSettings](functions/configureSettings.md)
 - [loadEnvConfig](functions/loadEnvConfig.md)

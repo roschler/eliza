@@ -742,6 +742,48 @@ Get memories matching criteria
 
 ***
 
+### removeRelationship()
+
+> **removeRelationship**(`params`): `Promise`\<`boolean`\>
+
+#### Parameters
+
+• **params**
+
+• **params.userA**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
+
+• **params.userB**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
+
+#### Returns
+
+`Promise`\<`boolean`\>
+
+#### Defined in
+
+[packages/core/src/types.ts:987](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L987)
+
+***
+
+### removeAllRelationships()
+
+> **removeAllRelationships**(`params`): `Promise`\<`boolean`\>
+
+#### Parameters
+
+• **params**
+
+• **params.userA**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
+
+#### Returns
+
+`Promise`\<`boolean`\>
+
+#### Defined in
+
+[packages/core/src/types.ts:989](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L989)
+
+***
+
 ### getRelationship()
 
 > **getRelationship**(`params`): `Promise`\<[`Relationship`](Relationship.md)\>
@@ -760,7 +802,7 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:987](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L987)
+[packages/core/src/types.ts:991](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L991)
 
 ***
 
@@ -780,4 +822,4 @@ Get memories matching criteria
 
 #### Defined in
 
-[packages/core/src/types.ts:992](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L992)
+[packages/core/src/types.ts:996](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L996)

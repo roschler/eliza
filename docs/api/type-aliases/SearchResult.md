@@ -28,4 +28,4 @@
 
 ## Defined in
 
-[packages/core/src/types.ts:1226](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1226)
+[packages/core/src/types.ts:1230](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1230)

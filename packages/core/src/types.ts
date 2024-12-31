@@ -1,10 +1,9 @@
 import { Readable } from "stream";
-import {AgentRuntime} from "./runtime.ts";
 
 /**
  * Type for functions that return an AgentRuntime object or null.
  */
-export type AgentRuntimeOrNull = AgentRuntime | null;
+export type IAgentRuntimeOrNull = IAgentRuntime | null;
 
 /**
  * Represents a UUID string in the format "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"

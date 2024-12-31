@@ -1193,25 +1193,60 @@ Removes a relationship between two users if it exists.
 
 • **params**
 
-An object containing the UUIDs of the two users (userA and userB)
- and the room ID where the relationship exists.
+An object containing the UUIDs of the
+ two users (userA and userB) that have the relationship.
 
 • **params.userA**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
 
 • **params.userB**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
-
-• **params.roomId**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
 
 #### Returns
 
 `Promise`\<`boolean`\>
 
 A Promise that resolves to TRUE if the relationship was
- successfully removed, or FALSE if not.
+ successfully removed or did not exist, or FALSE if an error occurs.
+
+#### Implementation of
+
+[`IDatabaseAdapter`](../interfaces/IDatabaseAdapter.md).[`removeRelationship`](../interfaces/IDatabaseAdapter.md#removeRelationship)
 
 #### Defined in
 
 [packages/core/src/database.ts:383](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L383)
+
+***
+
+### removeAllRelationships()
+
+> `abstract` **removeAllRelationships**(`params`): `Promise`\<`boolean`\>
+
+Removes all relationships that exist userA is a
+ participant to the relationship, either side.
+
+#### Parameters
+
+• **params**
+
+An object containing the UUID of the desired user.
+
+• **params.userA**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
+
+#### Returns
+
+`Promise`\<`boolean`\>
+
+A Promise that resolves to TRUE if the relationships were
+ successfully removed or there weren't any relationships
+ to be removed, or FALSE if an error occurs.
+
+#### Implementation of
+
+[`IDatabaseAdapter`](../interfaces/IDatabaseAdapter.md).[`removeAllRelationships`](../interfaces/IDatabaseAdapter.md#removeAllRelationships)
+
+#### Defined in
+
+[packages/core/src/database.ts:395](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L395)
 
 ***
 
@@ -1241,7 +1276,7 @@ A Promise that resolves to an array of Relationship objects.
 
 #### Defined in
 
-[packages/core/src/database.ts:390](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L390)
+[packages/core/src/database.ts:402](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L402)
 
 ***
 
@@ -1277,4 +1312,4 @@ Will throw an error if the circuit breaker is open or if the operation fails
 
 #### Defined in
 
-[packages/core/src/database.ts:402](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L402)
+[packages/core/src/database.ts:414](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L414)
