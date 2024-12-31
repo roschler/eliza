@@ -1,5 +1,6 @@
 export * from "./actions/pickLicense";
 export * from "./types";
+export * from "./actions/selectCharacter.ts";
 
 import type { Plugin } from "@ai16z/eliza";
 import {selectCharacterAction} from "./actions/selectCharacter.ts";
