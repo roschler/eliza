@@ -53,8 +53,11 @@ export function findUserIdInState(state: State, ignoreUserNames: string[] = ["Pi
  * @param roomId - The ID of the target room.
  * @param userId - The user the agent/character is chatting with.
  * @param runtime - The current agent/character.
+ *
+ * @returns - Returns the newly created Goal object created during
+ *  the reset operation.
  */
-export async function resetBomCharacterAgentGoals(roomId: UUID, userId: UUID, runtime: IAgentRuntime): Promise<void> {
+export async function resetBomCharacterAgentGoals(roomId: UUID, userId: UUID, runtime: IAgentRuntime): Promise<Goal> {
     elizaLogger.debug(`RESETTING main GOAL and objectives using bill of materials content for agent/character: ${runtime.character.name}`);
 
     // Delete all existing goals for this agent/character
@@ -69,7 +72,7 @@ export async function resetBomCharacterAgentGoals(roomId: UUID, userId: UUID, ru
     const newGoal: Goal =
         {
             // Make the name of the goal the same as the
-            //  agent/character name so we know its the
+            //  agent/character name so we know it's the
             //  agent/character's MAIN goal.
             name: `${runtime.character.name}`,
             roomId: roomId,
@@ -83,6 +86,8 @@ export async function resetBomCharacterAgentGoals(roomId: UUID, userId: UUID, ru
     await runtime.databaseAdapter.createGoal(newGoal);
 
     elizaLogger.debug(`MAIN GOAL and objectives rebuilt using the bill of materials content for agent/character: ${runtime.character.name}`);
+
+    return newGoal;
 }
 
 // -------------------------- BEGIN: ACTION NAMES for CHARACTERS ------------------------

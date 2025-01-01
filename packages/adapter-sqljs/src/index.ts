@@ -577,6 +577,44 @@ export class SqlJsDatabaseAdapter
         return goals;
     }
 
+    async getGoalByAgentCharacterName(params: {
+        agentId: UUID;
+        roomId: UUID;
+        name: string;
+        onlyInProgress?: boolean;
+        count?: number;
+    }): Promise<Goal[]> {
+
+        let sql = `SELECT * FROM goals WHERE "agentId" = ? AND "roomId" = ? AND "name" = ?`;
+
+        const bindings: any[] = [params.agentId, params.roomId, params.name];
+
+        if (params.onlyInProgress) {
+            sql += " AND status = 'IN_PROGRESS'";
+        }
+
+        if (params.count) {
+            sql += " LIMIT ?";
+            bindings.push(params.count.toString());
+        }
+
+        const stmt = this.db.prepare(sql);
+        stmt.bind(bindings);
+        const goals: Goal[] = [];
+        while (stmt.step()) {
+            const goal = stmt.getAsObject() as unknown as Goal;
+            goals.push({
+                ...goal,
+                objectives:
+                    typeof goal.objectives === "string"
+                        ? JSON.parse(goal.objectives)
+                        : goal.objectives,
+            });
+        }
+        stmt.free();
+        return goals;
+    }
+
     async updateGoal(goal: Goal): Promise<void> {
         const sql =
             "UPDATE goals SET name = ?, status = ?, objectives = ? WHERE id = ?";

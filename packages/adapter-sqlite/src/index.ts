@@ -533,6 +533,36 @@ export class SqliteDatabaseAdapter
         }));
     }
 
+    async getGoalByAgentCharacterName(params: {
+        agentId: UUID;
+        roomId: UUID;
+        name: string;
+        onlyInProgress?: boolean;
+        count?: number;
+    }): Promise<Goal[]> {
+        let sql = `SELECT * FROM goals WHERE "agentId" = ? AND "roomId" = ? AND "name" = ?`;
+
+        const bindings: any[] = [params.agentId, params.roomId, params.name];
+
+        if (params.onlyInProgress) {
+            sql += " AND status = 'IN_PROGRESS'";
+        }
+
+        if (params.count) {
+            sql += " LIMIT ?";
+            bindings.push(params.count.toString());
+        }
+
+        const goals = this.db.prepare(sql).all(...bindings) as Goal[];
+        return goals.map((goal) => ({
+            ...goal,
+            objectives:
+                typeof goal.objectives === "string"
+                    ? JSON.parse(goal.objectives)
+                    : goal.objectives,
+        }));
+    }
+
     async updateGoal(goal: Goal): Promise<void> {
         const sql =
             "UPDATE goals SET name = ?, status = ?, objectives = ? WHERE id = ?";

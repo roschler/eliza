@@ -468,6 +468,38 @@ export class SupabaseDatabaseAdapter extends DatabaseAdapter {
         return goals;
     }
 
+    async getGoalByAgentCharacterName(params: {
+        agentId: UUID;
+        roomId: UUID;
+        name: string;
+        onlyInProgress?: boolean;
+        count?: number;
+    }): Promise<Goal[]> {
+
+        let query = this.supabase
+            .from("goals")
+            .select("*")
+            .eq("agentId", params.agentId)
+            .eq("roomId", params.roomId)
+            .eq("name", params.name);
+
+        if (params.onlyInProgress) {
+            query = query.eq("status", "in_progress"); // Replace "status" with the actual column name for progress tracking
+        }
+
+        if (params.count) {
+            query = query.limit(params.count);
+        }
+
+        const { data: goals, error } = await query;
+
+        if (error) {
+            throw new Error(error.message);
+        }
+
+        return goals;;
+    }
+
     async updateGoal(goal: Goal): Promise<void> {
         const { error } = await this.supabase
             .from("goals")

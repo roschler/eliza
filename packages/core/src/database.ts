@@ -242,6 +242,20 @@ export abstract class DatabaseAdapter<DB = any> implements IDatabaseAdapter {
     }): Promise<Goal[]>;
 
     /**
+     * Retrieves all goals for the given agent ID + room ID
+     *  combination that have the given name.
+     * @param params An object containing parameters for goal retrieval.
+     * @returns A Promise that resolves to an array of Goal objects.
+     */
+    abstract getGoalByAgentCharacterName(params: {
+        agentId: UUID;
+        roomId: UUID;
+        name: string;
+        onlyInProgress?: boolean;
+        count?: number;
+    }): Promise<Goal[]>;
+
+    /**
      * Updates a specific goal in the database.
      * @param goal The goal object with updated properties.
      * @returns A Promise that resolves when the goal has been updated.

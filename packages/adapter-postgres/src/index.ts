@@ -639,6 +639,40 @@ export class PostgresDatabaseAdapter
         }, "getGoals");
     }
 
+    async getGoalByAgentCharacterName(params: {
+        agentId: UUID;
+        roomId: UUID;
+        name: string;
+        onlyInProgress?: boolean;
+        count?: number;
+    }): Promise<Goal[]> {
+        return this.withDatabase(async () => {
+            let sql = `SELECT * FROM goals WHERE "agentId" = $1 AND "roomId" = $2 AND "name" = $3`;
+
+            const values: any[] = [params.agentId, params.roomId, params.name];
+            let paramCount = 1;
+
+            if (params.onlyInProgress) {
+                sql += " AND status = 'IN_PROGRESS'";
+            }
+
+            if (params.count) {
+                paramCount++;
+                sql += ` LIMIT $${paramCount}`;
+                values.push(params.count);
+            }
+
+            const { rows } = await this.pool.query(sql, values);
+            return rows.map((row) => ({
+                ...row,
+                objectives:
+                    typeof row.objectives === "string"
+                        ? JSON.parse(row.objectives)
+                        : row.objectives,
+            }));
+        }, "getGoalByAgentCharacterName");
+    }
+
     async updateGoal(goal: Goal): Promise<void> {
         return this.withDatabase(async () => {
             try {

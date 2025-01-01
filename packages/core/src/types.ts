@@ -959,6 +959,14 @@ export interface IDatabaseAdapter {
         tableName?: string
     ): Promise<number>;
 
+    getGoalByAgentCharacterName(params: {
+        agentId: UUID;
+        roomId: UUID;
+        name: string;
+        onlyInProgress?: boolean;
+        count?: number;
+    }): Promise<Goal[]>;
+
     getGoals(params: {
         agentId: UUID;
         roomId: UUID;

@@ -13,7 +13,7 @@ import {
 import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
 import { messageCompletionFooter } from "@ai16z/eliza";
-import { AgentRuntime } from "@ai16z/eliza";
+import { AgentRuntime, Goal } from "@ai16z/eliza";
 import { resetBomCharacterAgentGoals } from "@ai16z/plugin-pilterms";
 import {
     Content,
@@ -262,6 +262,8 @@ export class DirectClient {
                 //  available agent.
                 const bIsResetCommand = userInput === 'reset';
 
+                let mainGoal: Goal | null = null;
+
                 if (bIsResetCommand)
                     elizaLogger.debug(`Direct client message route received a RESET instruction.`);
 
@@ -283,16 +285,16 @@ export class DirectClient {
 
                 // -------------------------- BEGIN: CHARACTER/AGENT SWITCH HANDLING ------------------------
 
-                // TODO: We need a more nuanced way to reset a session than this.
+                // Was an explicit RESET command triggered?
                 if (bIsResetCommand) {
                     elizaLogger.debug(`RESET command received.`);
 
-                    // Rebuild the character/agent's MAIN goal using its
+                    // Yes. Rebuild the character/agent's MAIN goal using its
                     //  bill of materials content.
-                    await resetBomCharacterAgentGoals(roomId, userId, runtime);
+                    mainGoal = await resetBomCharacterAgentGoals(roomId, userId, runtime);
                 } else {
 
-                    // Check if a character assignment relationship was created for the
+                    //  No. Check if a character assignment relationship was created for the
                     //  current room ID + user ID pair.
 
                     // Iterate the available agents to see if any of them
@@ -307,7 +309,20 @@ export class DirectClient {
                         // Override the selected agent.
                         runtime = overrideRuntimeOrNull;
                     }
+
                 }
+
+                if (!runtime) {
+                    throw new Error(`The "runtime" agent/character variable is unassigned.`);
+                }
+
+                // If we don't have a main goal yet, then get the
+                //   current bill-of-materials main GOAL for the
+                //   resulting agent/character.
+                if (!mainGoal) {
+                    mainGoal = await runtime.databaseAdapter.getGoals()
+                }
+
 
                 // -------------------------- END  : CHARACTER/AGENT SWITCH HANDLING ------------------------
 
@@ -320,6 +335,11 @@ export class DirectClient {
 
                 // -------------------------- END  : HOT-LOAD CHARACTER CONTENT ------------------------
 
+                // -------------------------- BEGIN: BILL-OF-MATERIALS GOAL PROCESSING ------------------------
+
+                // Retrieve the current goal, if any for the current agent/character
+
+                // -------------------------- END  : BILL-OF-MATERIALS GOAL PROCESSING ------------------------
                 await runtime.ensureConnection(
                     userId,
                     roomId,
