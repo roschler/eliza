@@ -2,17 +2,8 @@
 
 GOALS:
 
-    - If RESET command or resetGoalsOnInitialActivation is TRUE and agent/character just
-       activated either due to an agent/character switch or first-time app launch,
-       build the main goal and its objectives from the current character's bill-of-materials
-       line items.  But first, remove all goals for the current room-id + agent/Character
-       ID combination.
-
-       STRATEGY NOTE: The getGoals() call requires a room ID.  We prepend the room ID to
-        all user and agent/character ID's, BUT, we still create the goal with a room ID
-        so we can remove all the goals for all characters in the same room with the
-        removeAllGoals(roomId) call.
-
+// TODO: Now it is time to modify the LLM prompt by creating the bill-of-materials
+//  sub-prompt for insertion into the message handler template.  See bookmark #1.
 
 - SPSTART message template is not outputting a proper JSON object when the user just wants to chat.
 

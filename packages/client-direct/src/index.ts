@@ -14,7 +14,7 @@ import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
 import { messageCompletionFooter } from "@ai16z/eliza";
 import { AgentRuntime, Goal } from "@ai16z/eliza";
-import { resetBomGoalsForRelationship } from "@ai16z/plugin-pilterms";
+import {GOAL_NAME_BILL_OF_MATERIALS, resetBomGoalsForRelationship} from "@ai16z/plugin-pilterms";
 import {
     Content,
     Memory,
@@ -312,29 +312,31 @@ export class DirectClient {
                 if (!bIsResetCommand) {
                     // -------------------------- BEGIN: CHECK FOR EXISTING BOM GOAL FOR AGENT/CHARACTER ------------------------
 
-                    const goalsFound =
+                    // Find all the bill-of-materials goals belonging to this
+                    //  user to agent/character relationship.
+                    const bomGoalsFound =
                         await runtime.databaseAdapter.getGoalsByRelationship(
                         {
                             agentId: relationshipIdPair.fullCharacterId,
-                            roomId: roomId,
-                            name: runtime.character.name
+                            userId: relationshipIdPair.fullUserId,
+                            name: GOAL_NAME_BILL_OF_MATERIALS
                         }
                     );
 
-                    if (!Array.isArray(goalsFound))
+                    if (!Array.isArray(bomGoalsFound))
                         throw new Error(`The return from getGoalsByRelationship was not an array.`);
 
                     // We should only have 1 main goal for a particular agent/character
                     //  name.  If there is more than 1 then, the ensuing results
                     //  are unpredictable.
-                    if (goalsFound.length > 1)
+                    if (bomGoalsFound.length > 1)
                         throw new Error(`More than one goal was returned from getGoalsByRelationship.  Only one or none is expected.`);
 
-                    if (goalsFound.length > 0) {
+                    if (bomGoalsFound.length > 0) {
                         elizaLogger.debug(`An existing goal was found for agent/character: ${runtime.character.name}`);
 
                         // Use the existing goal.
-                        mainBomGoal = goalsFound[0];
+                        mainBomGoal = bomGoalsFound[0];
                     } else {
                         elizaLogger.debug(`No existing goals found for agent/character: ${runtime.character.name}`);
                     }
@@ -345,16 +347,15 @@ export class DirectClient {
                 // Was an explicit RESET command triggered OR does the agent/character
                 //  not have an existing goal object?
                 if (bIsResetCommand || !mainBomGoal) {
-                    elizaLogger.debug(`RESET command received.  Clearing and rebuilding the main bill-of-materials goal for agent/character: ${runtime.character.name}.`);
+                    elizaLogger.debug(`RESET command received.  Building the main bill-of-materials goal for agent/character: ${runtime.character.name}.`);
 
                     // Yes. Rebuild the character/agent's MAIN goal using its
                     //  bill of materials content.
                     mainBomGoal = await resetBomGoalsForRelationship(roomId, userId, runtime);
                 } else {
-                    //  No. Check if a character assignment relationship was created for the
-                    //  current room ID + user ID pair.
-
-
+                    // No. mainBomGoal should have a valid bill-of-materials goal for
+                    //  us to use now.
+                    elizaLogger.debug(`Re-using the main bill-of-materials goal for agent/character: ${runtime.character.name}.`);
                 }
 
                 if (!runtime) {
@@ -372,11 +373,13 @@ export class DirectClient {
 
                 // -------------------------- END  : HOT-LOAD CHARACTER CONTENT ------------------------
 
-                // -------------------------- BEGIN: BILL-OF-MATERIALS GOAL PROCESSING ------------------------
+                // -------------------------- BEGIN: BILL-OF-MATERIALS TO PROMPT ------------------------
 
-                // Retrieve the current goal, if any for the current agent/character
+                // TODO: Now it is time to modify the LLM prompt by creating the bill-of-materials
+                //  sub-prompt for insertion into the message handler template.
+                throw new Error("Not implemented yet.")
 
-                // -------------------------- END  : BILL-OF-MATERIALS GOAL PROCESSING ------------------------
+                // -------------------------- END  : BILL-OF-MATERIALS TO PROMPT ------------------------
                 await runtime.ensureConnection(
                     userId,
                     roomId,

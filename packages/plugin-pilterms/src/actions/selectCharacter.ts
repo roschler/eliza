@@ -15,6 +15,9 @@ import {ActorActionDetails} from "../system/types.ts";
 import {isRelated} from "@ai16z/client-direct";
 import {v4} from "uuid";
 
+// This is the name we assign to goals that are part of the bill-of-materials
+//  system.
+export const GOAL_NAME_BILL_OF_MATERIALS = 'bill of materials';
 export { pickLicenseTemplate };
 
 const bVerbose = true;
@@ -63,13 +66,17 @@ export async function resetBomGoalsForRelationship(roomId: UUID, userId: UUID, r
     // Build a room ID prepended relationship ID pair object.
     const relationshipIdPair = buildRelationshipIdPair(roomId, userId, runtime.character.name);
 
-    // Delete all existing goals for the user ID + agent ID pair
-    //  that have a relationship in the same room.  Note, the
-    //  room ID is prepended to create the full IDs.
+    // Delete all existing bill-of-materials goals for the
+    //  user ID + agent ID pair that have a relationship in
+    //  the same room.  Note, theroom ID is prepended to
+    //  create the full IDs, so we don't need to add the room ID
+    //  as a parameter.
     await runtime.databaseAdapter.removeGoalsByRelationship(
         {
             agentId: relationshipIdPair.fullCharacterId,
-            userId: relationshipIdPair.fullUserId
+            userId: relationshipIdPair.fullUserId,
+            name: GOAL_NAME_BILL_OF_MATERIALS,
+            // goalStatus: "IN_PROGRESS" // "IN_PROGRESS" | "DONE" | "FAILED"
         }
     );
 
