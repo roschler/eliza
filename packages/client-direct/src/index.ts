@@ -66,6 +66,15 @@ function validateBillOfMaterialsLineItem(billOfMaterialsLineItem: BillOfMaterial
         validationFailures.push(`The "defaultValue" field is assigned an empty string.`);
     }
 
+    // If this line item is marked as optional, then we MUST have a preliminary
+    //  question to ask the user, to see if they are interested in the line item.
+    if (billOfMaterialsLineItem.isOptional) {
+        if (typeof billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem !== "string"
+            || (typeof billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem === "string" && billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem.length === 0)) {
+            validationFailures.push(`The "preliminaryPromptForOptionalLineItem" field is missing or is assigned an empty string for a line items marked as "optional".`);
+        }
+    }
+
     if (billOfMaterialsLineItem.type === 'string') {
         // -------------------------- BEGIN: STRING TYPE VALIDATIONS ------------------------
         // If the list of values array is assigned, then it must contain
@@ -103,6 +112,9 @@ function validateBillOfMaterialsLineItem(billOfMaterialsLineItem: BillOfMaterial
 /**
  * Given an array of BillOfMaterialsLineItem objects, determine the
  *  next objective that needs to be completed.
+ *
+ * NOTE: The selected, if any, BillOfMaterialsLineItem object
+ *  will be validated before being returned.
  *
  * @param bomGoal - A Goal object that was prepared for use as a
  *  bill-of-materials purposes.
@@ -167,15 +179,51 @@ function getNextBomObjective(bomGoal: Goal): ObjectiveOrNull {
 function buildBillOfMaterialsPrompt(bomGoal: Goal): string | null {
     let retStr: StringOrNull = null;
 
+    const piecesOfPrompt: string[] = [];
+
     // Do we have any bill-of-materials to process?
     if (Array.isArray(bomGoal.objectives) && bomGoal.objectives.length > 0) {
         // Determine the next objective that needs to be completed.
         const nextBomObjective = getNextBomObjective(bomGoal);
 
+        if (nextBomObjective === null) {
+            // -------------------------- BEGIN: GOAL COMPLETE PROCESSING ------------------------
+
+            throw new Error(`Goal complete processing not implemented yet.`)
+
+            // -------------------------- END  : GOAL COMPLETE PROCESSING ------------------------
+        } else {
+            // -------------------------- BEGIN: PROCESS NEW OBJECTIVE ------------------------
+
+            // Is the objective carrying an optional bill-of-materials line item?
+            if (nextBomObjective.billOfMaterialsLineItem.isOptional) {
+                // -------------------------- BEGIN: PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
+
+                piecesOfPrompt.push(`Your main task is to find out if the user is interested in a particular topic or not.  Here is the question you should ask them now:`)
+
+                // Yes.  Ask the user the question that determines if they are interested
+                //  in the optional line item or not.
+                piecesOfPrompt.push(nextBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+
+                // -------------------------- END  : PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
+            } else {
+                // -------------------------- BEGIN: MAIN LINE ITEM QUESTION ------------------------
+
+                piecesOfPrompt.push(nextBomObjective.billOfMaterialsLineItem.prompt);
+
+                // -------------------------- END  : MAIN LINE ITEM QUESTION ------------------------
+            }
+
+            // -------------------------- END  : PROCESS NEW OBJECTIVE ------------------------
+        }
+    }
+
+    if (piecesOfPrompt.length > 0) {
+        // Assemble the sub-prompt for the bill-of-materials line item processing.
+        retStr = piecesOfPrompt.join('\n\n');
     }
 
     return retStr;
-
 }
 
 // -------------------------- END  : BILL-OF-MATERIALS SUB-PROMPT PROCESSING ------------------------

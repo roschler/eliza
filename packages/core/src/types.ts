@@ -114,10 +114,24 @@ export interface Objective {
     /** Whether objective is completed */
     completed: boolean;
 
+    /**
+     * This flag is used in conjunction with optional
+     *  bill-of-materials line items to determine if it
+     *  is time to ask the preliminary question to see
+     *  if the user is interested in the line item,
+     *  or if this field is TRUE, to ask the main
+     *  question that gets the value for the line item.
+     */
+    isOptionalFieldDesiredByUser: boolean;
+
     /** The optional data object that is the result of the objective
      *   being completed.
+     *
+     * NOTE: If this objective carries an optional bill-of-materials
+     *  line item object, and the user is not interested in the
+     *  line item, then this field will contain specifically NULL.
      */
-    resultData: object;
+    resultData: ObjectOrNull;
 
     /**
      * If present, then this object is a bill of materials line
@@ -673,6 +687,12 @@ export type BillOfMaterialsLineItem = {
      *   or the user abandons the chat.
      */
     isOptional: boolean;
+
+    /** The PRELIMINARY question to ask the user to see if they are
+     *   interested or not in this line item, if and only if it is
+     *   an optional line item. get the desired value from them.
+     */
+    preliminaryPromptForOptionalLineItem?: string;
 
     // -------------------------- BEGIN: STRING TYPE ONLY ------------------------
 
