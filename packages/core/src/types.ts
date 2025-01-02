@@ -748,6 +748,18 @@ export type Character = {
     billOfMaterials?: BillOfMaterialsLineItem[];
 
     /**
+     * If this field has a value,then when the bill-of-materials
+     *  goals is completed, control will be switched to the
+     *  agent/character that has this value in its "name"
+     *  field.
+     *
+     *  NOTE: This agent/character must be in collection of
+     *   available agents that were instantiated when the
+     *   client was created!
+     */
+    bomCompleteCharacterName?: string;
+
+    /**
      * This field if present and is equal to FALSE,
      *  will suppress the default behavior of characters
      *  whereby all of their goals are completely reset
