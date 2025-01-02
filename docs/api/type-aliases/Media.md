@@ -46,4 +46,4 @@ Text content
 
 ## Defined in
 
-[packages/core/src/types.ts:559](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L559)
+[packages/core/src/types.ts:567](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L567)

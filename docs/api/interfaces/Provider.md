@@ -26,4 +26,4 @@ Data retrieval function
 
 #### Defined in
 
-[packages/core/src/types.ts:478](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L478)
+[packages/core/src/types.ts:486](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L486)

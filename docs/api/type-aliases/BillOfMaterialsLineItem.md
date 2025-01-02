@@ -27,6 +27,13 @@ The type of the field.  E.g. - "string", or "number", etc. *
 
 The question to ask the user to get the desired value from them. *
 
+### defaultValue?
+
+> `optional` **defaultValue**: [`BillOfMaterialsResultType`](BillOfMaterialsResultType.md)
+
+The default value for the result.  If present, then the LLM
+ will be given this value to suggest it to the user.
+
 ### isOptional
 
 > **isOptional**: `boolean`
@@ -79,4 +86,4 @@ If present, then this string will be appended to any numeric values
 
 ## Defined in
 
-[packages/core/src/types.ts:631](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L631)
+[packages/core/src/types.ts:639](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L639)

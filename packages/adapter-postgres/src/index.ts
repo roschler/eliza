@@ -639,22 +639,32 @@ export class PostgresDatabaseAdapter
         }, "getGoals");
     }
 
-    async getGoalByAgentCharacterName(params: {
+    async getGoalsByRelationship(params: {
         agentId: UUID;
-        roomId: UUID;
-        name: string;
-        onlyInProgress?: boolean;
+        userId: UUID;
+        name?: string;
+        goalStatus?: string;
         count?: number;
     }): Promise<Goal[]> {
         return this.withDatabase(async () => {
-            let sql = `SELECT * FROM goals WHERE "agentId" = $1 AND "roomId" = $2 AND "name" = $3`;
+            let sql = `SELECT * FROM goals WHERE "agentId" = $1 AND "userId" = $2`;
+            let values: any[] = [params.agentId, params.userId];
 
-            const values: any[] = [params.agentId, params.roomId, params.name];
-            let paramCount = 1;
+            let nextFldNum = 3;
 
-            if (params.onlyInProgress) {
-                sql += " AND status = 'IN_PROGRESS'";
+            if (params.name) {
+                sql += ` AND "name" = $${nextFldNum}`;
+                values.push(params.name);
+                nextFldNum++;
             }
+
+            if (params.goalStatus) {
+                sql += ` AND "status" = $${nextFldNum}`;
+                values.push(params.goalStatus);
+                nextFldNum++;
+            }
+
+            let paramCount = 1;
 
             if (params.count) {
                 paramCount++;
@@ -670,33 +680,33 @@ export class PostgresDatabaseAdapter
                         ? JSON.parse(row.objectives)
                         : row.objectives,
             }));
-        }, "getGoalByAgentCharacterName");
+        }, "getGoalsByRelationship");
     }
 
-    async removeGoalsByAgentCharacterName(params: {
+    async removeGoalsByRelationship(params: {
         agentId: UUID;
-        roomId: UUID;
-        name: string;
-        onlyInProgress?: boolean;
+        userId: UUID;
+        name?: string;
+        goalStatus?: string;
     }): Promise<void> {
         return this.withDatabase(async () => {
             try {
                 const result = await this.pool.query(
-                    `DELETE FROM goals WHERE "agentId" = $1 AND "roomId" = $2 AND "name" = $3`,
-                    [params.agentId, params.roomId, params.name]
+                    `DELETE FROM goals WHERE "agentId" = $1 AND "userId" = $2`,
+                    [params.agentId, params.userId]
                 );
 
-                elizaLogger.debug(`Num goals removed for agent ID: ${params.agentId}`, {
+                elizaLogger.debug(`Num goals removed for agent ID, user ID: ${params.agentId}, ${params.userId}`, {
                     removed: result?.rowCount ?? 0 > 0,
                 });
             } catch (error) {
-                elizaLogger.error(`Failed to remove goal for agent ID: ${params.agentId}`, {
+                elizaLogger.error(`Failed to remove goal for agent ID, user ID: ${params.agentId}, ${params.userId}`, {
                     error:
                         error instanceof Error ? error.message : String(error),
                 });
                 throw error;
             }
-        }, "removeGoalsByAgentCharacterName");
+        }, "removeGoalsByRelationship");
     }
 
     async updateGoal(goal: Goal): Promise<void> {
@@ -726,8 +736,8 @@ export class PostgresDatabaseAdapter
     async createGoal(goal: Goal): Promise<void> {
         return this.withDatabase(async () => {
             await this.pool.query(
-                `INSERT INTO goals (id, "roomId", "userId", name, status, objectives)
-                VALUES ($1, $2, $3, $4, $5, $6)`,
+                `INSERT INTO goals (id, "roomId", "userId", name, status, objectives, "agentId")
+                VALUES ($1, $2, $3, $4, $5, $6, $7)`,
                 [
                     goal.id ?? v4(),
                     goal.roomId,
@@ -735,6 +745,7 @@ export class PostgresDatabaseAdapter
                     goal.name,
                     goal.status,
                     JSON.stringify(goal.objectives),
+                    goal.agentId ?? null
                 ]
             );
         }, "createGoal");

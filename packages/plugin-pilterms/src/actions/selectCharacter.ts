@@ -8,7 +8,7 @@ import {
     type Memory,
     setExclusiveUserToCharacterRelationship,
     type State,
-    UUID,
+    UUID, buildRelationshipIdPair,
 } from "@ai16z/eliza";
 import {pickLicenseTemplate} from "../templates";
 import {ActorActionDetails} from "../system/types.ts";
@@ -57,16 +57,21 @@ export function findUserIdInState(state: State, ignoreUserNames: string[] = ["Pi
  * @returns - Returns the newly created Goal object created during
  *  the reset operation.
  */
-export async function resetBomCharacterAgentGoals(roomId: UUID, userId: UUID, runtime: IAgentRuntime): Promise<Goal> {
+export async function resetBomGoalsForRelationship(roomId: UUID, userId: UUID, runtime: IAgentRuntime): Promise<Goal> {
     elizaLogger.debug(`RESETTING main GOAL and objectives using bill of materials content for agent/character: ${runtime.character.name}`);
 
-    // Delete all existing goals for this agent/character.
-    runtime.databaseAdapter.removeGoalsByAgentCharacterName(
-        {
-            agentId
-        }
-    )
+    // Build a room ID prepended relationship ID pair object.
+    const relationshipIdPair = buildRelationshipIdPair(roomId, userId, runtime.character.name);
 
+    // Delete all existing goals for the user ID + agent ID pair
+    //  that have a relationship in the same room.  Note, the
+    //  room ID is prepended to create the full IDs.
+    await runtime.databaseAdapter.removeGoalsByRelationship(
+        {
+            agentId: relationshipIdPair.fullCharacterId,
+            userId: relationshipIdPair.fullUserId
+        }
+    );
 
     // Recreate the main goal for this agent/character
     //  with its objectives using the bill-of-materials line item
@@ -78,15 +83,13 @@ export async function resetBomCharacterAgentGoals(roomId: UUID, userId: UUID, ru
     //  bill-of-materials information.
     const newGoal: Goal =
         {
-            // Make the name of the goal the same as the
-            //  agent/character name so we know it's the
-            //  agent/character's MAIN goal.
-            name: `${runtime.character.name}`,
+            agentId: relationshipIdPair.fullCharacterId,
+            userId: relationshipIdPair.fullCharacterId,
             roomId: roomId,
-            userId: userId,
+            name: `bill-of-materials`,
             id: v4() as UUID,
             objectives: objectivesForAgent,
-            status: GoalStatus.IN_PROGRESS
+            status: GoalStatus.IN_PROGRESS,
         }
 
     // Store the goal.
@@ -228,7 +231,7 @@ export const selectCharacterAction = {
                     // Does the character have the resetGoalsOnReceivingControl flag
                     //  set?
                     if (runtime.character.resetGoalsOnReceivingControl) {
-                        await resetBomCharacterAgentGoals(roomId, userId, runtime);
+                        await resetBomGoalsForRelationship(roomId, userId, runtime);
                     }
 
                     //  TODO: Need to do this from the "reset" command code too! (See

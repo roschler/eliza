@@ -669,6 +669,83 @@ A Promise that resolves to an array of Goal objects.
 
 ***
 
+### getGoalByAgentCharacterName()
+
+> `abstract` **getGoalByAgentCharacterName**(`params`): `Promise`\<[`Goal`](../interfaces/Goal.md)[]\>
+
+Retrieves all goals for the given agent ID + room ID
+ combination that have the given name.
+
+#### Parameters
+
+• **params**
+
+An object containing parameters for goal retrieval.
+If onlyInProgress is TRUE, then only goals that are in progress
+ will be retrieved, otherwise all goals for the given
+ agent ID + room ID pair will be retrieved.
+
+• **params.agentId**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
+
+• **params.roomId**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
+
+• **params.name**: `string`
+
+• **params.onlyInProgress?**: `boolean`
+
+• **params.count?**: `number`
+
+#### Returns
+
+`Promise`\<[`Goal`](../interfaces/Goal.md)[]\>
+
+A Promise that resolves to an array of Goal objects.
+
+#### Implementation of
+
+[`IDatabaseAdapter`](../interfaces/IDatabaseAdapter.md).[`getGoalByAgentCharacterName`](../interfaces/IDatabaseAdapter.md#getGoalByAgentCharacterName)
+
+#### Defined in
+
+[packages/core/src/database.ts:255](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L255)
+
+***
+
+### removeGoalsByRelationship()
+
+> `abstract` **removeGoalsByRelationship**(`params`): `Promise`\<`void`\>
+
+Removes all goals for the given agent ID + room ID. If
+ onlyInProgress is TRUE, then only goals that are in
+ progress will be removed, otherwise all goals for the
+ given agent ID + room ID pair will be removed.
+
+#### Parameters
+
+• **params**
+
+An object containing parameters for goal retrieval.
+
+• **params.agentId**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
+
+• **params.roomId**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
+
+• **params.onlyInProgress?**: `boolean`
+
+#### Returns
+
+`Promise`\<`void`\>
+
+#### Implementation of
+
+[`IDatabaseAdapter`](../interfaces/IDatabaseAdapter.md).[`removeGoalsByRelationship`](../interfaces/IDatabaseAdapter.md#removeGoalsByRelationship)
+
+#### Defined in
+
+[packages/core/src/database.ts:271](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L271)
+
+***
+
 ### updateGoal()
 
 > `abstract` **updateGoal**(`goal`): `Promise`\<`void`\>
@@ -693,7 +770,7 @@ A Promise that resolves when the goal has been updated.
 
 #### Defined in
 
-[packages/core/src/database.ts:249](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L249)
+[packages/core/src/database.ts:282](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L282)
 
 ***
 
@@ -721,7 +798,7 @@ A Promise that resolves when the goal has been created.
 
 #### Defined in
 
-[packages/core/src/database.ts:256](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L256)
+[packages/core/src/database.ts:289](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L289)
 
 ***
 
@@ -749,7 +826,7 @@ A Promise that resolves when the goal has been removed.
 
 #### Defined in
 
-[packages/core/src/database.ts:263](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L263)
+[packages/core/src/database.ts:296](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L296)
 
 ***
 
@@ -777,7 +854,7 @@ A Promise that resolves when all goals have been removed.
 
 #### Defined in
 
-[packages/core/src/database.ts:270](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L270)
+[packages/core/src/database.ts:303](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L303)
 
 ***
 
@@ -805,7 +882,7 @@ A Promise that resolves to the room ID or null if not found.
 
 #### Defined in
 
-[packages/core/src/database.ts:277](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L277)
+[packages/core/src/database.ts:310](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L310)
 
 ***
 
@@ -833,7 +910,7 @@ A Promise that resolves to the UUID of the created room.
 
 #### Defined in
 
-[packages/core/src/database.ts:284](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L284)
+[packages/core/src/database.ts:317](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L317)
 
 ***
 
@@ -861,7 +938,7 @@ A Promise that resolves when the room has been removed.
 
 #### Defined in
 
-[packages/core/src/database.ts:291](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L291)
+[packages/core/src/database.ts:324](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L324)
 
 ***
 
@@ -889,7 +966,7 @@ A Promise that resolves to an array of room IDs.
 
 #### Defined in
 
-[packages/core/src/database.ts:298](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L298)
+[packages/core/src/database.ts:331](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L331)
 
 ***
 
@@ -917,7 +994,7 @@ A Promise that resolves to an array of room IDs.
 
 #### Defined in
 
-[packages/core/src/database.ts:305](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L305)
+[packages/core/src/database.ts:338](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L338)
 
 ***
 
@@ -949,7 +1026,7 @@ A Promise that resolves to a boolean indicating success or failure.
 
 #### Defined in
 
-[packages/core/src/database.ts:313](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L313)
+[packages/core/src/database.ts:346](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L346)
 
 ***
 
@@ -981,7 +1058,7 @@ A Promise that resolves to a boolean indicating success or failure.
 
 #### Defined in
 
-[packages/core/src/database.ts:321](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L321)
+[packages/core/src/database.ts:354](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L354)
 
 ***
 
@@ -1011,7 +1088,7 @@ A Promise that resolves to an array of Participant objects.
 
 ##### Defined in
 
-[packages/core/src/database.ts:328](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L328)
+[packages/core/src/database.ts:361](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L361)
 
 #### getParticipantsForAccount(userId)
 
@@ -1037,7 +1114,7 @@ A Promise that resolves to an array of Participant objects.
 
 ##### Defined in
 
-[packages/core/src/database.ts:335](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L335)
+[packages/core/src/database.ts:368](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L368)
 
 ***
 
@@ -1065,7 +1142,7 @@ A Promise that resolves to an array of UUIDs representing the participants.
 
 #### Defined in
 
-[packages/core/src/database.ts:342](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L342)
+[packages/core/src/database.ts:375](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L375)
 
 ***
 
@@ -1089,7 +1166,7 @@ A Promise that resolves to an array of UUIDs representing the participants.
 
 #### Defined in
 
-[packages/core/src/database.ts:344](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L344)
+[packages/core/src/database.ts:377](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L377)
 
 ***
 
@@ -1115,7 +1192,7 @@ A Promise that resolves to an array of UUIDs representing the participants.
 
 #### Defined in
 
-[packages/core/src/database.ts:348](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L348)
+[packages/core/src/database.ts:381](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L381)
 
 ***
 
@@ -1147,7 +1224,7 @@ A Promise that resolves to a boolean indicating success or failure of the creati
 
 #### Defined in
 
-[packages/core/src/database.ts:359](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L359)
+[packages/core/src/database.ts:392](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L392)
 
 ***
 
@@ -1179,7 +1256,7 @@ A Promise that resolves to the Relationship object or null if not found.
 
 #### Defined in
 
-[packages/core/src/database.ts:369](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L369)
+[packages/core/src/database.ts:402](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L402)
 
 ***
 
@@ -1213,7 +1290,7 @@ A Promise that resolves to TRUE if the relationship was
 
 #### Defined in
 
-[packages/core/src/database.ts:383](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L383)
+[packages/core/src/database.ts:416](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L416)
 
 ***
 
@@ -1246,7 +1323,7 @@ A Promise that resolves to TRUE if the relationships were
 
 #### Defined in
 
-[packages/core/src/database.ts:395](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L395)
+[packages/core/src/database.ts:428](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L428)
 
 ***
 
@@ -1276,7 +1353,7 @@ A Promise that resolves to an array of Relationship objects.
 
 #### Defined in
 
-[packages/core/src/database.ts:402](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L402)
+[packages/core/src/database.ts:435](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L435)
 
 ***
 
@@ -1312,4 +1389,4 @@ Will throw an error if the circuit breaker is open or if the operation fails
 
 #### Defined in
 
-[packages/core/src/database.ts:414](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L414)
+[packages/core/src/database.ts:447](https://github.com/roschler/eliza/blob/main/packages/core/src/database.ts#L447)

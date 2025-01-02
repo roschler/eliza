@@ -38,4 +38,4 @@ Stop client connection
 
 ## Defined in
 
-[packages/core/src/types.ts:582](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L582)
+[packages/core/src/types.ts:590](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L590)

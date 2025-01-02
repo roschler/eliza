@@ -14,7 +14,7 @@ import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
 import { messageCompletionFooter } from "@ai16z/eliza";
 import { AgentRuntime, Goal } from "@ai16z/eliza";
-import { resetBomCharacterAgentGoals } from "@ai16z/plugin-pilterms";
+import { resetBomGoalsForRelationship } from "@ai16z/plugin-pilterms";
 import {
     Content,
     Memory,
@@ -279,7 +279,11 @@ export class DirectClient {
                 }
 
                 if (!runtime) {
-                    res.status(404).send("Agent not found");
+                    const infoMsg = `Unable to find an agent with ID: ${agentId}`;
+
+                    elizaLogger.debug(infoMsg);
+
+                    res.status(404).send(infoMsg);
                     return;
                 }
 
@@ -309,7 +313,7 @@ export class DirectClient {
                     // -------------------------- BEGIN: CHECK FOR EXISTING BOM GOAL FOR AGENT/CHARACTER ------------------------
 
                     const goalsFound =
-                        await runtime.databaseAdapter.getGoalByAgentCharacterName(
+                        await runtime.databaseAdapter.getGoalsByRelationship(
                         {
                             agentId: relationshipIdPair.fullCharacterId,
                             roomId: roomId,
@@ -318,13 +322,13 @@ export class DirectClient {
                     );
 
                     if (!Array.isArray(goalsFound))
-                        throw new Error(`The return from getGoalByAgentCharacterName was not an array.`);
+                        throw new Error(`The return from getGoalsByRelationship was not an array.`);
 
                     // We should only have 1 main goal for a particular agent/character
                     //  name.  If there is more than 1 then, the ensuing results
                     //  are unpredictable.
                     if (goalsFound.length > 1)
-                        throw new Error(`More than one goal was returned from getGoalByAgentCharacterName.  Only one or none is expected.`);
+                        throw new Error(`More than one goal was returned from getGoalsByRelationship.  Only one or none is expected.`);
 
                     if (goalsFound.length > 0) {
                         elizaLogger.debug(`An existing goal was found for agent/character: ${runtime.character.name}`);
@@ -345,7 +349,7 @@ export class DirectClient {
 
                     // Yes. Rebuild the character/agent's MAIN goal using its
                     //  bill of materials content.
-                    mainBomGoal = await resetBomCharacterAgentGoals(roomId, userId, runtime);
+                    mainBomGoal = await resetBomGoalsForRelationship(roomId, userId, runtime);
                 } else {
                     //  No. Check if a character assignment relationship was created for the
                     //  current room ID + user ID pair.

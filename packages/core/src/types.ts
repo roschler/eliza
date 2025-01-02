@@ -139,6 +139,13 @@ export interface Goal {
     /** Room ID where goal exists */
     roomId: UUID;
 
+    /** If specified, then this goal is
+     *   tied to a specific user to
+     *   agent/character relationship
+     *   belonging to the room.
+     */
+    agentId?: UUID;
+
     /** User ID of goal owner */
     userId: UUID;
 
@@ -959,19 +966,19 @@ export interface IDatabaseAdapter {
         tableName?: string
     ): Promise<number>;
 
-    getGoalByAgentCharacterName(params: {
+    getGoalsByRelationship(params: {
         agentId: UUID;
-        roomId: UUID;
-        name: string;
-        onlyInProgress?: boolean;
+        userId: UUID;
+        name?: string;
+        goalStatus?: string;
         count?: number;
     }): Promise<Goal[]>;
 
-    removeGoalsByAgentCharacterName(params: {
+    removeGoalsByRelationship(params: {
         agentId: UUID;
-        roomId: UUID;
-        name: string;
-        onlyInProgress?: boolean;
+        userId: UUID;
+        name?: string;
+        goalStatus?: string;
     }): Promise<void>;
 
     getGoals(params: {

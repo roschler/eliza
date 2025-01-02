@@ -245,35 +245,60 @@ export abstract class DatabaseAdapter<DB = any> implements IDatabaseAdapter {
      * Retrieves all goals for the given agent ID + room ID
      *  combination that have the given name.
      *
-     * @param params An object containing parameters for goal retrieval.
-     * If onlyInProgress is TRUE, then only goals that are in progress
-     *  will be retrieved, otherwise all goals for the given
-     *  agent ID + room ID pair will be retrieved.
+     * @param params.agentId - The full agent ID (i.e. -
+     *  room ID prepended) for the agent/character in the
+     *  relationship.
+     *  @param params.userId - The full user ID (i.e. -
+     *  room ID prepended) for the user in the
+     *  relationship.
+     *  @param params.name - If specified, only goals
+     *   found for the relationship that have this name
+     *   will be included in the results.
+     *  @param params.goalStatus - If specified, only goals
+     *   found for the relationship that have this goal
+     *   status will be included in the results.
+     *  @param params.count - If specified, then this is
+     *   the maximum number of goals that will be
+     *   returned.
+     *
+     * An object containing parameters for goal retrieval.
+     *
      *
      * @returns A Promise that resolves to an array of Goal objects.
      */
-    abstract getGoalByAgentCharacterName(params: {
+    abstract getGoalsByRelationship(params: {
         agentId: UUID;
-        roomId: UUID;
-        name: string;
-        onlyInProgress?: boolean;
+        userId: UUID;
+        name?: string;
+        goalStatus?: string;
         count?: number;
     }): Promise<Goal[]>;
 
     /**
-     * Removes all goals for the given agent ID + room ID
-     *  combination that have the given name.  If onlyInProgress
-     *  is TRUE, then only goals that are in progress will be
-     *  removed, otherwise all goals for the given
-     *  agent ID + room ID pair will be removed.
+     * Removes all goals for the given agent ID + user ID
+     *  combination that makes up a relationship link. If
+     *  onlyInProgress is TRUE, then only goals that are in
+     *  progress will be removed, otherwise all goals for the
+     *  given agent ID + user ID pair will be removed.
      *
-     * @param params An object containing parameters for goal retrieval.
+     * @param params.agentId - The full agent ID (i.e. -
+     *  room ID prepended) for the agent/character in the
+     *  relationship.
+     *  @param params.userId - The full user ID (i.e. -
+     *  room ID prepended) for the user in the
+     *  relationship.
+     *  @param params.name - If specified, only goals
+     *   found for the relationship that have this name
+     *   will be included in the results.
+     *  @param params.goalStatus - If specified, only goals
+     *   found for the relationship that have this goal
+     *   status will be included in the results.
      */
-    abstract removeGoalsByAgentCharacterName(params: {
+    abstract removeGoalsByRelationship(params: {
         agentId: UUID;
-        roomId: UUID;
-        name: string;
-        onlyInProgress?: boolean;
+        userId: UUID;
+        name?: string;
+        goalStatus?: string;
     }): Promise<void>;
 
     /**

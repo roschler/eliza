@@ -14,7 +14,7 @@ Optional unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:129](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L129)
+[packages/core/src/types.ts:137](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L137)
 
 ***
 
@@ -26,7 +26,7 @@ Room ID where goal exists
 
 #### Defined in
 
-[packages/core/src/types.ts:132](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L132)
+[packages/core/src/types.ts:140](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L140)
 
 ***
 
@@ -38,7 +38,7 @@ User ID of goal owner
 
 #### Defined in
 
-[packages/core/src/types.ts:135](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L135)
+[packages/core/src/types.ts:143](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L143)
 
 ***
 
@@ -50,7 +50,7 @@ Name/title of the goal
 
 #### Defined in
 
-[packages/core/src/types.ts:138](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L138)
+[packages/core/src/types.ts:146](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L146)
 
 ***
 
@@ -62,7 +62,7 @@ Current status
 
 #### Defined in
 
-[packages/core/src/types.ts:141](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L141)
+[packages/core/src/types.ts:149](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L149)
 
 ***
 
@@ -74,4 +74,4 @@ Component objectives
 
 #### Defined in
 
-[packages/core/src/types.ts:144](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L144)
+[packages/core/src/types.ts:152](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L152)

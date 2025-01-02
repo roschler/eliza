@@ -468,11 +468,11 @@ export class SupabaseDatabaseAdapter extends DatabaseAdapter {
         return goals;
     }
 
-    async getGoalByAgentCharacterName(params: {
+    async getGoalsByRelationship(params: {
         agentId: UUID;
-        roomId: UUID;
+        userId: UUID;
         name: string;
-        onlyInProgress?: boolean;
+        goalStatus?: string;
         count?: number;
     }): Promise<Goal[]> {
 
@@ -480,13 +480,15 @@ export class SupabaseDatabaseAdapter extends DatabaseAdapter {
             .from("goals")
             .select("*")
             .eq("agentId", params.agentId)
-            .eq("roomId", params.roomId)
-            .eq("name", params.name);
+            .eq("userId", params.userId)
 
-        if (params.onlyInProgress) {
-            query = query.eq("status", "in_progress"); // Replace "status" with the actual column name for progress tracking
+        if (params.name) {
+            query = query.eq("name", params.name);
         }
 
+        if (params.goalStatus) {
+            query = query.eq("status", params.goalStatus);
+        }
         if (params.count) {
             query = query.limit(params.count);
         }
@@ -494,24 +496,22 @@ export class SupabaseDatabaseAdapter extends DatabaseAdapter {
         const { data: goals, error } = await query;
 
         if (error) {
-            throw new Error(`Error removing goals for -\nagent ID: ${params.agentId}\nroomId: ${params.roomId}\nAgent/character name: ${params.name}\nError details: ${error.message}`);
+            throw new Error(`Error removing goals for -\nagent ID: ${params.agentId}\nuserId: ${params.userId}\nAgent/character name: ${params.name}\nError details: ${error.message}`);
         }
 
         return goals;
     }
 
-    async removeGoalsByAgentCharacterName(params: {
+    async removeGoalsByRelationship(params: {
         agentId: UUID;
-        roomId: UUID;
-        name: string;
+        userId: UUID;
         onlyInProgress?: boolean;
     }): Promise<void> {
         let query = this.supabase
             .from("goals")
             .delete()
             .eq("agentId", params.agentId)
-            .eq("roomId", params.roomId)
-            .eq("name", params.name);
+            .eq("userId", params.userId)
 
         if (params.onlyInProgress) {
             query = query.eq("status", 'IN_PROGRESS');
@@ -520,7 +520,7 @@ export class SupabaseDatabaseAdapter extends DatabaseAdapter {
         const { error } = await query;
 
         if (error) {
-            throw new Error(`Error removing goals for -\nagent ID: ${params.agentId}\nroomId: ${params.roomId}\nAgent/character name: ${params.name}\nError details: ${error.message}`);
+            throw new Error(`Error removing goals for -\nagent ID: ${params.agentId}\nuserId: ${params.userId}\nError details: ${error.message}`);
         }
     }
 

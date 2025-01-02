@@ -60,9 +60,9 @@ If billOfMaterialsJsonStr has a value when the character is loaded,
  character's bill of materials.  If present, it will contain
  an array of BillOfMaterialsLineItem objects.
 
-### resetGoalsOnInitialActivation?
+### resetGoalsOnReceivingControl?
 
-> `optional` **resetGoalsOnInitialActivation**: `boolean`
+> `optional` **resetGoalsOnReceivingControl**: `boolean`
 
 This field if present and is equal to FALSE,
  will suppress the default behavior of characters
@@ -370,4 +370,4 @@ Optional Twitter profile
 
 ## Defined in
 
-[packages/core/src/types.ts:698](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L698)
+[packages/core/src/types.ts:712](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L712)

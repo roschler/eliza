@@ -14,7 +14,7 @@ Optional unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:101](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L101)
+[packages/core/src/types.ts:103](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L103)
 
 ***
 
@@ -26,7 +26,7 @@ Description of what needs to be achieved
 
 #### Defined in
 
-[packages/core/src/types.ts:104](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L104)
+[packages/core/src/types.ts:106](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L106)
 
 ***
 
@@ -38,17 +38,30 @@ Whether objective is completed
 
 #### Defined in
 
-[packages/core/src/types.ts:107](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L107)
+[packages/core/src/types.ts:109](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L109)
 
 ***
 
-### resultData?
+### resultData
 
-> `optional` **resultData**: `object`
+> **resultData**: `object`
 
 The optional data object that is the result of the objective
   being completed.
 
 #### Defined in
 
-[packages/core/src/types.ts:112](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L112)
+[packages/core/src/types.ts:114](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L114)
+
+***
+
+### billOfMaterialsLineItem?
+
+> `optional` **billOfMaterialsLineItem**: [`BillOfMaterialsLineItem`](../type-aliases/BillOfMaterialsLineItem.md)
+
+If present, then this object is a bill of materials line
+ item objective.
+
+#### Defined in
+
+[packages/core/src/types.ts:120](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L120)

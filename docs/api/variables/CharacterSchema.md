@@ -106,9 +106,9 @@ Main Character schema
 
 > **billOfMaterials**: `ZodOptional`\<`ZodArray`\<`ZodObject`\<`object`, `"strip"`, `ZodTypeAny`, `object`, `object`\>, `"many"`\>\>
 
-### resetGoalsOnInitialActivation
+### resetGoalsOnReceivingControl
 
-> **resetGoalsOnInitialActivation**: `ZodOptional`\<`ZodBoolean`\>
+> **resetGoalsOnReceivingControl**: `ZodOptional`\<`ZodBoolean`\>
 
 ## Defined in
 

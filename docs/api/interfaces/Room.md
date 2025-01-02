@@ -14,7 +14,7 @@ Unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:550](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L550)
+[packages/core/src/types.ts:558](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L558)
 
 ***
 
@@ -26,4 +26,4 @@ Room participants
 
 #### Defined in
 
-[packages/core/src/types.ts:553](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L553)
+[packages/core/src/types.ts:561](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L561)

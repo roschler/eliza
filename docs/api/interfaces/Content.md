@@ -18,7 +18,7 @@ The main text content
 
 #### Defined in
 
-[packages/core/src/types.ts:27](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L27)
+[packages/core/src/types.ts:24](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L24)
 
 ***
 
@@ -30,7 +30,7 @@ Optional action associated with the message
 
 #### Defined in
 
-[packages/core/src/types.ts:30](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L30)
+[packages/core/src/types.ts:27](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L27)
 
 ***
 
@@ -42,7 +42,7 @@ Optional source/origin of the content
 
 #### Defined in
 
-[packages/core/src/types.ts:33](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L33)
+[packages/core/src/types.ts:30](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L30)
 
 ***
 
@@ -54,7 +54,7 @@ URL of the original message/post (e.g. tweet URL, Discord message link)
 
 #### Defined in
 
-[packages/core/src/types.ts:36](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L36)
+[packages/core/src/types.ts:33](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L33)
 
 ***
 
@@ -66,7 +66,7 @@ UUID of parent message if this is a reply/thread
 
 #### Defined in
 
-[packages/core/src/types.ts:39](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L39)
+[packages/core/src/types.ts:36](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L36)
 
 ***
 
@@ -78,4 +78,4 @@ Array of media attachments
 
 #### Defined in
 
-[packages/core/src/types.ts:42](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L42)
+[packages/core/src/types.ts:39](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L39)

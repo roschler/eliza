@@ -577,29 +577,35 @@ export class SqlJsDatabaseAdapter
         return goals;
     }
 
-    async getGoalByAgentCharacterName(params: {
+    async getGoalsByRelationship(params: {
         agentId: UUID;
-        roomId: UUID;
-        name: string;
-        onlyInProgress?: boolean;
+        userId: UUID;
+        name?: string;
+        goalStatus?: string;
         count?: number;
     }): Promise<Goal[]> {
 
-        let sql = `SELECT * FROM goals WHERE "agentId" = ? AND "roomId" = ? AND "name" = ?`;
+        let sql = `SELECT * FROM goals WHERE "agentId" = ? AND "userId" = ?`;
 
-        const bindings: any[] = [params.agentId, params.roomId, params.name];
+        const values: any[] = [params.agentId, params.userId];
 
-        if (params.onlyInProgress) {
-            sql += " AND status = 'IN_PROGRESS'";
+        if (params.name) {
+            sql += ` AND "name" = ?`;
+            values.push(params.name);
+        }
+
+        if (params.goalStatus) {
+            sql += ` AND "status" = ?`;
+            values.push(params.goalStatus);
         }
 
         if (params.count) {
             sql += " LIMIT ?";
-            bindings.push(params.count.toString());
+            values.push(params.count.toString());
         }
 
         const stmt = this.db.prepare(sql);
-        stmt.bind(bindings);
+        stmt.bind(values);
         const goals: Goal[] = [];
         while (stmt.step()) {
             const goal = stmt.getAsObject() as unknown as Goal;
@@ -615,16 +621,15 @@ export class SqlJsDatabaseAdapter
         return goals;
     }
 
-    async removeGoalsByAgentCharacterName(params: {
+    async removeGoalsByRelationship(params: {
         agentId: UUID;
-        roomId: UUID;
-        name: string;
+        userId: UUID;
         onlyInProgress?: boolean;
     }): Promise<void> {
-        const sql = "DELETE FROM goals WHERE agentId = ? AND roomId = ? AND name = ?";
+        const sql = "DELETE FROM goals WHERE agentId = ? AND userId = ?";
 
         const stmt = this.db.prepare(sql);
-        stmt.run([params.agentId, params.roomId, params.name]);
+        stmt.run([params.agentId, params.userId]);
         stmt.free();
     }
 
@@ -643,7 +648,7 @@ export class SqlJsDatabaseAdapter
 
     async createGoal(goal: Goal): Promise<void> {
         const sql =
-            "INSERT INTO goals (id, roomId, userId, name, status, objectives) VALUES (?, ?, ?, ?, ?, ?)";
+            "INSERT INTO goals (id, roomId, userId, name, status, objectives) VALUES (?, ?, ?, ?, ?, ?, ?)";
         const stmt = this.db.prepare(sql);
         stmt.run([
             goal.id ?? v4(),
@@ -652,6 +657,7 @@ export class SqlJsDatabaseAdapter
             goal.name,
             goal.status,
             JSON.stringify(goal.objectives),
+            goal.agentId ?? null,
         ]);
         stmt.free();
     }

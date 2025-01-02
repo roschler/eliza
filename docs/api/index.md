@@ -60,6 +60,7 @@
 - [CharacterConfig](type-aliases/CharacterConfig.md)
 - [IAgentRuntimeOrNull](type-aliases/IAgentRuntimeOrNull.md)
 - [UUID](type-aliases/UUID.md)
+- [BillOfMaterialsResultType](type-aliases/BillOfMaterialsResultType.md)
 - [Model](type-aliases/Model.md)
 - [Models](type-aliases/Models.md)
 - [Handler](type-aliases/Handler.md)

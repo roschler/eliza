@@ -533,27 +533,33 @@ export class SqliteDatabaseAdapter
         }));
     }
 
-    async getGoalByAgentCharacterName(params: {
+    async getGoalsByRelationship(params: {
         agentId: UUID;
-        roomId: UUID;
-        name: string;
-        onlyInProgress?: boolean;
+        userId: UUID;
+        name?: string;
+        goalStatus?: string;
         count?: number;
     }): Promise<Goal[]> {
-        let sql = `SELECT * FROM goals WHERE "agentId" = ? AND "roomId" = ? AND "name" = ?`;
+        let sql = `SELECT * FROM goals WHERE "agentId" = ? AND "userId" = ?`;
 
-        const bindings: any[] = [params.agentId, params.roomId, params.name];
+        const values: any[] = [params.agentId, params.userId];
 
-        if (params.onlyInProgress) {
-            sql += " AND status = 'IN_PROGRESS'";
+        if (params.name) {
+            sql += ` AND "name" = ?`;
+            values.push(params.name);
+        }
+
+        if (params.goalStatus) {
+            sql += ` AND "status" = ?`;
+            values.push(params.goalStatus);
         }
 
         if (params.count) {
             sql += " LIMIT ?";
-            bindings.push(params.count.toString());
+            values.push(params.count.toString());
         }
 
-        const goals = this.db.prepare(sql).all(...bindings) as Goal[];
+        const goals = this.db.prepare(sql).all(...values) as Goal[];
         return goals.map((goal) => ({
             ...goal,
             objectives:
@@ -563,19 +569,18 @@ export class SqliteDatabaseAdapter
         }));
     }
 
-    async removeGoalsByAgentCharacterName(params: {
+    async removeGoalsByRelationship(params: {
         agentId: UUID;
-        roomId: UUID;
-        name: string;
+        userId: UUID;
         onlyInProgress?: boolean;
     }): Promise<void> {
-        let sql = "DELETE FROM goals WHERE agentId = ? AND roomId = ? AND name = ?";
+        let sql = "DELETE FROM goals WHERE agentId = ? AND userId = ?";
 
         if (params.onlyInProgress) {
             sql += " AND status = 'IN_PROGRESS'";
         }
 
-        this.db.prepare(sql).run(params.agentId, params.roomId, params.name);
+        this.db.prepare(sql).run(params.agentId, params.userId);
     }
 
     async updateGoal(goal: Goal): Promise<void> {
@@ -593,7 +598,7 @@ export class SqliteDatabaseAdapter
 
     async createGoal(goal: Goal): Promise<void> {
         const sql =
-            "INSERT INTO goals (id, roomId, userId, name, status, objectives) VALUES (?, ?, ?, ?, ?, ?)";
+            "INSERT INTO goals (id, roomId, userId, name, status, objectives, agentId) VALUES (?, ?, ?, ?, ?, ?, ?)";
         this.db
             .prepare(sql)
             .run(
@@ -602,7 +607,8 @@ export class SqliteDatabaseAdapter
                 goal.userId,
                 goal.name,
                 goal.status,
-                JSON.stringify(goal.objectives)
+                JSON.stringify(goal.objectives),
+                goal.agentId ?? null,
             );
     }
 
