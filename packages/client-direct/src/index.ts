@@ -8,7 +8,7 @@ import {
     buildFullRelationshipId,
     elizaLogger,
     generateCaption,
-    generateImage, UUID
+    generateImage, UUID, FullUserIdCharacterIdPair, buildRelationshipIdPair
 } from "@ai16z/eliza";
 import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
@@ -262,7 +262,7 @@ export class DirectClient {
                 //  available agent.
                 const bIsResetCommand = userInput === 'reset';
 
-                let mainGoal: Goal | null = null;
+                let mainBomGoal: Goal | null = null;
 
                 if (bIsResetCommand)
                     elizaLogger.debug(`Direct client message route received a RESET instruction.`);
@@ -285,44 +285,77 @@ export class DirectClient {
 
                 // -------------------------- BEGIN: CHARACTER/AGENT SWITCH HANDLING ------------------------
 
-                // Was an explicit RESET command triggered?
-                if (bIsResetCommand) {
-                    elizaLogger.debug(`RESET command received.`);
+                // Iterate the available agents to see if any of them
+                //  have a relationship with the current user in the
+                //  current room.  If they do, override the default
+                //  agent/character choice with the one in the
+                //  relationship with the user in the current room.
+                const overrideRuntimeOrNull =
+                    await findAgentAssignedToUser(roomId, userId, this.agents);
+
+                if (overrideRuntimeOrNull instanceof AgentRuntime) {
+                    elizaLogger.debug(`User assigned the following agent with CHARACTER name: ${overrideRuntimeOrNull.character.name}`);
+
+                    // Override the selected agent.
+                    runtime = overrideRuntimeOrNull;
+                }
+
+                const relationshipIdPair: FullUserIdCharacterIdPair =
+                    buildRelationshipIdPair(roomId, userId, runtime.character.name);
+
+                // If this is not an explicit RESET command, then see if the
+                //  current agent/character has a goal in progress.
+                if (!bIsResetCommand) {
+                    // -------------------------- BEGIN: CHECK FOR EXISTING BOM GOAL FOR AGENT/CHARACTER ------------------------
+
+                    const goalsFound =
+                        await runtime.databaseAdapter.getGoalByAgentCharacterName(
+                        {
+                            agentId: relationshipIdPair.fullCharacterId,
+                            roomId: roomId,
+                            name: runtime.character.name
+                        }
+                    );
+
+                    if (!Array.isArray(goalsFound))
+                        throw new Error(`The return from getGoalByAgentCharacterName was not an array.`);
+
+                    // We should only have 1 main goal for a particular agent/character
+                    //  name.  If there is more than 1 then, the ensuing results
+                    //  are unpredictable.
+                    if (goalsFound.length > 1)
+                        throw new Error(`More than one goal was returned from getGoalByAgentCharacterName.  Only one or none is expected.`);
+
+                    if (goalsFound.length > 0) {
+                        elizaLogger.debug(`An existing goal was found for agent/character: ${runtime.character.name}`);
+
+                        // Use the existing goal.
+                        mainBomGoal = goalsFound[0];
+                    } else {
+                        elizaLogger.debug(`No existing goals found for agent/character: ${runtime.character.name}`);
+                    }
+
+                    // -------------------------- END  : CHECK FOR EXISTING BOM GOAL FOR AGENT/CHARACTER ------------------------
+                }
+
+                // Was an explicit RESET command triggered OR does the agent/character
+                //  not have an existing goal object?
+                if (bIsResetCommand || !mainBomGoal) {
+                    elizaLogger.debug(`RESET command received.  Clearing and rebuilding the main bill-of-materials goal for agent/character: ${runtime.character.name}.`);
 
                     // Yes. Rebuild the character/agent's MAIN goal using its
                     //  bill of materials content.
-                    mainGoal = await resetBomCharacterAgentGoals(roomId, userId, runtime);
+                    mainBomGoal = await resetBomCharacterAgentGoals(roomId, userId, runtime);
                 } else {
-
                     //  No. Check if a character assignment relationship was created for the
                     //  current room ID + user ID pair.
 
-                    // Iterate the available agents to see if any of them
-                    //  have a relationship with the current user in the
-                    //  current room.
-                    const overrideRuntimeOrNull =
-                        await findAgentAssignedToUser(roomId, userId, this.agents);
-
-                    if (overrideRuntimeOrNull instanceof AgentRuntime) {
-                        elizaLogger.debug(`User assigned the following agent with CHARACTER name: ${overrideRuntimeOrNull.character.name}`);
-
-                        // Override the selected agent.
-                        runtime = overrideRuntimeOrNull;
-                    }
 
                 }
 
                 if (!runtime) {
                     throw new Error(`The "runtime" agent/character variable is unassigned.`);
                 }
-
-                // If we don't have a main goal yet, then get the
-                //   current bill-of-materials main GOAL for the
-                //   resulting agent/character.
-                if (!mainGoal) {
-                    mainGoal = await runtime.databaseAdapter.getGoals()
-                }
-
 
                 // -------------------------- END  : CHARACTER/AGENT SWITCH HANDLING ------------------------
 

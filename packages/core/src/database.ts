@@ -244,7 +244,12 @@ export abstract class DatabaseAdapter<DB = any> implements IDatabaseAdapter {
     /**
      * Retrieves all goals for the given agent ID + room ID
      *  combination that have the given name.
+     *
      * @param params An object containing parameters for goal retrieval.
+     * If onlyInProgress is TRUE, then only goals that are in progress
+     *  will be retrieved, otherwise all goals for the given
+     *  agent ID + room ID pair will be retrieved.
+     *
      * @returns A Promise that resolves to an array of Goal objects.
      */
     abstract getGoalByAgentCharacterName(params: {
@@ -254,6 +259,22 @@ export abstract class DatabaseAdapter<DB = any> implements IDatabaseAdapter {
         onlyInProgress?: boolean;
         count?: number;
     }): Promise<Goal[]>;
+
+    /**
+     * Removes all goals for the given agent ID + room ID
+     *  combination that have the given name.  If onlyInProgress
+     *  is TRUE, then only goals that are in progress will be
+     *  removed, otherwise all goals for the given
+     *  agent ID + room ID pair will be removed.
+     *
+     * @param params An object containing parameters for goal retrieval.
+     */
+    abstract removeGoalsByAgentCharacterName(params: {
+        agentId: UUID;
+        roomId: UUID;
+        name: string;
+        onlyInProgress?: boolean;
+    }): Promise<void>;
 
     /**
      * Updates a specific goal in the database.

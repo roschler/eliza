@@ -967,6 +967,13 @@ export interface IDatabaseAdapter {
         count?: number;
     }): Promise<Goal[]>;
 
+    removeGoalsByAgentCharacterName(params: {
+        agentId: UUID;
+        roomId: UUID;
+        name: string;
+        onlyInProgress?: boolean;
+    }): Promise<void>;
+
     getGoals(params: {
         agentId: UUID;
         roomId: UUID;

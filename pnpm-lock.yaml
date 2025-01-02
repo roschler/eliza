@@ -1244,9 +1244,6 @@ importers:
 
   packages/plugin-pilterms:
     dependencies:
-      '@ai16z/client-direct':
-        specifier: workspace:*
-        version: link:../client-direct
       '@ai16z/eliza':
         specifier: workspace:*
         version: link:../core

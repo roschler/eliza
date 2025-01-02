@@ -563,6 +563,21 @@ export class SqliteDatabaseAdapter
         }));
     }
 
+    async removeGoalsByAgentCharacterName(params: {
+        agentId: UUID;
+        roomId: UUID;
+        name: string;
+        onlyInProgress?: boolean;
+    }): Promise<void> {
+        let sql = "DELETE FROM goals WHERE agentId = ? AND roomId = ? AND name = ?";
+
+        if (params.onlyInProgress) {
+            sql += " AND status = 'IN_PROGRESS'";
+        }
+
+        this.db.prepare(sql).run(params.agentId, params.roomId, params.name);
+    }
+
     async updateGoal(goal: Goal): Promise<void> {
         const sql =
             "UPDATE goals SET name = ?, status = ?, objectives = ? WHERE id = ?";

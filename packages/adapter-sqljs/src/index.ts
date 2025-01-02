@@ -6,7 +6,7 @@ import {
     Actor, DatabaseAdapter, GoalStatus, IDatabaseCacheAdapter, Participant, type Goal,
     type Memory,
     type Relationship,
-    type UUID
+    type UUID, elizaLogger
 } from "@ai16z/eliza";
 import { v4 } from "uuid";
 import { sqliteTables } from "./sqliteTables.ts";
@@ -613,6 +613,19 @@ export class SqlJsDatabaseAdapter
         }
         stmt.free();
         return goals;
+    }
+
+    async removeGoalsByAgentCharacterName(params: {
+        agentId: UUID;
+        roomId: UUID;
+        name: string;
+        onlyInProgress?: boolean;
+    }): Promise<void> {
+        const sql = "DELETE FROM goals WHERE agentId = ? AND roomId = ? AND name = ?";
+
+        const stmt = this.db.prepare(sql);
+        stmt.run([params.agentId, params.roomId, params.name]);
+        stmt.free();
     }
 
     async updateGoal(goal: Goal): Promise<void> {

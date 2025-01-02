@@ -673,6 +673,32 @@ export class PostgresDatabaseAdapter
         }, "getGoalByAgentCharacterName");
     }
 
+    async removeGoalsByAgentCharacterName(params: {
+        agentId: UUID;
+        roomId: UUID;
+        name: string;
+        onlyInProgress?: boolean;
+    }): Promise<void> {
+        return this.withDatabase(async () => {
+            try {
+                const result = await this.pool.query(
+                    `DELETE FROM goals WHERE "agentId" = $1 AND "roomId" = $2 AND "name" = $3`,
+                    [params.agentId, params.roomId, params.name]
+                );
+
+                elizaLogger.debug(`Num goals removed for agent ID: ${params.agentId}`, {
+                    removed: result?.rowCount ?? 0 > 0,
+                });
+            } catch (error) {
+                elizaLogger.error(`Failed to remove goal for agent ID: ${params.agentId}`, {
+                    error:
+                        error instanceof Error ? error.message : String(error),
+                });
+                throw error;
+            }
+        }, "removeGoalsByAgentCharacterName");
+    }
+
     async updateGoal(goal: Goal): Promise<void> {
         return this.withDatabase(async () => {
             try {

@@ -46,7 +46,7 @@ export function findUserIdInState(state: State, ignoreUserNames: string[] = ["Pi
 }
 
 /**
- * This function removes all the goals for the specified agent/character
+ * This function removes all the goals for the specified agent/characters
  *  that exist in the given room, and recreates the MAIN goal from the
  *  agent/character's bill of materials line items.
  *
@@ -60,8 +60,15 @@ export function findUserIdInState(state: State, ignoreUserNames: string[] = ["Pi
 export async function resetBomCharacterAgentGoals(roomId: UUID, userId: UUID, runtime: IAgentRuntime): Promise<Goal> {
     elizaLogger.debug(`RESETTING main GOAL and objectives using bill of materials content for agent/character: ${runtime.character.name}`);
 
-    // Delete all existing goals for this agent/character
-    //  and recreate the main goal for this agent/character
+    // Delete all existing goals for this agent/character.
+    runtime.databaseAdapter.removeGoalsByAgentCharacterName(
+        {
+            agentId
+        }
+    )
+
+
+    // Recreate the main goal for this agent/character
     //  with its objectives using the bill-of-materials line item
     //  fields.
     const objectivesForAgent: Objective[] =

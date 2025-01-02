@@ -494,10 +494,34 @@ export class SupabaseDatabaseAdapter extends DatabaseAdapter {
         const { data: goals, error } = await query;
 
         if (error) {
-            throw new Error(error.message);
+            throw new Error(`Error removing goals for -\nagent ID: ${params.agentId}\nroomId: ${params.roomId}\nAgent/character name: ${params.name}\nError details: ${error.message}`);
         }
 
-        return goals;;
+        return goals;
+    }
+
+    async removeGoalsByAgentCharacterName(params: {
+        agentId: UUID;
+        roomId: UUID;
+        name: string;
+        onlyInProgress?: boolean;
+    }): Promise<void> {
+        let query = this.supabase
+            .from("goals")
+            .delete()
+            .eq("agentId", params.agentId)
+            .eq("roomId", params.roomId)
+            .eq("name", params.name);
+
+        if (params.onlyInProgress) {
+            query = query.eq("status", 'IN_PROGRESS');
+        }
+
+        const { error } = await query;
+
+        if (error) {
+            throw new Error(`Error removing goals for -\nagent ID: ${params.agentId}\nroomId: ${params.roomId}\nAgent/character name: ${params.name}\nError details: ${error.message}`);
+        }
     }
 
     async updateGoal(goal: Goal): Promise<void> {

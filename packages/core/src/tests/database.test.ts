@@ -67,13 +67,21 @@ class MockDatabaseAdapter extends DatabaseAdapter {
     }): Promise<Goal[]> {
         throw new Error("Method not implemented.");
     }
-    getGoalByAgentCharacterName(params: {
+    getGoalByAgentCharacterName(_params: {
         agentId: UUID;
         roomId: UUID;
         name: string;
         onlyInProgress?: boolean;
         count?: number;
     }): Promise<Goal[]> {
+        throw new Error("Method not implemented.");
+    }
+    removeGoalsByAgentCharacterName(_params: {
+        agentId: UUID;
+        roomId: UUID;
+        name: string;
+        onlyInProgress?: boolean;
+    }): Promise<void> {
         throw new Error("Method not implemented.");
     }
     updateGoal(_goal: Goal): Promise<void> {
