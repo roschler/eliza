@@ -8,7 +8,13 @@ import {
     buildFullRelationshipId,
     elizaLogger,
     generateCaption,
-    generateImage, UUID, FullUserIdCharacterIdPair, buildRelationshipIdPair
+    generateImage,
+    UUID,
+    FullUserIdCharacterIdPair,
+    buildRelationshipIdPair,
+    BillOfMaterialsLineItem,
+    Objective,
+    ObjectiveOrNull, StringOrNull
 } from "@ai16z/eliza";
 import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
@@ -29,6 +35,150 @@ import * as fs from "fs";
 import * as path from "path";
 import {processFileOrUrlReferences} from "./process-external-references.ts";
 const upload = multer({ storage: multer.memoryStorage() });
+
+// -------------------------- BEGIN: BILL-OF-MATERIALS SUB-PROMPT PROCESSING ------------------------
+
+/**
+ * Validate the given BillOfMaterialsLineItem by checking the logical
+ *  consistency of its fields.
+ *
+ * @param billOfMaterialsLineItem - The BillOfMaterialsLineItem to inspect.
+ *
+ * @returns - Returns an error message indicating where validation
+ *  failed, or NULL if the object validated.
+ */
+function validateBillOfMaterialsLineItem(billOfMaterialsLineItem: BillOfMaterialsLineItem): string {
+    const validationFailures: string[] = [];
+
+    if (billOfMaterialsLineItem.name.trim().length === 0) {
+        validationFailures.push(`The "name" field is empty.`);
+    }
+
+    if (billOfMaterialsLineItem.type.trim().length === 0) {
+        validationFailures.push(`The "type" field is empty.`);
+    }
+
+    if (billOfMaterialsLineItem.prompt.trim().length === 0) {
+        validationFailures.push(`The "prompt" field is empty.`);
+    }
+
+    if (typeof billOfMaterialsLineItem.defaultValue === 'string' && billOfMaterialsLineItem.defaultValue.trim().length === 0) {
+        validationFailures.push(`The "defaultValue" field is assigned an empty string.`);
+    }
+
+    if (billOfMaterialsLineItem.type === 'string') {
+        // -------------------------- BEGIN: STRING TYPE VALIDATIONS ------------------------
+        // If the list of values array is assigned, then it must contain
+        //  at least one value.
+
+        if (Array.isArray(billOfMaterialsLineItem) && billOfMaterialsLineItem.listOfValidValues.length === 0) {
+            validationFailures.push(`The "listOfValidValues" array is empty.`);
+        }
+
+        // -------------------------- END  : STRING TYPE VALIDATIONS ------------------------
+    } else if (billOfMaterialsLineItem.type === 'number') {
+        // -------------------------- BEGIN: NUMBER TYPE VALIDATIONS ------------------------
+
+        // If we have a minimum and maximum value field, make sure the
+        //  minimum is less than or equal to the maximum value.
+        if (typeof billOfMaterialsLineItem.minVal === 'number' && typeof billOfMaterialsLineItem.maxVal === 'number') {
+            if (billOfMaterialsLineItem.minVal > billOfMaterialsLineItem.maxVal)
+                validationFailures.push(`The minVal field value(${billOfMaterialsLineItem.minVal}) is greater than the maxVal field value: ${billOfMaterialsLineItem.maxVal}.`);
+        }
+
+        if (typeof billOfMaterialsLineItem.unitsDescription === 'string' && billOfMaterialsLineItem.unitsDescription.trim().length === 0) {
+            validationFailures.push(`The unitsDescription field is empty.`);
+        }
+
+        // -------------------------- END  : NUMBER TYPE VALIDATIONS ------------------------
+    }
+
+    if (validationFailures.length > 0) {
+        return validationFailures.join('\n');
+    } else {
+        return null;
+    }
+}
+
+/**
+ * Given an array of BillOfMaterialsLineItem objects, determine the
+ *  next objective that needs to be completed.
+ *
+ * @param bomGoal - A Goal object that was prepared for use as a
+ *  bill-of-materials purposes.
+ *
+ * @returns - Returns NULL if all of the bill-of-materials objectives
+ *  for the goal have been completed, otherwise, the next incomplete
+ *  objective found sequentially in the BillOfMaterialsLineItem
+ *  objects array is returned.
+ */
+function getNextBomObjective(bomGoal: Goal): ObjectiveOrNull {
+    let nextBomObject: ObjectiveOrNull = null;
+
+    if (!Array.isArray(bomGoal.objectives)) {
+        throw new Error(`The bomGoal parameter's "objectives" field is not an array.`);
+    }
+
+    if (bomGoal.objectives.length === 0) {
+        throw new Error(`The bomGoal parameter's "objectives" array is empty.`);
+    }
+
+    // Find the first bill-of-materials objective that is not completed.
+    for (let objectiveNdx = 0; objectiveNdx < bomGoal.objectives.length; objectiveNdx++) {
+        const bomObjective = bomGoal.objectives[objectiveNdx];
+
+        // Is it an incomplete bill-of-materials objective object?
+        if (!bomObjective.completed && bomObjective.billOfMaterialsLineItem) {
+            // Yes. Validate the objective's bill-of-materials line item object.
+            //  It will return an error message describing all the validation
+            //  checks that failed, if any occurred, or NULL all validations
+            //  succeeded.
+            const validationFailureMsgs =
+                validateBillOfMaterialsLineItem(bomObjective.billOfMaterialsLineItem);
+
+            if (validationFailureMsgs)
+            {
+                throw new Error(`Invalid bill-of-materials line item object encountered.  Details:\n${validationFailureMsgs}.`);
+            }
+
+            // Select this bill-of-materials objective to be processed
+            //  this chat volley.
+            nextBomObject = bomObjective;
+            break; // Cease iteration.
+        }
+    }
+
+    return nextBomObject;
+}
+
+/**
+ * Given an agent/character bill-of-materials goal, use
+ *  its bill-of-materials Goal content to create the sub-prompt
+ *  for the LLM that facilitates completing the bill-of-materials
+ *  objectives.
+ *
+ * @param bomGoal - A Goal object that was prepared for use as a
+ *  bill-of-materials purposes.
+ *
+ * @returns - Returns NULL if the goal has no
+ *  bill-of-materials content, or if it does, returns the
+ *  bill-of-materials sub-prompt made from that content.
+ */
+function buildBillOfMaterialsPrompt(bomGoal: Goal): string | null {
+    let retStr: StringOrNull = null;
+
+    // Do we have any bill-of-materials to process?
+    if (Array.isArray(bomGoal.objectives) && bomGoal.objectives.length > 0) {
+        // Determine the next objective that needs to be completed.
+        const nextBomObjective = getNextBomObjective(bomGoal);
+
+    }
+
+    return retStr;
+
+}
+
+// -------------------------- END  : BILL-OF-MATERIALS SUB-PROMPT PROCESSING ------------------------
 
 export const messageHandlerTemplate =
     // {{goals}}
@@ -377,7 +527,8 @@ export class DirectClient {
 
                 // TODO: Now it is time to modify the LLM prompt by creating the bill-of-materials
                 //  sub-prompt for insertion into the message handler template.
-                throw new Error("Not implemented yet.")
+                const billOfMaterialsSubPrompt =
+                    buildBillOfMaterialsPrompt(runtime);
 
                 // -------------------------- END  : BILL-OF-MATERIALS TO PROMPT ------------------------
                 await runtime.ensureConnection(

@@ -1,8 +1,14 @@
 import { Readable } from "stream";
 
-/**
- * Type for functions that return an AgentRuntime object or null.
- */
+// Some simple types that are either NULL or some other primitive value.
+export type StringOrNull = string | null;
+export type NumberOrNull = number | null;
+export type ObjectOrNull = object | null;
+export type BooleanOrNull = boolean | null;
+export type ObjectiveOrNull = Objective | null;
+export type BillOfMaterialsLineItemOrNull = BillOfMaterialsLineItem | null;
+export type GoalOrNull = Goal | null;
+export type RelationshipOrNull = Relationship | null;
 export type IAgentRuntimeOrNull = IAgentRuntime | null;
 
 /**
@@ -1336,3 +1342,4 @@ export type FullUserIdCharacterIdPair = {
     //  potential conflicts with other ID types.
     fullCharacterId: UUID;
 }
+
