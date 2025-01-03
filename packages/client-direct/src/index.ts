@@ -14,7 +14,7 @@ import {
     buildRelationshipIdPair,
     BillOfMaterialsLineItem,
     Objective,
-    ObjectiveOrNull, StringOrNull
+    ObjectiveOrNull, StringOrNull, GoalOrNull
 } from "@ai16z/eliza";
 import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
@@ -37,6 +37,19 @@ import {processFileOrUrlReferences} from "./process-external-references.ts";
 const upload = multer({ storage: multer.memoryStorage() });
 
 // -------------------------- BEGIN: BILL-OF-MATERIALS SUB-PROMPT PROCESSING ------------------------
+
+/**
+ * An agent/character is considered a bill-of-materials agent/character
+ *  if it is a non-empty array of BillOfMaterialsLineItem objects.
+ *
+ * @param runtime - The agent/character to inspect.
+ *
+ * @returns - Returns TRUE if the given agent/character is a bill-of-materials
+ *  agent/character, FALSE if not.
+ */
+function isBomAgentCharacter(runtime: IAgentRuntime): boolean {
+    return Array.isArray(runtime.character.billOfMaterials) && runtime.character.billOfMaterials.length > 0;
+}
 
 /**
  * Validate the given BillOfMaterialsLineItem by checking the logical
@@ -451,6 +464,59 @@ export class DirectClient {
         this.app.post(
             "/:agentId/message",
             async (req: express.Request, res: express.Response) => {
+
+                /**
+                 * Check for the existence of a main bill-of-materials goal for the
+                 *  the current relationship.
+                 *
+                 *  @param relationshipIdPair - The room ID prepended full user ID
+                 *   and agent/character ID that forms the relationship.
+                 *
+                 *  @returns - Returns the active bill-of-materials goal for the
+                 *   current relationship if one exists, NULL if not.
+                 */
+                async function checkForMainBomGoal(relationshipIdPair: FullUserIdCharacterIdPair): Promise<GoalOrNull> {
+                    const errPrefix = '(checkForMainBomGoal) ';
+
+                    let retGoalOrNull: GoalOrNull = null;
+
+                    if (relationshipIdPair.fullUserId.length === 0)
+                        throw new Error(`${errPrefix} The full user ID is empty.`);
+                    if (relationshipIdPair.fullCharacterId.length === 0)
+                        throw new Error(`${errPrefix} The full character ID is empty.`);
+
+                    // Find all the bill-of-materials goals belonging to this
+                    //  user to agent/character relationship.
+                    const bomGoalsFound =
+                        await runtime.databaseAdapter.getGoalsByRelationship(
+                            {
+                                agentId: relationshipIdPair.fullCharacterId,
+                                userId: relationshipIdPair.fullUserId,
+                                name: GOAL_NAME_BILL_OF_MATERIALS
+                            }
+                        );
+
+                    if (!Array.isArray(bomGoalsFound))
+                        throw new Error(`The return from getGoalsByRelationship was not an array.`);
+
+                    // We should only have 1 main goal for a particular agent/character
+                    //  name.  If there is more than 1 then, the ensuing results
+                    //  are unpredictable.
+                    if (bomGoalsFound.length > 1)
+                        throw new Error(`More than one goal was returned from getGoalsByRelationship.  Only one or none is expected.`);
+
+                    if (bomGoalsFound.length > 0) {
+                        elizaLogger.debug(`An existing goal was found for agent/character: ${runtime.character.name}`);
+
+                        // Use the existing goal.
+                        retGoalOrNull = bomGoalsFound[0];
+                    } else {
+                        elizaLogger.debug(`No existing goals found for agent/character: ${runtime.character.name}`);
+                    }
+
+                    return retGoalOrNull;
+                }
+
                 const agentId = req.params.agentId;
                 const roomId = stringToUuid(
                     req.body.roomId ?? "default-room-" + agentId
@@ -507,65 +573,10 @@ export class DirectClient {
                     runtime = overrideRuntimeOrNull;
                 }
 
-                const relationshipIdPair: FullUserIdCharacterIdPair =
-                    buildRelationshipIdPair(roomId, userId, runtime.character.name);
-
-                // If this is not an explicit RESET command, then see if the
-                //  current agent/character has a goal in progress.
-                if (!bIsResetCommand) {
-                    // -------------------------- BEGIN: CHECK FOR EXISTING BOM GOAL FOR AGENT/CHARACTER ------------------------
-
-                    // Find all the bill-of-materials goals belonging to this
-                    //  user to agent/character relationship.
-                    const bomGoalsFound =
-                        await runtime.databaseAdapter.getGoalsByRelationship(
-                        {
-                            agentId: relationshipIdPair.fullCharacterId,
-                            userId: relationshipIdPair.fullUserId,
-                            name: GOAL_NAME_BILL_OF_MATERIALS
-                        }
-                    );
-
-                    if (!Array.isArray(bomGoalsFound))
-                        throw new Error(`The return from getGoalsByRelationship was not an array.`);
-
-                    // We should only have 1 main goal for a particular agent/character
-                    //  name.  If there is more than 1 then, the ensuing results
-                    //  are unpredictable.
-                    if (bomGoalsFound.length > 1)
-                        throw new Error(`More than one goal was returned from getGoalsByRelationship.  Only one or none is expected.`);
-
-                    if (bomGoalsFound.length > 0) {
-                        elizaLogger.debug(`An existing goal was found for agent/character: ${runtime.character.name}`);
-
-                        // Use the existing goal.
-                        mainBomGoal = bomGoalsFound[0];
-                    } else {
-                        elizaLogger.debug(`No existing goals found for agent/character: ${runtime.character.name}`);
-                    }
-
-                    // -------------------------- END  : CHECK FOR EXISTING BOM GOAL FOR AGENT/CHARACTER ------------------------
-                }
-
-                // Was an explicit RESET command triggered OR does the agent/character
-                //  not have an existing goal object?
-                if (bIsResetCommand || !mainBomGoal) {
-                    elizaLogger.debug(`RESET command received.  Building the main bill-of-materials goal for agent/character: ${runtime.character.name}.`);
-
-                    // Yes. Rebuild the character/agent's MAIN goal using its
-                    //  bill of materials content.
-                    mainBomGoal = await resetBomGoalsForRelationship(roomId, userId, runtime);
-                } else {
-                    // No. mainBomGoal should have a valid bill-of-materials goal for
-                    //  us to use now.
-                    elizaLogger.debug(`Re-using the main bill-of-materials goal for agent/character: ${runtime.character.name}.`);
-                }
-
+                // Make sure we have a valid agent/character to use from here one.
                 if (!runtime) {
                     throw new Error(`The "runtime" agent/character variable is unassigned.`);
                 }
-
-                // -------------------------- END  : CHARACTER/AGENT SWITCH HANDLING ------------------------
 
                 // -------------------------- BEGIN: HOT-LOAD CHARACTER CONTENT ------------------------
 
@@ -576,109 +587,159 @@ export class DirectClient {
 
                 // -------------------------- END  : HOT-LOAD CHARACTER CONTENT ------------------------
 
+                // >>>>> Is this a bill-of-materials agent/character or not?
+                const bIsBomAgentCharacter =
+                    isBomAgentCharacter(runtime);
+
+                if (bIsBomAgentCharacter) {
+
+                    const relationshipIdPair: FullUserIdCharacterIdPair =
+                        buildRelationshipIdPair(roomId, userId, runtime.character.name);
+
+                    // If this is not an explicit RESET command, then see if the
+                    //  current agent/character has a goal in progress.
+                    if (!bIsResetCommand) {
+                        // -------------------------- BEGIN: CHECK FOR EXISTING BOM GOAL FOR AGENT/CHARACTER ------------------------
+
+                        mainBomGoal =
+                            await checkForMainBomGoal(relationshipIdPair);
+
+                        // -------------------------- END  : CHECK FOR EXISTING BOM GOAL FOR AGENT/CHARACTER ------------------------
+                    }
+
+                    // Was an explicit RESET command triggered OR does the agent/character
+                    //  not have an existing goal object?
+                    if (bIsResetCommand || !mainBomGoal) {
+                        elizaLogger.debug(`RESET command received.  Building the main bill-of-materials goal for agent/character: ${runtime.character.name}.`);
+
+                        // Yes. Rebuild the character/agent's MAIN goal using its
+                        //  bill of materials content.
+                        mainBomGoal = await resetBomGoalsForRelationship(roomId, userId, runtime);
+                    } else {
+                        // No. mainBomGoal should have a valid bill-of-materials goal for
+                        //  us to use now.
+                        elizaLogger.debug(`Re-using the main bill-of-materials goal for agent/character: ${runtime.character.name}.`);
+                    }
+                }
+
+                // -------------------------- END  : CHARACTER/AGENT SWITCH HANDLING ------------------------
+
                 // -------------------------- BEGIN: BILL-OF-MATERIALS TO PROMPT ------------------------
 
-                // TODO: Now it is time to modify the LLM prompt by creating the bill-of-materials
-                //  sub-prompt for insertion into the message handler template.
+
+                // -------------------------- END  : BILL-OF-MATERIALS TO PROMPT ------------------------
+
+                // TODO: If there is a bill-of-materials goal active for the current
+                //  agent/character, then now it is time to facilitate that objective
+                //  by creating the bill-of-materials sub-prompt for insertion into
+                //  the message handler template.
                 const billOfMaterialsSubPrompt =
                     buildBillOfMaterialsPrompt(runtime);
 
-                // -------------------------- END  : BILL-OF-MATERIALS TO PROMPT ------------------------
-                await runtime.ensureConnection(
-                    userId,
-                    roomId,
-                    req.body.userName,
-                    req.body.name,
-                    "direct"
-                );
-
-                const text = req.body.text;
-                const messageId = stringToUuid(Date.now().toString());
-
-                const content: Content = {
-                    text,
-                    attachments: [],
-                    source: "direct",
-                    inReplyTo: undefined,
-                };
-
-                const userMessage = {
-                    content,
-                    userId,
-                    roomId,
-                    agentId: runtime.agentId,
-                };
-
-                const memory: Memory = {
-                    id: messageId,
-                    agentId: runtime.agentId,
-                    userId,
-                    roomId,
-                    content,
-                    createdAt: Date.now(),
-                };
-
-                await runtime.messageManager.createMemory(memory);
-
-                const state = await runtime.composeState(userMessage, {
-                    agentName: runtime.character.name,
-                });
-
-                // If the character has its own message template, use that instead.
-                let useTemplate = messageHandlerTemplate;
-
-                if (runtime.character.messageTemplate && runtime.character.messageTemplate.trim().length > 0) {
-                    elizaLogger.debug(`OVERRIDING message template with CHARACTER defined message template.`);
-                    useTemplate = runtime.character.messageTemplate.trim();
-                }
-
-                const context = composeContext({
-                    state,
-                    template: useTemplate,
-                });
-
-                const response = await generateMessageResponse({
-                    runtime: runtime,
-                    context,
-                    modelClass: ModelClass.SMALL,
-                });
-
-                // save response to memory
-                const responseMessage = {
-                    ...userMessage,
-                    userId: runtime.agentId,
-                    content: response,
-                };
-
-                await runtime.messageManager.createMemory(responseMessage);
-
-                if (!response) {
-                    res.status(500).send(
-                        "No response from generateMessageResponse"
+                if (billOfMaterialsSubPrompt === null) {
+                    await runtime.ensureConnection(
+                        userId,
+                        roomId,
+                        req.body.userName,
+                        req.body.name,
+                        "direct"
                     );
-                    return;
-                }
 
-                let message = null as Content | null;
+                    const text = req.body.text;
+                    const messageId = stringToUuid(Date.now().toString());
 
-                await runtime.evaluate(memory, state);
+                    const content: Content = {
+                        text,
+                        attachments: [],
+                        source: "direct",
+                        inReplyTo: undefined,
+                    };
 
-                const _result = await runtime.processActions(
-                    memory,
-                    [responseMessage],
-                    state,
-                    async (newMessages) => {
-                        message = newMessages;
-                        return [memory];
+                    const userMessage = {
+                        content,
+                        userId,
+                        roomId,
+                        agentId: runtime.agentId,
+                    };
+
+                    const memory: Memory = {
+                        id: messageId,
+                        agentId: runtime.agentId,
+                        userId,
+                        roomId,
+                        content,
+                        createdAt: Date.now(),
+                    };
+
+                    await runtime.messageManager.createMemory(memory);
+
+                    const state = await runtime.composeState(userMessage, {
+                        agentName: runtime.character.name,
+                    });
+
+                    // TODO: Need to either execute a direct question answer using the
+                    //  preliminary question assigned to the current bill-of-materials
+                    //  line item objective, if that is the current context, or pass
+                    //  through to normal LLM processing if not.
+
+                    // If the character has its own message template, use that instead.
+                    let useTemplate = messageHandlerTemplate;
+
+                    if (runtime.character.messageTemplate && runtime.character.messageTemplate.trim().length > 0) {
+                        elizaLogger.debug(`OVERRIDING message template with CHARACTER defined message template.`);
+                        useTemplate = runtime.character.messageTemplate.trim();
                     }
-                );
 
-                if (message) {
-                    res.json([response, message]);
-                } else {
-                    res.json([response]);
+                    const context = composeContext({
+                        state,
+                        template: useTemplate,
+                    });
+
+                    // Now, make the call to the LLM using the updated context.
+                    const response = await generateMessageResponse({
+                        runtime: runtime,
+                        context,
+                        modelClass: ModelClass.SMALL,
+                    });
+
+                    // save response to memory
+                    const responseMessage = {
+                        ...userMessage,
+                        userId: runtime.agentId,
+                        content: response,
+                    };
+
+                    await runtime.messageManager.createMemory(responseMessage);
+
+                    if (!response) {
+                        res.status(500).send(
+                            "No response from generateMessageResponse"
+                        );
+                        return;
+                    }
+
+                    let message = null as Content | null;
+
+                    await runtime.evaluate(memory, state);
+
+                    const _result = await runtime.processActions(
+                        memory,
+                        [responseMessage],
+                        state,
+                        async (newMessages) => {
+                            message = newMessages;
+                            return [memory];
+                        }
+                    );
+
+                    if (message) {
+                        res.json([response, message]);
+                    } else {
+                        res.json([response]);
+                    }
                 }
-            }
+            } else {
+        }
         );
 
         this.app.post(
