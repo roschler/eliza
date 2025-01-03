@@ -2,6 +2,22 @@
 
 GOALS:
 
+NEXT: Need to find the right spot to inspect the response from the user
+    to a bill-of-materials line item direct question and:
+
+        + If the preliminary question was just asked, determine if the
+            user response is "false" | "true" | "query" by asking the
+            LLM to determine that from the question we asked and the
+            user's input.  Then take the appropriate action for each
+            choice and update the Goal and its objectives properly.
+
+
+- Add code to handle "::<character name>" values in a BillOfMaterialsLineItem
+  object's ListOfValues field (need to fill out buildBillOfMaterialsQuestion()
+  function to handle ListOfValues fields).
+
+- Add code to create prompts and handle boolean and number line items
+
 // TODO: Now it is time to modify the LLM prompt by creating the bill-of-materials
 //  sub-prompt for insertion into the message handler template.  See bookmark #1.
 
