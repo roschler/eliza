@@ -144,7 +144,7 @@ export const CharacterSchema = z.object({
         .optional(),
     messageTemplate: z.string().optional(),
     billOfMaterials: z.array(BillOfMaterialsSchema).optional(),
-    bomCompleteCharacterName: z.string().optional(),
+    switchToCharacterWhenBomComplete: z.string().optional(),
     resetGoalsOnReceivingControl: z.boolean().optional(),
 });
 

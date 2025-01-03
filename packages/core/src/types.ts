@@ -797,7 +797,7 @@ export type Character = {
      *   available agents that were instantiated when the
      *   client was created!
      */
-    bomCompleteCharacterName?: string;
+    switchToCharacterWhenBomComplete?: string;
 
     /**
      * This field if present and is equal to FALSE,

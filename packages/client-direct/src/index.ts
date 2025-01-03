@@ -194,7 +194,7 @@ function getNextBomObjective(bomGoal: Goal): ObjectiveOrNull {
  *  bill-of-materials content, or if it does, returns the
  *  bill-of-materials sub-prompt made from that content.
  */
-function buildBillOfMaterialsPrompt(nextBomObjective: Objective): string | null {
+function buildBillOfMaterialQuestion(nextBomObjective: Objective): string | null {
     let retStr: StringOrNull = null;
 
     const piecesOfPrompt: string[] = [];
@@ -212,7 +212,7 @@ function buildBillOfMaterialsPrompt(nextBomObjective: Objective): string | null 
         // Yes. Check for a declined optional line item, since those
         //  should not be passed to this function.
         if (nextBomObjective.resultData === null) {
-            throw new Error(`The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user decline interest in it, so it should never have been passed to buildBillOfMaterialsPrompt() in the first place.`);
+            throw new Error(`The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user decline interest in it, so it should never have been passed to buildBillOfMaterialQuestion() in the first place.`);
         }
 
         // If the objective does not have a result yet, then we need to ask the
@@ -689,7 +689,22 @@ export class DirectClient {
                     if (nextBomObjective === null) {
                         // -------------------------- BEGIN: BILL-OF-MATERIALS GOAL COMPLETE ------------------------
 
-                        throw new Error(`Bill-of-materials completed goal processing not implemented yet.`);
+                        // If we don't have an agent/character to switch control to,
+                        //  now that the bill-of-materials goal is complete, then that
+                        //  is an error.
+                        const nextCharacterName =
+                            runtime.character.switchToCharacterWhenBomComplete;
+
+                        if (typeof nextCharacterName !== "string" || typeof nextCharacterName === "string" && nextCharacterName.trim().length === 0) {
+                            throw new Error(`The bill-of-materials goal processing is complete, but the character does not specify the next agent to transfer control to (i.e. - switchToCharacterWhenBomComplete is unassigned or invalid.`);
+                        }
+
+                        // Emit the action that will transfer control of the conversation
+                        //  to the next agent/character.
+                        response = {
+                            text: `Transferring you over to the next agent: ${nextCharacterName}`,
+                            action: `SELECT_CHARACTER_${nextCharacterName}`
+                        }
 
                         // -------------------------- END  : BILL-OF-MATERIALS GOAL COMPLETE ------------------------
 
@@ -698,10 +713,15 @@ export class DirectClient {
 
                         // Determine what question we should ask the user now.
                         const billOfMaterialsQuestion =
-                            buildBillOfMaterialsPrompt(nextBomObjective);
+                            buildBillOfMaterialQuestion(nextBomObjective);
 
                         if (billOfMaterialsQuestion.trim().length === 0)
                             throw new Error(`The billOfMaterialsQuestion variable is empty.`);
+
+                        // Create a response that will ask the user the desired question.
+                        response = {
+                            text: billOfMaterialsQuestion
+                        }
 
                         // -------------------------- END  : PROCESS CURRENT BILL-OF-MATERIALS OBJECTIVE ------------------------
                     }
