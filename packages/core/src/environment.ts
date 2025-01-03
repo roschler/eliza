@@ -73,6 +73,7 @@ const BillOfMaterialsLineItemSchema = z.object({
     maxVal: z.number().optional(),
     unitsDescription: z.string().optional(),
     preliminaryPromptForOptionalLineItem: z.string().optional(),
+    helpTextForOptionalLineItem: z.string().optional(),
 });
 
 const BillOfMaterialsSchema = z.object({

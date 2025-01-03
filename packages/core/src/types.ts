@@ -680,6 +680,10 @@ export type BillOfMaterialsLineItem = {
      */
     defaultValue?: BillOfMaterialsResultType;
 
+    // -------------------------- BEGIN: OPTIONAL FIELDS ------------------------
+
+    // These fields are only relevant to OPTIONAL line items.
+
     /**
      * If FALSE, then the character will ask the user for the field value
      *   but will accept an empty answer as a response.  If TRUE, then
@@ -693,6 +697,16 @@ export type BillOfMaterialsLineItem = {
      *   an optional line item. get the desired value from them.
      */
     preliminaryPromptForOptionalLineItem?: string;
+
+    /**
+     * The help text to include that the LLM can use to answer
+     *  any questions the user may have about the optional
+     *  line item.
+     */
+    helpTextForOptionalLineItem?: string;
+
+
+    // -------------------------- END  : OPTIONAL FIELDS ------------------------
 
     // -------------------------- BEGIN: STRING TYPE ONLY ------------------------
 
