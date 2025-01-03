@@ -36,6 +36,78 @@ import * as path from "path";
 import {processFileOrUrlReferences} from "./process-external-references.ts";
 const upload = multer({ storage: multer.memoryStorage() });
 
+// -------------------------- BEGIN: UTILITY MESSAGE TEMPLATES ------------------------
+
+/**
+ * This is the message template we use to ask the LLM if the user
+ *  answered a previously asked preliminary question associated with
+ *  an objective that carries a bill-of-materials line item.
+ */
+const preliminaryQuestionLLmMessageTemplate =
+    `
+    Your task is to analyze your recent chat interactions with the user and determine if
+    they have definitively answered the following question:
+
+    QUESTION: {{simpleQuestion}}
+
+    Here is your recent chat history with the user:
+
+    {{recentMessages}}
+
+    The user's answer will fall into one of the following categories:
+
+    CATEGORY: An answer that equates to boolean true.  For example, "yes", "sure", "Ok", etc.
+    CATEGORY: An answer that equates to boolean false.  For example, "no", "not interested", "I don't want to do that", "I don't need that", "Nah", "I'm OK without that" etc.
+    CATEGORY: A query about the subject matter the question involves that indicates the user wants more information on the subject.
+
+    Determine the correct_category and then give your answer in JSON format as described here:
+    \`\`\`json
+    {
+        "category": "correct_category"
+    }\`\`\`
+    `;
+
+/**
+ * This is the message template we use to ask the LLM if the user
+ *  answered a previously asked main question associated with
+ *  an objective that carries a bill-of-materials line item.
+ */
+const mainQuestionLLmMessageTemplate =
+    `
+    Your task is to analyze your recent chat interactions with the user and determine if
+    they have definitively answered the following question that requested a vital piece
+    of information from the user:
+
+    QUESTION: {{simpleQuestion}}
+
+    Here is your recent chat history with the user:
+
+    {{recentMessages}}
+
+    If the user provided a valid answer to the information request, then your answer
+    should be that value and just the value, without any surrounding text that isn't
+    part of the value, and the category of the answer is "result".
+
+    If the user asked a question about the subject matter the question involves, thus
+    indicating the user wants more information on the subject, then your answer
+    should be that question and just the question, without any surrounding text that isn't
+    related to the question, and the category of the answer is "query".
+
+    If the user indicated that they have changed their mind and are no longer
+    interested in the question asked, or want to do something completely different,
+    or they want to cancel the current chat,  then your answer be the user's statement,
+    and the category of the answer is "abort".
+
+    Determine the category and then give your complete reply in JSON format as described here:
+    \`\`\`json
+    {
+        "category": "Put the category here you selected",
+        "result_value": "If the user provided a valid answer put it here, otherwise, put the word null here."
+    }\`\`\`
+    `;
+
+// -------------------------- END  : UTILITY MESSAGE TEMPLATES ------------------------
+
 // -------------------------- BEGIN: BILL-OF-MATERIALS SUB-PROMPT PROCESSING ------------------------
 
 /**
@@ -181,6 +253,55 @@ function getNextBomObjective(bomGoal: Goal): ObjectiveOrNull {
     return nextBomObject;
 }
 
+async function determineBomQuestionResult(state: State, nextBomObjective: Objective): object {
+    const errPrefix = `(determineBomQuestionResult) `;
+
+    if (nextBomObjective === null) {
+        throw new Error(`${errPrefix}The nextBomObjective parameter is unassigned.`);
+    }
+
+    let bIsTimeForThePreliminaryQuestion = false;
+
+    // Is the objective's bill-of-materials line item object optional?
+    if (nextBomObjective.billOfMaterialsLineItem.isOptional) {
+        // Yes. Check for a declined optional line item, since those
+        //  should not be passed to this function.
+        if (nextBomObjective.resultData === null) {
+            throw new Error(`${errPrefix}The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user decline interest in it, so it should never have been passed to buildBillOfMaterialQuestion() in the first place.`);
+        }
+
+        // If the objective does not have a result yet, then we assume that
+        //  the preliminary question has already been asked in the chat
+        //  history.
+        if (typeof nextBomObjective.resultData === 'undefined') {
+            // -------------------------- BEGIN: PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
+
+            // Create a prompt that asks the LLM if the preliminary question is
+            //  answered definitely in the recent chat history using our template.
+
+
+
+            // -------------------------- END  : PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
+
+            // Set the flag to let subsequent code now we are processing
+            //  an optional line item's preliminary question, not its
+            //  main question.
+            bIsTimeForThePreliminaryQuestion = true;
+        }
+    }
+
+    // Are we asking the preliminary question for an optional line item now?
+    if (!bIsTimeForThePreliminaryQuestion) {
+        // No.  We are asking the main question, optional line item or not.
+
+        // -------------------------- BEGIN: MAIN LINE ITEM QUESTION ------------------------
+
+        piecesOfPrompt.push(nextBomObjective.billOfMaterialsLineItem.prompt);
+
+        // -------------------------- END  : MAIN LINE ITEM QUESTION ------------------------
+    }
+}
+
 /**
  * Given an agent/character bill-of-materials goal, use
  *  its bill-of-materials Goal content to create the sub-prompt
@@ -195,12 +316,14 @@ function getNextBomObjective(bomGoal: Goal): ObjectiveOrNull {
  *  bill-of-materials sub-prompt made from that content.
  */
 function buildBillOfMaterialQuestion(nextBomObjective: Objective): string | null {
+    const errPrefix = `(buildBillOfMaterialQuestion) `;
+
     let retStr: StringOrNull = null;
 
     const piecesOfPrompt: string[] = [];
 
     if (nextBomObjective === null) {
-        throw new Error(`The nextBomObjective parameter is unassigned.`)
+        throw new Error(`${errPrefix}The nextBomObjective parameter is unassigned.`)
     }
 
     // -------------------------- BEGIN: PROCESS NEW OBJECTIVE ------------------------
@@ -212,7 +335,7 @@ function buildBillOfMaterialQuestion(nextBomObjective: Objective): string | null
         // Yes. Check for a declined optional line item, since those
         //  should not be passed to this function.
         if (nextBomObjective.resultData === null) {
-            throw new Error(`The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user decline interest in it, so it should never have been passed to buildBillOfMaterialQuestion() in the first place.`);
+            throw new Error(`${errPrefix}The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user decline interest in it, so it should never have been passed to buildBillOfMaterialQuestion() in the first place.`);
         }
 
         // If the objective does not have a result yet, then we need to ask the

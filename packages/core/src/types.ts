@@ -367,6 +367,13 @@ export interface State {
     /** Optional knowledge data */
     knowledgeData?: KnowledgeItem[];
 
+    /** Optional question that the current chat interaction
+     *   with the user is intended to have answered.  For
+     *   example, let getting the answer to a bill-of-materials
+     *   related question from the LLM.
+     */
+    simpleQuestion?: string;
+
     /** Additional dynamic properties */
     [key: string]: unknown;
 }
