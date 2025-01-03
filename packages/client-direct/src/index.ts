@@ -187,54 +187,64 @@ function getNextBomObjective(bomGoal: Goal): ObjectiveOrNull {
  *  for the LLM that facilitates completing the bill-of-materials
  *  objectives.
  *
- * @param bomGoal - A Goal object that was prepared for use as a
- *  bill-of-materials purposes.
+ * @param nextBomObjective - The current bill-of-materials Objective
+ *   object that needs to be processed.
  *
  * @returns - Returns NULL if the goal has no
  *  bill-of-materials content, or if it does, returns the
  *  bill-of-materials sub-prompt made from that content.
  */
-function buildBillOfMaterialsPrompt(bomGoal: Goal): string | null {
+function buildBillOfMaterialsPrompt(nextBomObjective: Objective): string | null {
     let retStr: StringOrNull = null;
 
     const piecesOfPrompt: string[] = [];
 
-    // Do we have any bill-of-materials to process?
-    if (Array.isArray(bomGoal.objectives) && bomGoal.objectives.length > 0) {
-        // Determine the next objective that needs to be completed.
-        const nextBomObjective = getNextBomObjective(bomGoal);
+    if (nextBomObjective === null) {
+        throw new Error(`The nextBomObjective parameter is unassigned.`)
+    }
 
-        if (nextBomObjective === null) {
-            // -------------------------- BEGIN: GOAL COMPLETE PROCESSING ------------------------
+    // -------------------------- BEGIN: PROCESS NEW OBJECTIVE ------------------------
 
-            throw new Error(`Goal complete processing not implemented yet.`)
+    let bIsTimeForThePreliminaryQuestion = false;
 
-            // -------------------------- END  : GOAL COMPLETE PROCESSING ------------------------
-        } else {
-            // -------------------------- BEGIN: PROCESS NEW OBJECTIVE ------------------------
+    // Is the objective's bill-of-materials line item object optional?
+    if (nextBomObjective.billOfMaterialsLineItem.isOptional) {
+        // Yes. Check for a declined optional line item, since those
+        //  should not be passed to this function.
+        if (nextBomObjective.resultData === null) {
+            throw new Error(`The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user decline interest in it, so it should never have been passed to buildBillOfMaterialsPrompt() in the first place.`);
+        }
 
-            // Is the objective carrying an optional bill-of-materials line item?
-            if (nextBomObjective.billOfMaterialsLineItem.isOptional) {
-                // -------------------------- BEGIN: PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
+        // If the objective does not have a result yet, then we need to ask the
+        //  preliminary question now.
+        if (typeof nextBomObjective.resultData === 'undefined') {
+            // -------------------------- BEGIN: PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
 
-                piecesOfPrompt.push(`Your main task is to find out if the user is interested in a particular topic or not.  Here is the question you should ask them now:`)
+            // Yes.  Ask the user the question that determines if they are interested
+            //  in the optional line item or not.
+            piecesOfPrompt.push(nextBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
 
-                // Yes.  Ask the user the question that determines if they are interested
-                //  in the optional line item or not.
-                piecesOfPrompt.push(nextBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+            // -------------------------- END  : PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
 
-                // -------------------------- END  : PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
-            } else {
-                // -------------------------- BEGIN: MAIN LINE ITEM QUESTION ------------------------
-
-                piecesOfPrompt.push(nextBomObjective.billOfMaterialsLineItem.prompt);
-
-                // -------------------------- END  : MAIN LINE ITEM QUESTION ------------------------
-            }
-
-            // -------------------------- END  : PROCESS NEW OBJECTIVE ------------------------
+            // Set the flag to let subsequent code now we are processing
+            //  an optional line item's preliminary question, not its
+            //  main question.
+            bIsTimeForThePreliminaryQuestion = true;
         }
     }
+
+    // Are we asking the preliminary question for an optional line item now?
+    if (!bIsTimeForThePreliminaryQuestion) {
+        // No.  We are asking the main question, optional line item or not.
+
+        // -------------------------- BEGIN: MAIN LINE ITEM QUESTION ------------------------
+
+        piecesOfPrompt.push(nextBomObjective.billOfMaterialsLineItem.prompt);
+
+        // -------------------------- END  : MAIN LINE ITEM QUESTION ------------------------
+    }
+
+    // -------------------------- END  : PROCESS NEW OBJECTIVE ------------------------
 
     if (piecesOfPrompt.length > 0) {
         // Assemble the sub-prompt for the bill-of-materials line item processing.
@@ -624,63 +634,79 @@ export class DirectClient {
 
                 // -------------------------- END  : CHARACTER/AGENT SWITCH HANDLING ------------------------
 
-                // -------------------------- BEGIN: BILL-OF-MATERIALS TO PROMPT ------------------------
+                await runtime.ensureConnection(
+                    userId,
+                    roomId,
+                    req.body.userName,
+                    req.body.name,
+                    "direct"
+                );
 
+                const text = req.body.text;
+                const messageId = stringToUuid(Date.now().toString());
 
-                // -------------------------- END  : BILL-OF-MATERIALS TO PROMPT ------------------------
+                const content: Content = {
+                    text,
+                    attachments: [],
+                    source: "direct",
+                    inReplyTo: undefined,
+                };
+
+                const userMessage = {
+                    content,
+                    userId,
+                    roomId,
+                    agentId: runtime.agentId,
+                };
+
+                const memory: Memory = {
+                    id: messageId,
+                    agentId: runtime.agentId,
+                    userId,
+                    roomId,
+                    content,
+                    createdAt: Date.now(),
+                };
+
+                await runtime.messageManager.createMemory(memory);
+
+                const state = await runtime.composeState(userMessage, {
+                    agentName: runtime.character.name,
+                });
+
 
                 // TODO: If there is a bill-of-materials goal active for the current
                 //  agent/character, then now it is time to facilitate that objective
                 //  by creating the bill-of-materials sub-prompt for insertion into
                 //  the message handler template.
-                const billOfMaterialsSubPrompt =
-                    buildBillOfMaterialsPrompt(runtime);
 
-                if (billOfMaterialsSubPrompt === null) {
-                    await runtime.ensureConnection(
-                        userId,
-                        roomId,
-                        req.body.userName,
-                        req.body.name,
-                        "direct"
-                    );
+                let response: Content | null = null;
 
-                    const text = req.body.text;
-                    const messageId = stringToUuid(Date.now().toString());
+                if (mainBomGoal) {
+                    // Determine the next objective that needs to be completed.
+                    const nextBomObjective = getNextBomObjective(mainBomGoal);
 
-                    const content: Content = {
-                        text,
-                        attachments: [],
-                        source: "direct",
-                        inReplyTo: undefined,
-                    };
+                    if (nextBomObjective === null) {
+                        // -------------------------- BEGIN: BILL-OF-MATERIALS GOAL COMPLETE ------------------------
 
-                    const userMessage = {
-                        content,
-                        userId,
-                        roomId,
-                        agentId: runtime.agentId,
-                    };
+                        throw new Error(`Bill-of-materials completed goal processing not implemented yet.`);
 
-                    const memory: Memory = {
-                        id: messageId,
-                        agentId: runtime.agentId,
-                        userId,
-                        roomId,
-                        content,
-                        createdAt: Date.now(),
-                    };
+                        // -------------------------- END  : BILL-OF-MATERIALS GOAL COMPLETE ------------------------
 
-                    await runtime.messageManager.createMemory(memory);
+                    } else {
+                        // -------------------------- BEGIN: PROCESS CURRENT BILL-OF-MATERIALS OBJECTIVE ------------------------
 
-                    const state = await runtime.composeState(userMessage, {
-                        agentName: runtime.character.name,
-                    });
+                        // Determine what question we should ask the user now.
+                        const billOfMaterialsQuestion =
+                            buildBillOfMaterialsPrompt(nextBomObjective);
 
-                    // TODO: Need to either execute a direct question answer using the
-                    //  preliminary question assigned to the current bill-of-materials
-                    //  line item objective, if that is the current context, or pass
-                    //  through to normal LLM processing if not.
+                        if (billOfMaterialsQuestion.trim().length === 0)
+                            throw new Error(`The billOfMaterialsQuestion variable is empty.`);
+
+                        // -------------------------- END  : PROCESS CURRENT BILL-OF-MATERIALS OBJECTIVE ------------------------
+                    }
+                } else {
+                    // -------------------------- BEGIN: LEGACY PROCESSING (Not bill-of-materials) ------------------------
 
                     // If the character has its own message template, use that instead.
                     let useTemplate = messageHandlerTemplate;
@@ -696,50 +722,72 @@ export class DirectClient {
                     });
 
                     // Now, make the call to the LLM using the updated context.
-                    const response = await generateMessageResponse({
+                    //
+                    // DEV NOTE: "context" is just a string with the substitution
+                    //  variables filled in by the composeContext() call using
+                    //  elements found in the "state" variable.
+                    //
+                    //  The "runtime" (agent/character) object is passed in to
+                    //  give the code that sets up the LLM call access to the
+                    //  settings and environment variables the agent/character
+                    //  object carries, and access to the agent/character's
+                    //  system prompt (i.e. - runtime.character.system_prompt),
+                    //  which has priority ver the SYSTEM_PROMPT environment
+                    //  variable.  Note, either or both of these two system
+                    //  prompt sources may be unassigned.
+                    //
+                    //  See aiGenerateText in generations.ts (eliza package) for
+                    //  details.
+                    response = await generateMessageResponse({
                         runtime: runtime,
                         context,
                         modelClass: ModelClass.SMALL,
                     });
 
-                    // save response to memory
-                    const responseMessage = {
-                        ...userMessage,
-                        userId: runtime.agentId,
-                        content: response,
-                    };
-
-                    await runtime.messageManager.createMemory(responseMessage);
-
-                    if (!response) {
-                        res.status(500).send(
-                            "No response from generateMessageResponse"
-                        );
-                        return;
-                    }
-
-                    let message = null as Content | null;
-
-                    await runtime.evaluate(memory, state);
-
-                    const _result = await runtime.processActions(
-                        memory,
-                        [responseMessage],
-                        state,
-                        async (newMessages) => {
-                            message = newMessages;
-                            return [memory];
-                        }
-                    );
-
-                    if (message) {
-                        res.json([response, message]);
-                    } else {
-                        res.json([response]);
-                    }
+                    // -------------------------- END  : LEGACY PROCESSING (Not bill-of-materials) ------------------------
                 }
-            } else {
-        }
+
+                // TODO: Need to either execute a direct question answer using the
+                //  preliminary question assigned to the current bill-of-materials
+                //  line item objective, if that is the current context, or pass
+                //  through to normal LLM processing if not.
+
+                // save response to memory
+                const responseMessage = {
+                    ...userMessage,
+                    userId: runtime.agentId,
+                    content: response,
+                };
+
+                await runtime.messageManager.createMemory(responseMessage);
+
+                if (!response) {
+                    res.status(500).send(
+                        "No response from generateMessageResponse"
+                    );
+                    return;
+                }
+
+                let message = null as Content | null;
+
+                await runtime.evaluate(memory, state);
+
+                const _result = await runtime.processActions(
+                    memory,
+                    [responseMessage],
+                    state,
+                    async (newMessages) => {
+                        message = newMessages;
+                        return [memory];
+                    }
+                );
+
+                if (message) {
+                    res.json([response, message]);
+                } else {
+                    res.json([response]);
+                }
+            }
         );
 
         this.app.post(

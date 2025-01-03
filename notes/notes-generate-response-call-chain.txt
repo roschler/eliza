@@ -1,0 +1,25 @@
+// This file contains some notes on the call chain involved in making an
+//  Eliza LLM call.
+
+// Everything appears to resolve down to the aiGenerateText() call:
+
+    const { text: openaiResponse } = await aiGenerateText({
+        model: openai.languageModel(model),
+        prompt: context,
+        system:
+            runtime.character.system ??
+            settings.SYSTEM_PROMPT ??
+            undefined,
+        temperature: temperature,
+        maxTokens: max_response_length,
+        frequencyPenalty: frequency_penalty,
+        presencePenalty: presence_penalty,
+    });
+
+// As you can see, the prompt + system prompt paradigm is used and not the
+//  alternative and mutually exclusive "messages" paradigm.  Also, the
+//  system prompt takes the first available option in order from:
+
+    [runtime.character.system, settings.SYSTEM_PROMPT (environment variable)]
+
+// Falling back to "undefined" as a last resort.
