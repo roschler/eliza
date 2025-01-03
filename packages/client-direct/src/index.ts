@@ -73,6 +73,11 @@ function validateBillOfMaterialsLineItem(billOfMaterialsLineItem: BillOfMaterial
             || (typeof billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem === "string" && billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem.length === 0)) {
             validationFailures.push(`The "preliminaryPromptForOptionalLineItem" field is missing or is assigned an empty string for a line items marked as "optional".`);
         }
+
+        if (typeof billOfMaterialsLineItem.helpTextForOptionalLineItem !== "string"
+            || (typeof billOfMaterialsLineItem.helpTextForOptionalLineItem === "string" && billOfMaterialsLineItem.helpTextForOptionalLineItem.length === 0)) {
+            validationFailures.push(`The "helpTextForOptionalLineItem" field is missing or is assigned an empty string for a line items marked as "optional".`);
+        }
     }
 
     if (billOfMaterialsLineItem.type === 'string') {
