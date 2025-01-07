@@ -19,7 +19,7 @@ import {
     GoalOrNull,
     State,
     formatMessagesWithStopAtStrings,
-    NEW_SESSION_MESSAGE_AS_DELIMITER
+    NEW_SESSION_MESSAGE_AS_DELIMITER, GoalStatus
 } from "@ai16z/eliza";
 import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
@@ -780,7 +780,7 @@ export class DirectClient {
 
                 /**
                  * Check for the existence of a main bill-of-materials goal for
-                 *  the current relationship.
+                 *  the current relationship that is marked as IN_PROGRESS.
                  *
                  *  @param relationshipIdPair - The room ID prepended full user ID
                  *   and agent/character ID that forms the relationship.
@@ -799,13 +799,15 @@ export class DirectClient {
                         throw new Error(`${errPrefix} The full character ID is empty.`);
 
                     // Find all the bill-of-materials goals belonging to this
-                    //  user to agent/character relationship.
+                    //  user to agent/character relationship that is still
+                    //  in progress.
                     const bomGoalsFound =
                         await runtime.databaseAdapter.getGoalsByRelationship(
                             {
                                 agentId: relationshipIdPair.fullCharacterId,
                                 userId: relationshipIdPair.fullUserId,
-                                name: GOAL_NAME_BILL_OF_MATERIALS
+                                name: GOAL_NAME_BILL_OF_MATERIALS,
+                                goalStatus: GoalStatus.IN_PROGRESS,
                             }
                         );
 
@@ -983,7 +985,7 @@ export class DirectClient {
 
 
                 // TODO: If there is a bill-of-materials goal active for the current
-                //  agent/character, then now it is time to facilitate that objective
+                //  agent/character, then it is time to facilitate that objective
                 //  by creating the bill-of-materials sub-prompt for insertion into
                 //  the message handler template.
 
