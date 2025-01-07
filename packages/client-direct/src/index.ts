@@ -43,6 +43,62 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // -------------------------- BEGIN: HELP RESPONSE CATEGORIES ------------------------
 
+/**
+ * These are various help response category values that are used
+ *  to classify the last chat volley that occurs during a
+ *  bill-of-materials line item operation that has entered
+ *  HELP mode (i.e. - switching from data collection mode
+ *  to answering questions fromt he user about the current
+ *  bill-of-materials line item.
+ */
+export enum HELP_RESPONSE_CATEGORY {
+
+    // >>>>> These help response categories are output by the LLM that
+    //  does the result check for help chat volleys initiated during
+    //  a bill-of-materials line item session.
+    /**
+     * The user wants to abandon the session. The response
+     *  text is the text the user used to indicate that.
+     */
+    ABORT = "ABORT",
+
+    /**
+     * The user has indicated that their question has been
+     *  fully answered.  The response text is the text the
+     *  user used to indicate that.
+     */
+    ANSWERED = "ANSWERED",
+
+    /**
+     * The user doesn't understand the help information you
+     * have just gave them. The response text is the text the
+     * user used to indicate that.
+     */
+    CONFUSED = "CONFUSED",
+
+    /**
+     * The user has asked another question or wants more details
+     * on the current subject. The response text is the text
+     * the user used to ask another question or request more
+     * details on the current subject.
+     */
+    HELP = "HELP",
+
+    // These values are NOT output by the LLM, but by the
+    //  bill-of-materials related JavaScript code instead.
+
+    /**
+     * This value is used when the LLM failed to putput a
+     *  proper help response category.  It is a signal to
+     *  the bill-of-materials code to ask the user again
+     *  a recent question, or to clarify a current one,
+     *  hoping that on the next pass a usable result is
+     *  found in the recent messages.
+     */
+    RETRY = "RETRY",
+}
+
+
 // -------------------------- END  : HELP RESPONSE CATEGORIES ------------------------
 
 // -------------------------- BEGIN: RESULT CHECK MESSAGE TEMPLATES ------------------------
