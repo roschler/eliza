@@ -41,14 +41,22 @@ import * as path from "path";
 import {processFileOrUrlReferences} from "./process-external-references.ts";
 const upload = multer({ storage: multer.memoryStorage() });
 
-// -------------------------- BEGIN: UTILITY MESSAGE TEMPLATES ------------------------
+// -------------------------- BEGIN: HELP RESPONSE CATEGORIES ------------------------
+
+// -------------------------- END  : HELP RESPONSE CATEGORIES ------------------------
+
+// -------------------------- BEGIN: RESULT CHECK MESSAGE TEMPLATES ------------------------
+
+// The following message templates are used during a bill-of-materials form
+//  fill operation, when we ask the LLM to categorize the recent message
+//  history, and to extract any new result data from that history.
 
 /**
  * This is the message template we use to ask the LLM if the user
  *  answered a previously asked preliminary question associated with
  *  an objective that carries a bill-of-materials line item.
  */
-const preliminaryQuestionLLmMessageTemplate =
+const preliminaryQuestionLLmResultCheckTemplate =
     `
     Your task is to analyze your recent chat interactions with the user and determine if
     they have definitively answered the following question:
@@ -77,7 +85,7 @@ const preliminaryQuestionLLmMessageTemplate =
  *  answered a previously asked main question associated with
  *  an objective that carries a bill-of-materials line item.
  */
-const mainQuestionLLmMessageTemplate =
+const mainQuestionLLmResultTemplate =
     `
     Your task is to analyze your recent chat interactions with the user and determine if
     they have definitively answered the following question that requested a vital piece
@@ -100,7 +108,7 @@ const mainQuestionLLmMessageTemplate =
 
     If the user indicated that they have changed their mind and are no longer
     interested in the question asked, or want to do something completely different,
-    or they want to cancel the current chat,  then your answer be the user's statement,
+    or they want to cancel the current chat,  then your answer should be the user's statement,
     and the category of the answer is "abort".
 
     Determine the category and then give your complete reply in JSON format as described here:
@@ -110,6 +118,48 @@ const mainQuestionLLmMessageTemplate =
         "result_value": "If the user provided a valid answer put it here, otherwise, put the word null here."
     }\`\`\`
     `;
+
+
+/**
+ * This is the message template we use to check for a result
+ *  condition when we are in HELP mode.  We pass this to the
+ *  LLM to have it analyze the recent chat history and let us
+ *  know if the user has indicated that it's help query has
+ *  been properly answered.
+ */
+const helpModeResultCheckTemplate =
+    `
+    You are a helpful assistant whose goal is to analyze recent
+     messages in your chat history with the user, and to detect
+     the following conditions.  Each condition is preceded by
+     the CATEGORY label that is assigned to condition, followed by a colon,
+     the definition of the condition, and finally, the response text definition:
+
+     - ANSWERED: The user has indicated that their question has been fully answered.  The response text is the text the user used to indicate that.
+     - ABORT: The user wants to abandon the session. The response text is the text the user used to indicate that.
+     - HELP: The user has asked another question or wants more details on the current subject. The response text is the text the user used to ask another question or request more details on the current subject.
+     - CONFUSED: The user doesn't understand the help information you have just gave them. The response text is the text the user used to indicate that.
+
+    Here is your recent chat history with the user:
+
+    {{recentMessages}}
+
+    You must output your answer in JSON format, as described here:
+
+    \`\`\`json
+    {
+        "category": "<put the category that identifies the nature of your response here>",
+        "text": "<put your response text here>"
+    }\`\`\`
+    `;
+
+// -------------------------- END  : RESULT CHECK MESSAGE TEMPLATES ------------------------
+
+// -------------------------- BEGIN: UTILITY MESSAGE TEMPLATES ------------------------
+
+// These are some utility message templates used for various dedicated
+//  LLM call, like when we switch into HELP mode during a bill-of-materials
+//  line item operation.
 
 /**
  * This is the message template we use to when we switch into
@@ -133,18 +183,19 @@ const helpModeMessageTemplate =
 
     {{recentMessages}}
 
-    You need to decide what category of response you are giving the user, using the following rules:
+    Create a response that answers the users question, or ask them a question instead if you need more information to answer their question properly, or to disambiguate the current conversation context.  Make sure you always end your response text with some variant of the question:
 
-    - If you are continuing to chat with the user to offer them help, the category of your response should be "HELP" and your response text should be the text you want to give to the user.  You should always end your response text with a question asking them if their question has been fully answered.
-    - If the user has indicated that their question has been fully answered, the category or your response should be "ANSWERED" and your response text should be {{simpleQuestion}}
+    "Did you get the answer needed?"
+    "Have I answered your question fully?"
+    "Do you need more information?"
+
+    You must output your response as a JSON object, using this format:
 
     \`\`\`json
     {
-        "category": "<put the category that identifies the nature of your response here>",
         "text": "<put your response text to the user here>"
     }\`\`\`
     `;
-
 
 // -------------------------- END  : UTILITY MESSAGE TEMPLATES ------------------------
 
@@ -321,6 +372,28 @@ function buildBomStopAtStringsArray(recentlyAskedQuestion: string): string[] {
         NEW_SESSION_MESSAGE_AS_DELIMITER,
         recentlyAskedQuestion
     ];
+}
+
+async function bomHelpModeResultHandler(runtime: IAgentRuntime, useFormattedMessage: string) {
+    const response = await generateMessageResponse({
+        runtime: runtime,
+        context: useFormattedMessage,
+        modelClass: ModelClass.SMALL,
+    });
+
+    // Examine the response and determine how it affects the current
+    //  chat.  The response should have  "category" and "text"
+    //  properties.
+
+    const category: StringOrNull = response.category;
+    const text: StringOrNull = response.text;
+
+    if
+
+
+
+
+    return response;
 }
 
 /**
@@ -920,10 +993,23 @@ export class DirectClient {
                     // Determine the next objective that needs to be completed.
                     const currentBomObjective = getNextBomObjective(mainBomGoal);
 
+                    if (currentBomObjective !== null) {
+                        // -------------------------- BEGIN: ANALYZE STATUS OF CURRENT BOM OBJECTIVE ------------------------
+
+                        // First, we need to check for an answer to a recently
+                        //  asked optional line item preliminary question,
+                        //  optional line item main question, or non-optional
+                        //  line item main question.
+                        await determineBomQuestionResult(state, currentBomObjective);
+
+                        // -------------------------- END  : ANALYZE STATUS OF CURRENT BOM OBJECTIVE ------------------------
+                    }
+
+                    // Is the GOAL (aka form fill operation) complete?
                     if (currentBomObjective === null) {
                         // -------------------------- BEGIN: BILL-OF-MATERIALS GOAL COMPLETE ------------------------
 
-                        // If we don't have an agent/character to switch control to,
+                        // Yes.  If we don't have an agent/character to switch control to,
                         //  now that the bill-of-materials goal is complete, then that
                         //  is an error.
                         const nextCharacterName =
@@ -943,13 +1029,7 @@ export class DirectClient {
                         // -------------------------- END  : BILL-OF-MATERIALS GOAL COMPLETE ------------------------
 
                     } else {
-                        // -------------------------- BEGIN: PROCESS CURRENT BILL-OF-MATERIALS OBJECTIVE ------------------------
-
-                        // First, we need to check for an answer to a recently
-                        //  asked optional line item preliminary question,
-                        //  optional line item main question, or non-optional
-                        //  line item main question.
-                        await determineBomQuestionResult(state, currentBomObjective);
+                        // -------------------------- BEGIN: ASK NEXT BOM QUESTION ------------------------
 
                         // Determine what question we should ask the user now.
                         const billOfMaterialsQuestion =
@@ -963,7 +1043,8 @@ export class DirectClient {
                             text: billOfMaterialsQuestion
                         }
 
-                        // -------------------------- END  : PROCESS CURRENT BILL-OF-MATERIALS OBJECTIVE ------------------------
+
+                        // -------------------------- END  : ASK NEXT BOM QUESTION ------------------------
                     }
                 } else {
                     // -------------------------- BEGIN: LEGACY PROCESSING (Not bill-of-materials) ------------------------
