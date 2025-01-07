@@ -111,6 +111,41 @@ const mainQuestionLLmMessageTemplate =
     }\`\`\`
     `;
 
+/**
+ * This is the message template we use to when we switch into
+ *  HELP mode, in response to a user request for information
+ *  (query) during a bill-of-materials line item answering
+ *  operation.
+ */
+const helpModeMessageTemplate =
+    `
+    You are a helpful assistant whose goal is to answer a user's
+    specific questions.  Here is a help document you should use
+    to answer the user's question.  Feel free to include any
+    knowledge you inherently know about the subject, as long as it
+    is directly relevant to the user's question:
+
+    {{helpDocument}}
+
+    Help the user explore the topic as long as they have questions.  If you don't know the answer to a question, be honest about that.
+
+    Here is your recent chat history with the user:
+
+    {{recentMessages}}
+
+    You need to decide what category of response you are giving the user, using the following rules:
+
+    - If you are continuing to chat with the user to offer them help, the category of your response should be "HELP" and your response text should be the text you want to give to the user.  You should always end your response text with a question asking them if their question has been fully answered.
+    - If the user has indicated that their question has been fully answered, the category or your response should be "ANSWERED" and your response text should be {{simpleQuestion}}
+
+    \`\`\`json
+    {
+        "category": "<put the category that identifies the nature of your response here>",
+        "text": "<put your response text to the user here>"
+    }\`\`\`
+    `;
+
+
 // -------------------------- END  : UTILITY MESSAGE TEMPLATES ------------------------
 
 // -------------------------- BEGIN: BILL-OF-MATERIALS SUB-PROMPT PROCESSING ------------------------
