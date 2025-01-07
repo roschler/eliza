@@ -1,6 +1,8 @@
 // This file contains some notes on the call chain involved in making an
 //  Eliza LLM call.
 
+// Remember to save/update the Goal!  It may have been altered.
+
 // Everything appears to resolve down to the aiGenerateText() call:
 
     const { text: openaiResponse } = await aiGenerateText({

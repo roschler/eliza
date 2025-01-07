@@ -814,6 +814,17 @@ export type Character = {
     switchToCharacterWhenBomComplete?: string;
 
     /**
+     * This is the agent/character that will be switched to
+     *  if the user wants to cancel the bill-of-materials
+     *  session.
+     *
+     *  NOTE: This agent/character must be in collection of
+     *   available agents that were instantiated when the
+     *   client was created!
+     */
+    switchToCharacterWhenBomSessionCancelled?: string;
+
+    /**
      * This field if present and is equal to FALSE,
      *  will suppress the default behavior of characters
      *  whereby all of their goals are completely reset

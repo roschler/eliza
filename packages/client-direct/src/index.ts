@@ -41,6 +41,17 @@ import * as path from "path";
 import {processFileOrUrlReferences} from "./process-external-references.ts";
 const upload = multer({ storage: multer.memoryStorage() });
 
+// -------------------------- BEGIN: SOME ERROR MESSAGES ------------------------
+
+/**
+ * The error message we output in various places when a function
+ *  that interprets the response from a bill-of-materials related
+ *  LLM operation in a useful manner.
+ */
+export const ERROR_MESSAGE_FAILED_BOM_LLM_RESPONSE_ANALYSIS = `(The system failed to interpret the LLM response properly.)`;
+
+// -------------------------- END  : SOME ERROR MESSAGES ------------------------
+
 // -------------------------- BEGIN: HELP RESPONSE CATEGORIES ------------------------
 
 /**
@@ -48,10 +59,10 @@ const upload = multer({ storage: multer.memoryStorage() });
  *  to classify the last chat volley that occurs during a
  *  bill-of-materials line item operation that has entered
  *  HELP mode (i.e. - switching from data collection mode
- *  to answering questions fromt he user about the current
+ *  to answering questions from the user about the current
  *  bill-of-materials line item.
  */
-export enum HELP_RESPONSE_CATEGORY {
+export enum enumHelpResponseCategory {
 
     // >>>>> These help response categories are output by the LLM that
     //  does the result check for help chat volleys initiated during
@@ -60,7 +71,7 @@ export enum HELP_RESPONSE_CATEGORY {
      * The user wants to abandon the session. The response
      *  text is the text the user used to indicate that.
      */
-    ABORT = "ABORT",
+    CANCEL = "CANCEL",
 
     /**
      * The user has indicated that their question has been
@@ -88,7 +99,7 @@ export enum HELP_RESPONSE_CATEGORY {
     //  bill-of-materials related JavaScript code instead.
 
     /**
-     * This value is used when the LLM failed to putput a
+     * This value is used when the LLM failed to output a
      *  proper help response category.  It is a signal to
      *  the bill-of-materials code to ask the user again
      *  a recent question, or to clarify a current one,
@@ -98,6 +109,33 @@ export enum HELP_RESPONSE_CATEGORY {
     RETRY = "RETRY",
 }
 
+/**
+ * Checks if a given string matches any value in the HELP_RESPONSE_CATEGORY enum,
+ * case-insensitive.
+ *
+ * @param str - The input string to check.
+ * @returns `true` if the input matches any enum value (case-insensitive), otherwise `false`.
+ */
+export function isValidHelpResponseCategory(str: string): boolean {
+    if (!str) {
+        return false; // Handle empty or null input
+    }
+
+    // Convert the input string to uppercase and compare with the enum values
+    return Object.values(enumHelpResponseCategory).includes(str.toUpperCase() as enumHelpResponseCategory);
+}
+
+/**
+ * This is the type of the object that is built as the
+ *  result of a HELP mode result check.
+ */
+export type helpResultCheckResponse = {
+    // The category assigned to the current chat context.
+    category: string;
+    // The most relevant text or all the text the user
+    //  gave that triggered the category selection.
+    text: string;
+}
 
 // -------------------------- END  : HELP RESPONSE CATEGORIES ------------------------
 
@@ -192,7 +230,7 @@ const helpModeResultCheckTemplate =
      the definition of the condition, and finally, the response text definition:
 
      - ANSWERED: The user has indicated that their question has been fully answered.  The response text is the text the user used to indicate that.
-     - ABORT: The user wants to abandon the session. The response text is the text the user used to indicate that.
+     - CANCEL:: The user wants to abandon the session. The response text is the text the user used to indicate that.
      - HELP: The user has asked another question or wants more details on the current subject. The response text is the text the user used to ask another question or request more details on the current subject.
      - CONFUSED: The user doesn't understand the help information you have just gave them. The response text is the text the user used to indicate that.
 
@@ -430,8 +468,37 @@ function buildBomStopAtStringsArray(recentlyAskedQuestion: string): string[] {
     ];
 }
 
-async function bomHelpModeResultHandler(runtime: IAgentRuntime, useFormattedMessage: string) {
-    const response = await generateMessageResponse({
+/**
+ * This function makes an LLM call to have the recent messages
+ *  analyzed as part of a bill-of-materials HELP mode operation.
+ *
+ * @param runtime - The current agent/character.
+ * @param currentBomObjective - The current bill-of-materials
+ *  objective.
+ * @param useFormattedMessage - The result check template to
+ *  use to analyze the recent messages.
+ *
+ * @returns - Returns a Content object that contains the
+ *  response the system should use as the chat volley
+ *  response, OR, returns NULL indicating the calling
+ *  code should continue
+ */
+async function bomHelpModeCheckResultHandler(
+        runtime: IAgentRuntime,
+        currentBomObjective: Objective,
+        useFormattedMessage: string): Promise<Content | null> {
+    const errPrefix = `(bomHelpModeCheckResultHandler) `;
+
+    // This function should only be called during HELP mode.
+    if (!currentBomObjective.isInHelpMode) {
+        throw new Error(`${errPrefix}This function should only be called in the context of a bill-of-materials HELP mode operation.`);
+    }
+
+    // Default response, in case we fail to interpret the result
+    //  check properly.
+    let response: Content | null = null;
+
+    const responseFromLlm = await generateMessageResponse({
         runtime: runtime,
         context: useFormattedMessage,
         modelClass: ModelClass.SMALL,
@@ -441,13 +508,68 @@ async function bomHelpModeResultHandler(runtime: IAgentRuntime, useFormattedMess
     //  chat.  The response should have  "category" and "text"
     //  properties.
 
-    const category: StringOrNull = response.category;
-    const text: StringOrNull = response.text;
+    let category = responseFromLlm.category;
+    let text = responseFromLlm.text ?? '(none)';
 
-    if
+    if (typeof category !== 'string' || (typeof category === 'string'  && !isValidHelpResponseCategory(category))) {
+        elizaLogger.debug(`Unable to find a valid help response category in the LLM output.  Setting response category to RETRY.`);
 
+        // Set the category to RETRY to let the calling code we should
+        //  try asking the user the current bill-of-materials line item
+        //  question again, or to ask the user to clarify their question.
+        category = enumHelpResponseCategory.RETRY;
+    }
 
+    category = (category as string).toUpperCase();
 
+    elizaLogger.debug(`${errPrefix}The selected CATEGORY for help mode is: ${category}\nAssociated text: ${text}\nObjective description: ${currentBomObjective.description}`);
+
+    // -------------------------- BEGIN: CATEGORY BASED UPDATES ------------------------
+
+    if (category === enumHelpResponseCategory.ANSWERED) {
+        // The user has indicated that their question has been fully
+        //  answered.  Exit HELP mode.
+        elizaLogger.debug(`Exiting HELP mode during current bill-of-materials object: ${currentBomObjective.description}`);
+        currentBomObjective.isInHelpMode = false;
+
+        // We don't create a response because we want the question
+        //  building code that follows to resume the bill-of-materials
+        //  information gathering operation.
+    } else if (category === enumHelpResponseCategory.CANCEL) {
+        // The user wants to cancel the session.  Get the name of the agent/character
+        //  the developer wants control transferred to.
+        //  If we don't have an agent/character to switch control to
+        //  in the event of a user cancellation request, then that is
+        //  an error.
+        const nextCharacterName =
+            runtime.character.switchToCharacterWhenBomSessionCancelled;
+
+        if (typeof nextCharacterName !== "string" || typeof nextCharacterName === "string" && nextCharacterName.trim().length === 0) {
+            throw new Error(`The user has requested the cancelling of the bill-of-materials session, but the character does not specify the next agent to transfer control to (i.e. - switchToCharacterWhenBomSessionCancelled is unassigned or invalid.`);
+        }
+
+        // Create a response with the action that will transfer control of the conversation
+        //  to the next agent/character.
+        response = {
+            text: `Cancelling your session and transferring you over to the next agent: ${nextCharacterName}`,
+            action: `SELECT_CHARACTER_${nextCharacterName}`
+        }
+    } else if (category === enumHelpResponseCategory.CONFUSED) {
+        // The user is confused by the help we have given them.  For now
+        //  treat this like a request for furtherhelp.  Leave the response object NULL so that
+        //  the calling code continues HELP mode.
+        //
+        // TODO: Create something more powerful to handle specifically the
+        //  situation where the user doesn't understand the help given
+        //  so far.
+    } else if (category === enumHelpResponseCategory.HELP) {
+        // The user needs more help.  Leave the response object NULL so that
+        //  the calling code continues HELP mode.
+    } else {
+        throw new Error(`${errPrefix}Unknown help response category: ${category}`);
+    }
+
+    // -------------------------- END  : CATEGORY BASED UPDATES ------------------------
 
     return response;
 }
@@ -456,12 +578,16 @@ async function bomHelpModeResultHandler(runtime: IAgentRuntime, useFormattedMess
  * Analyze the recent message stream to see how we should proceed
  *  with the current chat volley.
  *
+ * @param runtime - The current agent/character.
  * @param state - The current system state.
  * @param currentBomObjective - The current bill-of-materials objective.
+ *
+ * @returns - Returns the response that should
  */
 async function determineBomQuestionResult(
+    runtime: IAgentRuntime,
     state: State,
-    currentBomObjective: Objective): Promise<string> {
+    currentBomObjective: Objective): Promise<Content> {
     const errPrefix = `(determineBomQuestionResult) `;
 
     if (currentBomObjective === null) {
@@ -472,20 +598,31 @@ async function determineBomQuestionResult(
     //  to give to the LLM, to move the bill-of-materials session
     //  ahead, and then we need to replace the substitution variables
     //  using the current state.s
-    let useFormattedMessage: string | null = null;
+    // let useFormattedMessage: string | null = null;
+
+    let response: Content | null = null;
 
     // Are we in help mode?
     if (currentBomObjective.isInHelpMode) {
         // -------------------------- BEGIN: HELP MODE ------------------------
 
         // Do the substitution variable replacements.
-        useFormattedMessage = composeContext({
+        const useFormattedMessage = composeContext({
             state: state,
             template: helpModeMessageTemplate
         });
 
+        // Have the LLM analyze the chat messages so far and update the
+        //  goal and its objectives based on that analysis.
+        response = await bomHelpModeCheckResultHandler(runtime, currentBomObjective, useFormattedMessage);
+
         // -------------------------- END  : HELP MODE ------------------------
 
+    }
+
+    // Do we have a direct response, based on the result checks?
+    if (response) {
+        // Yes.  Use it as is.
     } else {
 
         // Is the objective's bill-of-materials line item object optional?
@@ -536,6 +673,8 @@ async function determineBomQuestionResult(
             // -------------------------- END  : MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
         } // else/if (currentBomObjective.billOfMaterialsLineItem.isOptional)
     } // else/if (currentBomObjective.isInHelpMode)
+
+    return response;
 }
 
 /**
