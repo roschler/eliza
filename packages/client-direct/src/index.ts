@@ -14,7 +14,12 @@ import {
     buildRelationshipIdPair,
     BillOfMaterialsLineItem,
     Objective,
-    ObjectiveOrNull, StringOrNull, GoalOrNull
+    ObjectiveOrNull,
+    StringOrNull,
+    GoalOrNull,
+    State,
+    formatMessagesWithStopAtStrings,
+    NEW_SESSION_MESSAGE_AS_DELIMITER
 } from "@ai16z/eliza";
 import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
@@ -253,52 +258,97 @@ function getNextBomObjective(bomGoal: Goal): ObjectiveOrNull {
     return nextBomObject;
 }
 
-async function determineBomQuestionResult(state: State, nextBomObjective: Objective): object {
+/**
+ * This function builds a stop-at-strings array that when used with
+ *  the formatMessagesWithStopAtStrings() function, will stop collecting
+ *  messages when the beginning of a new session is found, or when
+ *  a recently asked question was found.  This is to prevent the
+ *  mistaking of old answers to bill-of-materials questions from
+ *  the previous session, as current answers.
+ *
+ * @param recentlyAskedQuestion - The recently asked bill-of-materials
+ *  question we are checking the message history for to find an
+ *  answer to that question..
+ *
+ * @returns - Returns an array with the new session demarcating
+ *  string in it along with the recently asked bill-of-materials
+ *  question.
+ */
+function buildBomStopAtStringsArray(recentlyAskedQuestion: string): string[] {
+    const errPrefix = `(buildBomStopAtStringsArray) `;
+
+    if (recentlyAskedQuestion.trim().length < 1) {
+        throw new Error(`${errPrefix}The recentlyAskedQuestion parameter is an empty string. `);
+
+    }
+
+    return [
+        NEW_SESSION_MESSAGE_AS_DELIMITER,
+        recentlyAskedQuestion
+    ];
+}
+
+/**
+ * Analyze the recent message stream to see how we should proceed
+ *  with the current chat volley.
+ *
+ * @param state - The current system state.
+ * @param currentBomObjective - The current bill-of-materials objective.
+ */
+async function determineBomQuestionResult(
+    state: State,
+    currentBomObjective: Objective): Promise<object> {
     const errPrefix = `(determineBomQuestionResult) `;
 
-    if (nextBomObjective === null) {
-        throw new Error(`${errPrefix}The nextBomObjective parameter is unassigned.`);
+    if (currentBomObjective === null) {
+        throw new Error(`${errPrefix}The currentBomObjective parameter is unassigned.`);
     }
-
-    let bIsTimeForThePreliminaryQuestion = false;
 
     // Is the objective's bill-of-materials line item object optional?
-    if (nextBomObjective.billOfMaterialsLineItem.isOptional) {
+    if (currentBomObjective.billOfMaterialsLineItem.isOptional) {
+        // -------------------------- BEGIN: OPTIONAL LINE ITEM ------------------------
+
         // Yes. Check for a declined optional line item, since those
         //  should not be passed to this function.
-        if (nextBomObjective.resultData === null) {
-            throw new Error(`${errPrefix}The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user decline interest in it, so it should never have been passed to buildBillOfMaterialQuestion() in the first place.`);
+        if (currentBomObjective.resultData === null) {
+            throw new Error(`${errPrefix}The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user declined it.  This objective should never have been passed to buildBillOfMaterialQuestion() in the first place.`);
         }
 
-        // If the objective does not have a result yet, then we assume that
-        //  the preliminary question has already been asked in the chat
-        //  history.
-        if (typeof nextBomObjective.resultData === 'undefined') {
-            // -------------------------- BEGIN: PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
+        // We should have asked the preliminary question, if not, that's an error.
+        const stopAtStrings =
+            buildBomStopAtStringsArray(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
 
-            // Create a prompt that asks the LLM if the preliminary question is
-            //  answered definitely in the recent chat history using our template.
+        // Retrieve the message history up until the preliminary question or
+        //  the start of the latest session.
+        const recentMessagesFilteredString =
+            formatMessagesWithStopAtStrings(
+                {
+                    messages: state.recentMessagesData,
+                    actors: state.actorsData,
+                    stopAtStrings: stopAtStrings
+                });
 
+        // Was the preliminary question asked?
+        const bIsPreliminaryQuestionAsked =
+            recentMessagesFilteredString.includes(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
 
-
-            // -------------------------- END  : PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
-
-            // Set the flag to let subsequent code now we are processing
-            //  an optional line item's preliminary question, not its
-            //  main question.
-            bIsTimeForThePreliminaryQuestion = true;
+        if (!bIsPreliminaryQuestionAsked) {
+            // No.  That's a serious error.
+            throw new Error(`${errPrefix}The preliminary question not asked, despite there being an open optional bill-of-materials line item.`);
         }
-    }
 
-    // Are we asking the preliminary question for an optional line item now?
-    if (!bIsTimeForThePreliminaryQuestion) {
-        // No.  We are asking the main question, optional line item or not.
+        // Now we ask the LLM to analyze the recent messages history and
+        //  tell us if the preliminary question has been answered, or if
+        //  we should take a different action (e.g. - answer user's help
+        //  question, abort the session at the user's request, etc.).
 
-        // -------------------------- BEGIN: MAIN LINE ITEM QUESTION ------------------------
+        // -------------------------- END  : OPTIONAL LINE ITEM ------------------------
+    } else {
+        // -------------------------- BEGIN: MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
 
-        piecesOfPrompt.push(nextBomObjective.billOfMaterialsLineItem.prompt);
+        // TODO:???
 
-        // -------------------------- END  : MAIN LINE ITEM QUESTION ------------------------
+        // -------------------------- END  : MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
     }
 }
 
@@ -599,7 +649,7 @@ export class DirectClient {
             async (req: express.Request, res: express.Response) => {
 
                 /**
-                 * Check for the existence of a main bill-of-materials goal for the
+                 * Check for the existence of a main bill-of-materials goal for
                  *  the current relationship.
                  *
                  *  @param relationshipIdPair - The room ID prepended full user ID
@@ -648,7 +698,7 @@ export class DirectClient {
                     }
 
                     return retGoalOrNull;
-                }
+                }  // checkForMainBomGoal()
 
                 const agentId = req.params.agentId;
                 const roomId = stringToUuid(
@@ -765,6 +815,8 @@ export class DirectClient {
                     "direct"
                 );
 
+                // -------------------------- BEGIN: SAVE USER INPUT AS MEMORY ------------------------
+
                 const text = req.body.text;
                 const messageId = stringToUuid(Date.now().toString());
 
@@ -793,6 +845,8 @@ export class DirectClient {
 
                 await runtime.messageManager.createMemory(memory);
 
+                // -------------------------- END  : SAVE USER INPUT AS MEMORY ------------------------
+
                 const state = await runtime.composeState(userMessage, {
                     agentName: runtime.character.name,
                 });
@@ -807,9 +861,9 @@ export class DirectClient {
 
                 if (mainBomGoal) {
                     // Determine the next objective that needs to be completed.
-                    const nextBomObjective = getNextBomObjective(mainBomGoal);
+                    const currentBomObjective = getNextBomObjective(mainBomGoal);
 
-                    if (nextBomObjective === null) {
+                    if (currentBomObjective === null) {
                         // -------------------------- BEGIN: BILL-OF-MATERIALS GOAL COMPLETE ------------------------
 
                         // If we don't have an agent/character to switch control to,
@@ -834,9 +888,15 @@ export class DirectClient {
                     } else {
                         // -------------------------- BEGIN: PROCESS CURRENT BILL-OF-MATERIALS OBJECTIVE ------------------------
 
+                        // First, we need to check for an answer to a recently
+                        //  asked optional line item preliminary question,
+                        //  optional line item main question, or non-optional
+                        //  line item main question.
+                        await determineBomQuestionResult(state, currentBomObjective);
+
                         // Determine what question we should ask the user now.
                         const billOfMaterialsQuestion =
-                            buildBillOfMaterialQuestion(nextBomObjective);
+                            buildBillOfMaterialQuestion(currentBomObjective);
 
                         if (billOfMaterialsQuestion.trim().length === 0)
                             throw new Error(`The billOfMaterialsQuestion variable is empty.`);
@@ -889,11 +949,6 @@ export class DirectClient {
 
                     // -------------------------- END  : LEGACY PROCESSING (Not bill-of-materials) ------------------------
                 }
-
-                // TODO: Need to either execute a direct question answer using the
-                //  preliminary question assigned to the current bill-of-materials
-                //  line item objective, if that is the current context, or pass
-                //  through to normal LLM processing if not.
 
                 // save response to memory
                 const responseMessage = {
