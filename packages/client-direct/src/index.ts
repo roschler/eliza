@@ -332,59 +332,81 @@ function buildBomStopAtStringsArray(recentlyAskedQuestion: string): string[] {
  */
 async function determineBomQuestionResult(
     state: State,
-    currentBomObjective: Objective): Promise<object> {
+    currentBomObjective: Objective): Promise<string> {
     const errPrefix = `(determineBomQuestionResult) `;
 
     if (currentBomObjective === null) {
         throw new Error(`${errPrefix}The currentBomObjective parameter is unassigned.`);
     }
 
-    // Is the objective's bill-of-materials line item object optional?
-    if (currentBomObjective.billOfMaterialsLineItem.isOptional) {
-        // -------------------------- BEGIN: OPTIONAL LINE ITEM ------------------------
+    // First, we need to determine the right message template to use
+    //  to give to the LLM, to move the bill-of-materials session
+    //  ahead, and then we need to replace the substitution variables
+    //  using the current state.s
+    let useFormattedMessage: string | null = null;
 
-        // Yes. Check for a declined optional line item, since those
-        //  should not be passed to this function.
-        if (currentBomObjective.resultData === null) {
-            throw new Error(`${errPrefix}The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user declined it.  This objective should never have been passed to buildBillOfMaterialQuestion() in the first place.`);
-        }
+    // Are we in help mode?
+    if (currentBomObjective.isInHelpMode) {
+        // -------------------------- BEGIN: HELP MODE ------------------------
 
-        // We should have asked the preliminary question, if not, that's an error.
-        const stopAtStrings =
-            buildBomStopAtStringsArray(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+        // Do the substitution variable replacements.
+        useFormattedMessage = composeContext({
+            state: state,
+            template: helpModeMessageTemplate
+        });
 
-        // Retrieve the message history up until the preliminary question or
-        //  the start of the latest session.
-        const recentMessagesFilteredString =
-            formatMessagesWithStopAtStrings(
-                {
-                    messages: state.recentMessagesData,
-                    actors: state.actorsData,
-                    stopAtStrings: stopAtStrings
-                });
+        // -------------------------- END  : HELP MODE ------------------------
 
-        // Was the preliminary question asked?
-        const bIsPreliminaryQuestionAsked =
-            recentMessagesFilteredString.includes(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
-
-        if (!bIsPreliminaryQuestionAsked) {
-            // No.  That's a serious error.
-            throw new Error(`${errPrefix}The preliminary question not asked, despite there being an open optional bill-of-materials line item.`);
-        }
-
-        // Now we ask the LLM to analyze the recent messages history and
-        //  tell us if the preliminary question has been answered, or if
-        //  we should take a different action (e.g. - answer user's help
-        //  question, abort the session at the user's request, etc.).
-
-        // -------------------------- END  : OPTIONAL LINE ITEM ------------------------
     } else {
-        // -------------------------- BEGIN: MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
 
-        // TODO:???
+        // Is the objective's bill-of-materials line item object optional?
+        if (currentBomObjective.billOfMaterialsLineItem.isOptional) {
+            // -------------------------- BEGIN: OPTIONAL LINE ITEM ------------------------
 
-        // -------------------------- END  : MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
-    }
+            // Yes. Check for a declined optional line item, since those
+            //  should not be passed to this function.
+            if (currentBomObjective.resultData === null) {
+                throw new Error(`${errPrefix}The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user declined it.  This objective should never have been passed to buildBillOfMaterialQuestion() in the first place.`);
+            }
+
+            // We should have asked the preliminary question in the previous chat volley
+            //  in the code that executes after this code. If not, that's an error.
+            const stopAtStrings =
+                buildBomStopAtStringsArray(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+
+            // Retrieve the message history up until the preliminary question or
+            //  the start of the latest session.
+            const recentMessagesFilteredString =
+                formatMessagesWithStopAtStrings(
+                    {
+                        messages: state.recentMessagesData,
+                        actors: state.actorsData,
+                        stopAtStrings: stopAtStrings
+                    });
+
+            // Was the preliminary question asked?
+            const bIsPreliminaryQuestionAsked =
+                recentMessagesFilteredString.includes(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+
+            if (!bIsPreliminaryQuestionAsked) {
+                // No.  That's a serious error.
+                throw new Error(`${errPrefix}The preliminary question not asked, despite there being an open optional bill-of-materials line item.`);
+            }
+
+            // Now we ask the LLM to analyze the recent messages history and
+            //  tell us if the preliminary question has been answered, or if
+            //  we should take a different action (e.g. - answer user's help
+            //  question, abort the session at the user's request, etc.).
+
+            // -------------------------- END  : OPTIONAL LINE ITEM ------------------------
+        } else {
+            // -------------------------- BEGIN: MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
+
+            // TODO:???
+
+            // -------------------------- END  : MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
+        } // else/if (currentBomObjective.billOfMaterialsLineItem.isOptional)
+    } // else/if (currentBomObjective.isInHelpMode)
 }
 
 /**

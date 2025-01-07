@@ -115,14 +115,21 @@ export interface Objective {
     completed: boolean;
 
     /**
-     * This flag is used in conjunction with optional
-     *  bill-of-materials line items to determine if it
-     *  is time to ask the preliminary question to see
-     *  if the user is interested in the line item,
-     *  or if this field is TRUE, to ask the main
-     *  question that gets the value for the line item.
+     * This flag is set to TRUE if the user indicated they
+     *  are interested in (this) optional line item, if it
+     *  is optional, or FALSE if they indicated they are not
+     *  interested in it.
      */
     isOptionalFieldDesiredByUser: boolean;
+
+    /**
+     * This flag is set to TRUE if the users asks a help
+     *  question about the line item, and we have switched
+     *  to HELP mode until the user indicates we have
+     *  properly answered their question, or they cancel
+     *  the session.
+     */
+    isInHelpMode: boolean;
 
     /** The optional data object that is the result of the objective
      *   being completed.
