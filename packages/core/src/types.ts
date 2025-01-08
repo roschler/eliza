@@ -120,7 +120,7 @@ export interface Objective {
      *  is optional, or FALSE if they indicated they are not
      *  interested in it.
      */
-    isOptionalFieldDesiredByUser: boolean;
+    isOptionalFieldDesiredByUser?: boolean;
 
     /**
      * This flag is set to TRUE if the users asks a help
@@ -138,7 +138,7 @@ export interface Objective {
      *  line item object, and the user is not interested in the
      *  line item, then this field will contain specifically NULL.
      */
-    resultData: ObjectOrNull;
+    resultData?: ObjectOrNull;
 
     /**
      * If present, then this object is a bill of materials line

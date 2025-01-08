@@ -13,12 +13,10 @@ import {
     FullUserIdCharacterIdPair,
     buildRelationshipIdPair,
     GoalOrNull,
-    State,
     GoalStatus
 } from "@ai16z/eliza";
 import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
-import { messageCompletionFooter } from "@ai16z/eliza";
 import { AgentRuntime, Goal } from "@ai16z/eliza";
 import {GOAL_NAME_BILL_OF_MATERIALS, resetBomGoalsForRelationship} from "@ai16z/plugin-pilterms";
 import {
@@ -34,6 +32,12 @@ import { createApiRouter } from "./api.ts";
 import * as fs from "fs";
 import * as path from "path";
 import {processFileOrUrlReferences} from "./process-external-references.ts";
+import {
+    buildBillOfMaterialQuestion, determineBomQuestionResult,
+    getNextBomObjective,
+    isBomAgentCharacter,
+    messageHandlerTemplate
+} from "./bill-of-materials.ts";
 const upload = multer({ storage: multer.memoryStorage() });
 
 /**
@@ -344,7 +348,7 @@ export class DirectClient {
                     isBomAgentCharacter(runtime);
 
                 if (bIsBomAgentCharacter) {
-
+                    // Yes it is.  Get the bill-of-materials goal for this agent/character.
                     const relationshipIdPair: FullUserIdCharacterIdPair =
                         buildRelationshipIdPair(roomId, userId, runtime.character.name);
 
@@ -430,7 +434,7 @@ export class DirectClient {
 
                 if (mainBomGoal) {
                     // Determine the next objective that needs to be completed.
-                    const currentBomObjective = getNextBomObjective(mainBomGoal);
+                    let currentBomObjective = getNextBomObjective(mainBomGoal);
 
                     if (currentBomObjective !== null) {
                         // -------------------------- BEGIN: ANALYZE STATUS OF CURRENT BOM OBJECTIVE ------------------------
@@ -480,6 +484,14 @@ export class DirectClient {
                         //  Otherwise, we determine what question we should ask
                         //  the user now and build a response from that.
                         if (!response) {
+                            // We need to re-calculate the next bill-of-materials objective
+                            //  in case one of the result checks marked the current
+                            //  objective as completed, or in case an OPTIONAL line item
+                            //  objective was just marked as being of interest or not of
+                            //  interest to the user.
+                            currentBomObjective =
+                                getNextBomObjective(mainBomGoal);
+
                             elizaLogger.debug(`Building the next bill-of-materials question now, for objective: ${currentBomObjective.description}`);
 
                             const billOfMaterialsQuestion =

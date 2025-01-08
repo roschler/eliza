@@ -158,8 +158,6 @@ export async function billOfMaterialsToObjectives(runtime: IAgentRuntime): Promi
                 description: bomLineItem.name,
                 id: v4(),
                 completed: false,
-                isOptionalFieldDesiredByUser: false,
-                resultData: undefined
             }
 
             bomObjectivesForAgent.push(newObjective);

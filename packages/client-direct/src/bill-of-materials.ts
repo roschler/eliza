@@ -428,14 +428,14 @@ const helpModeMessageTemplate =
 
 /**
  * An agent/character is considered a bill-of-materials agent/character
- *  if it is a non-empty array of BillOfMaterialsLineItem objects.
+ *  if it has a non-empty array of BillOfMaterialsLineItem objects.
  *
  * @param runtime - The agent/character to inspect.
  *
  * @returns - Returns TRUE if the given agent/character is a bill-of-materials
  *  agent/character, FALSE if not.
  */
-function isBomAgentCharacter(runtime: IAgentRuntime): boolean {
+export function isBomAgentCharacter(runtime: IAgentRuntime): boolean {
     return Array.isArray(runtime.character.billOfMaterials) && runtime.character.billOfMaterials.length > 0;
 }
 
@@ -530,7 +530,7 @@ export function validateBillOfMaterialsLineItem(billOfMaterialsLineItem: BillOfM
  *  objective found sequentially in the BillOfMaterialsLineItem
  *  objects array is returned.
  */
-function getNextBomObjective(bomGoal: Goal): ObjectiveOrNull {
+export function getNextBomObjective(bomGoal: Goal): ObjectiveOrNull {
     let nextBomObject: ObjectiveOrNull = null;
 
     if (!Array.isArray(bomGoal.objectives)) {
@@ -585,7 +585,7 @@ function getNextBomObjective(bomGoal: Goal): ObjectiveOrNull {
  *  string in it along with the recently asked bill-of-materials
  *  question.
  */
-function buildBomStopAtStringsArray(recentlyAskedQuestion: string): string[] {
+export function buildBomStopAtStringsArray(recentlyAskedQuestion: string): string[] {
     const errPrefix = `(buildBomStopAtStringsArray) `;
 
     if (recentlyAskedQuestion.trim().length < 1) {
@@ -673,7 +673,9 @@ async function askLlmBomHelpQuestion(runtime: IAgentRuntime, state: State, curre
  * @returns - Returns a Content object that contains the
  *  response the system should use as the chat volley
  *  response, OR, returns NULL indicating the calling
- *  code should continue
+ *  code should continue to determine what to do and
+ *  say next, based on the current state of the chat
+ *  and system.
  */
 async function bomHelpModeCheckResultHandler(
     runtime: IAgentRuntime,
@@ -689,7 +691,7 @@ async function bomHelpModeCheckResultHandler(
     // Do the substitution variable replacements.
     const useFormattedMessage = composeContext({
         state: state,
-        template: helpModeMessageTemplate
+        template: helpModeResultCheckTemplate
     });
 
     // Default response, in case we fail to interpret the result
@@ -830,21 +832,19 @@ async function bomPreliminaryQuestionCheckResultHandler(
 
     // -------------------------- BEGIN: CATEGORY BASED UPDATES ------------------------
 
-    if (category === enumHelpResponseCategory.CANCEL) {
+    if (category === enumPreliminaryQuestionResultCategory.CANCEL) {
         // Build a CANCEL response.
         response =
             buildBomCancelResponse(runtime, errPrefix);
-    } else if (category === enumHelpResponseCategory.CONFUSED) {
-        // The user is confused by the help we have given them.  Create
-        //  a response that helps them with this confusion.
-        //
-        // TODO: Create something more powerful to handle specifically the
-        //  situation where the user doesn't understand the help given
-        //  so far.
-        response =
-            await askLlmBomHelpQuestion(runtime, state, currentBomObjective, category);
-
-    } else if (category === enumHelpResponseCategory.HELP) {
+    } else if (category === enumPreliminaryQuestionResultCategory.TRUE) {
+        // The user is interested in the OPTIONAL bill-of-materials line
+        //  item.  Update the current objective to indicate that.
+        currentBomObjective.isOptionalFieldDesiredByUser = true;
+    } else if (category === enumPreliminaryQuestionResultCategory.FALSE) {
+        // The user is NOT interested in the OPTIONAL bill-of-materials line
+        //  item.  Update the current objective to indicate that.
+        currentBomObjective.isOptionalFieldDesiredByUser = false;
+    } else if (category === enumPreliminaryQuestionResultCategory.HELP) {
         // The user needs more help. Create a response that helps them with
         //  this confusion.
         response =
@@ -868,7 +868,7 @@ async function bomPreliminaryQuestionCheckResultHandler(
  *
  * @returns - Returns the response that should
  */
-async function determineBomQuestionResult(
+export async function determineBomQuestionResult(
     runtime: IAgentRuntime,
     state: State,
     currentBomObjective: Objective): Promise<Content> {
@@ -943,7 +943,10 @@ async function determineBomQuestionResult(
                 throw new Error(`${errPrefix}The preliminary question for the current optional bill-of-materials line item has not been asked, which should have happened by now.`);
             }
 
-            // Has the preliminary question been properly answered?
+            // Has the preliminary question been properly answered?  Analyze
+            //  the chat message history for a result.
+            response =
+                await bomPreliminaryQuestionCheckResultHandler(runtime, state, currentBomObjective);
 
 
             // Leave the response null so that buildBillOfMaterialQuestion() is
@@ -976,7 +979,7 @@ async function determineBomQuestionResult(
  *  bill-of-materials content, or if it does, returns the
  *  bill-of-materials sub-prompt made from that content.
  */
-function buildBillOfMaterialQuestion(currentBomObjective: Objective): string | null {
+export function buildBillOfMaterialQuestion(currentBomObjective: Objective): string | null {
     const errPrefix = `(buildBillOfMaterialQuestion) `;
 
     let retStr: StringOrNull = null;
