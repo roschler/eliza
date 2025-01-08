@@ -141,6 +141,99 @@ export function isValidHelpResponseCategory(str: string): boolean {
 }
 
 /**
+ * These are various help response category values that are used
+ *  to classify the user input in the last chat volley during an
+ *  optional bill-of-materials line item's preliminary question.
+ */
+export enum enumPreliminaryQuestionResultCategories {
+
+    // >>>>> These preliminary question response categories are output
+    //  by the LLM that does the result check for a recently asked
+    //  preliminary question initiated during an OPTIONAL bill-of-materials
+    //  line item session.
+
+    /**
+     * The user gave an answer that indicates they want to stop the
+     *  entire session.
+     */
+    CANCEL = "CANCEL",
+
+    /**
+     * The user has indicated that they are interested in the
+     *  optional bill-of-materials line item.
+     */
+    TRUE = "TRUE",
+
+    /**
+     * The user has indicated that they are NOT interested in the
+     *  optional bill-of-materials line item.
+     */
+    FALSE = "FALSE",
+
+    /**
+     * The user has asked a question about the subject matter
+     *  the current bill-of-materials line item involves. The
+     *  response text is the text the user used to is a request
+     *  for more information.
+     */
+    HELP = "HELP",
+
+    // These values are NOT output by the LLM, but by the
+    //  bill-of-materials related JavaScript code instead.
+
+    /**
+     * This value is used when the LLM failed to output a
+     *  proper help response category.  It is a signal to
+     *  the bill-of-materials code to ask the user again
+     *  a recent question, or to clarify a current one,
+     *  hoping that on the next pass a usable result is
+     *  found in the recent messages.
+     */
+    RETRY = "RETRY",
+}
+
+/**
+ * Checks if a given string matches any value in the HELP_RESPONSE_CATEGORY enum,
+ * case-insensitive.
+ *
+ * @param str - The input string to check.
+ * @returns `true` if the input matches any enum value (case-insensitive), otherwise `false`.
+ */
+export function isValidHelpResponseCategory(str: string): boolean {
+    if (!str) {
+        return false; // Handle empty or null input
+    }
+
+    // Convert the input string to uppercase and compare with the enum values
+    return Object.values(enumHelpResponseCategory).includes(str.toUpperCase() as enumHelpResponseCategory);
+}
+
+/**
+ * This function merges a field with the given name and value into the
+ *  provided State object.  The bomFieldName will become the property
+ *  name used in the field value assignment.
+ *
+ * @param state - A valid State object.
+ * @param bomFieldName - The name of the bill-of-materials field that
+ *  should be assigned to the property in the State object of the same
+ *  name.
+ * @param bomFieldValue - The value to assign.
+ */
+export function mergeBomFieldIntoState(state: State, bomFieldName: string, bomFieldValue: string): void {
+    const errPrefix = `(mergeBomFieldIntoState) `;
+
+    if (bomFieldName.trim().length === 0) {
+        throw new Error(`${errPrefix}The bomFieldName parameter is empty.`);
+    }
+
+    if (bomFieldValue.trim().length === 0) {
+        throw new Error(`${errPrefix}The bomFieldValue parameter is empty.`);
+    }
+
+    state[bomFieldName] = bomFieldValue.trim();
+}
+
+/**
  * This is the type of the object that is built as the
  *  result of a HELP mode result check.
  */
@@ -176,16 +269,18 @@ const preliminaryQuestionLLmResultCheckTemplate =
 
     {{recentMessages}}
 
-    The user's answer will fall into one of the following categories:
+    The user's answer will fall into one of the following categories. Each line below is a category definition and is formatted like this:  Each line starts with the string "CATEGORY:", followed by the category name in uppercase letters, with everything after that followed by a description of the category, until the next category line begins.
 
-    CATEGORY: An answer that equates to boolean true.  For example, "yes", "sure", "Ok", etc.
-    CATEGORY: An answer that equates to boolean false.  For example, "no", "not interested", "I don't want to do that", "I don't need that", "Nah", "I'm OK without that" etc.
-    CATEGORY: A query about the subject matter the question involves that indicates the user wants more information on the subject.
+    CATEGORY: "TRUE", An answer that equates to boolean true.  For example, "yes", "sure", "Ok", etc.
+    CATEGORY: "FALSE", An answer that equates to boolean false.  For example, "no", "not interested", "I don't want to do that", "I don't need that", "Nah", "I'm OK without that" etc.
+    CATEGORY: "QUERY", A query about the subject matter the question involves that indicates the user wants more information on the subject.
+    CATEGORY: "CANCEL", The user has indicated that they want to stop the entire session.
 
-    Determine the correct_category and then give your answer in JSON format as described here:
+    Determine the correct category and then give your answer in JSON format as described here:
     \`\`\`json
     {
-        "category": "correct_category"
+        "category": "<put the category name here>",
+        "text": "<put the user text here that made you choose the category>"
     }\`\`\`
     `;
 
@@ -661,6 +756,127 @@ async function bomHelpModeCheckResultHandler(
 }
 
 /**
+ * This function makes an LLM call to have the recent messages
+ *  analyzed as part of a bill-of-materials OPTIONAL line item
+ *  question operation.
+ *
+ * @param runtime - The current agent/character.
+ * @param state - The current system state for the chat
+ * @param currentBomObjective - The current bill-of-materials
+ *  objective.
+ *
+ * @returns - Returns a Content object that contains the
+ *  response the system should use as the chat volley
+ *  response, OR, returns NULL indicating the calling
+ *  code should continue
+ */
+async function bomPreliminaryQuestionCheckResultHandler(
+    runtime: IAgentRuntime,
+    state: State,
+    currentBomObjective: Objective): Promise<Content | null> {
+    const errPrefix = `(bomPreliminaryQuestionCheckResultHandler) `;
+
+    // This function should NOT be called during HELP mode.
+    if (currentBomObjective.isInHelpMode) {
+        throw new Error(`${errPrefix}This function should NOT be called in the context of a bill-of-materials HELP mode operation.`);
+    }
+
+    // Put the objective's preliminary question into the state before we compose the context.
+    mergeBomFieldIntoState(state, "simpleQuestion", currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+
+    // Do the substitution variable replacements.
+    const useFormattedMessage = composeContext({
+        state: state,
+        template: preliminaryQuestionLLmResultCheckTemplate
+    });
+
+    // Default response, in case we fail to interpret the result
+    //  check properly.
+    let response: Content | null = null;
+
+    const responseFromLlm = await generateMessageResponse({
+        runtime: runtime,
+        context: useFormattedMessage,
+        modelClass: ModelClass.SMALL,
+    });
+
+    // Examine the response and determine how it affects the current
+    //  chat.  The response should have a "category" and "text"
+    //  properties.
+    let category = responseFromLlm.category;
+    let text = responseFromLlm.text ?? '(none)';
+
+    // WE MUST have a category.  If not, we create a RETRY response in the
+    //  hope the next chat volley will result in a category being generated
+    //  by the LLM.
+    if (typeof category !== 'string' || (typeof category === 'string'  && !isValidHelpResponseCategory(category))) {
+        elizaLogger.debug(`${errPrefix}Unable to find a valid help response category in the LLM output.  Setting response category to RETRY.`);
+
+        // Set the category to RETRY to let the calling code we should
+        //  try asking the user the current bill-of-materials line item
+        //  question again, or to ask the user to clarify their question.
+        category = enumHelpResponseCategory.RETRY;
+    }
+
+    category = (category as string).toUpperCase();
+
+    elizaLogger.debug(`${errPrefix}The selected CATEGORY for optional line item preliminary questin mode is: ${category}\nAssociated text: ${text}\nObjective description: ${currentBomObjective.description}`);
+
+    // -------------------------- BEGIN: CATEGORY BASED UPDATES ------------------------
+
+    if (category === enumHelpResponseCategory.ANSWERED) {
+        // The user has indicated that their question has been fully
+        //  answered.  Exit HELP mode.
+        elizaLogger.debug(`Exiting HELP mode during current bill-of-materials object: ${currentBomObjective.description}`);
+        currentBomObjective.isInHelpMode = false;
+
+        // We don't create a response because we want the question
+        //  building code that follows to resume the bill-of-materials
+        //  information gathering operation.
+    } else if (category === enumHelpResponseCategory.CANCEL) {
+        // The user wants to cancel the session.  Get the name of the agent/character
+        //  the developer wants control transferred to.
+        //  If we don't have an agent/character to switch control to
+        //  in the event of a user cancellation request, then that is
+        //  an error.
+        const nextCharacterName =
+            runtime.character.switchToCharacterWhenBomSessionCancelled;
+
+        if (typeof nextCharacterName !== "string" || typeof nextCharacterName === "string" && nextCharacterName.trim().length === 0) {
+            throw new Error(`The user has requested the cancelling of the bill-of-materials session, but the character does not specify the next agent to transfer control to (i.e. - switchToCharacterWhenBomSessionCancelled is unassigned or invalid.`);
+        }
+
+        // Create a response with the action that will transfer control of the conversation
+        //  to the next agent/character.
+        response = {
+            text: `Cancelling your session and transferring you over to the next agent: ${nextCharacterName}`,
+            action: `SELECT_CHARACTER_${nextCharacterName}`
+        }
+    } else if (category === enumHelpResponseCategory.CONFUSED) {
+        // The user is confused by the help we have given them.  Create
+        //  a response that helps them with this confusion.
+        //
+        // TODO: Create something more powerful to handle specifically the
+        //  situation where the user doesn't understand the help given
+        //  so far.
+        response =
+            await askLlmBomHelpQuestion(runtime, state, currentBomObjective, category);
+
+    } else if (category === enumHelpResponseCategory.HELP) {
+        // The user needs more help. Create a response that helps them with
+        //  this confusion.
+        response =
+            await askLlmBomHelpQuestion(runtime, state, currentBomObjective, category);
+    } else {
+        throw new Error(`${errPrefix}Unknown help response category: ${category}`);
+    }
+
+    // -------------------------- END  : CATEGORY BASED UPDATES ------------------------
+
+    return response;
+}
+
+/**
  * Analyze the recent message stream to see how we should proceed
  *  with the current chat volley.
  *
@@ -694,7 +910,7 @@ async function determineBomQuestionResult(
 
         // Have the LLM analyze the chat messages so far and update the
         //  goal and its objectives based on that analysis.
-        response = await bomHelpModeCheckResultHandler(state, runtime, currentBomObjective);
+        response = await bomHelpModeCheckResultHandler(runtime, state, currentBomObjective);
 
         // -------------------------- END  : HELP MODE ------------------------
     }
@@ -704,7 +920,10 @@ async function determineBomQuestionResult(
         // Yes.  Use it as is.
     } else {
         // No.  Validate the current context and if OK, allow
-        //  the NULL response to be returned.
+        //  the NULL response to be returned so buildBillOfMaterialQuestion()
+        //  can craft a new bill-of-materials question.
+        //
+        // Is the current bill-of-materials line item optional?
         if (currentBomObjective.billOfMaterialsLineItem.isOptional) {
             // -------------------------- BEGIN: OPTIONAL LINE ITEM ------------------------
 
@@ -714,14 +933,17 @@ async function determineBomQuestionResult(
                 throw new Error(`${errPrefix}The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user declined it.  This objective should never have been passed to buildBillOfMaterialQuestion() in the first place.`);
             }
 
-            // We should have asked the preliminary question in the previous chat volley
-            //  in the buildBillOfMaterialQuestion() that executes after this code. If not,
-            //  that's an error.
+            // Check to make sure we asked the preliminary question in a previous chat volley,
+            //  which should have happened via the buildBillOfMaterialQuestion() function call
+            //  made during that volley. If not, that's an error.
             const stopAtStrings =
                 buildBomStopAtStringsArray(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
 
             // Retrieve the message history up until the preliminary question or
-            //  the start of the latest session.
+            //  the start of the latest session.  We limit the scope of the
+            //  chat message history this way to avoid processing user responses
+            //  that don't belong to the current session, but belong to an
+            //  old session instead.
             const recentMessagesFilteredString =
                 formatMessagesWithStopAtStrings(
                     {
@@ -736,8 +958,11 @@ async function determineBomQuestionResult(
 
             if (!bIsPreliminaryQuestionAsked) {
                 // No.  That's a serious error.
-                throw new Error(`${errPrefix}The preliminary question not asked, despite there being an open optional bill-of-materials line item.`);
+                throw new Error(`${errPrefix}The preliminary question for the current optional bill-of-materials line item has not been asked, which should have happened by now.`);
             }
+
+            // Has the preliminary question been properly answered?
+
 
             // Leave the response null so that buildBillOfMaterialQuestion() is
             //  executed to build the next response.
