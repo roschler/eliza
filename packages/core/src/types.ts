@@ -374,12 +374,20 @@ export interface State {
     /** Optional knowledge data */
     knowledgeData?: KnowledgeItem[];
 
-    /** Optional question that the current chat interaction
+    /** Optional direct question that the current chat interaction
      *   with the user is intended to have answered.  For
-     *   example, let getting the answer to a bill-of-materials
+     *   example, like getting the answer to a bill-of-materials
      *   related question from the LLM.
      */
     simpleQuestion?: string;
+
+    /**
+     * Optional help document that should be used when the chat
+     *  interaction for a bill-of-materials line item has switched
+     *  into HELP mode to answer a user's questions about the
+     *  the current line item.
+     */
+    helpDocument?: string;
 
     /** Additional dynamic properties */
     [key: string]: unknown;
@@ -714,10 +722,9 @@ export type BillOfMaterialsLineItem = {
 
     /**
      * The help text to include that the LLM can use to answer
-     *  any questions the user may have about the optional
-     *  line item.
+     *  any questions the user may have about the line item.
      */
-    helpTextForOptionalLineItem?: string;
+    helpDocumentForBomLineItem?: string;
 
 
     // -------------------------- END  : OPTIONAL FIELDS ------------------------

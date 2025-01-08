@@ -41,6 +41,21 @@ import * as path from "path";
 import {processFileOrUrlReferences} from "./process-external-references.ts";
 const upload = multer({ storage: multer.memoryStorage() });
 
+// -------------------------- BEGIN: SOME CONSTANTS ------------------------
+
+/**
+ * If the developer did not assign a help document to the bill-of-materials
+ *  line item's helpDocumentForBomLineItem property, then we will use this
+ *  generic help.
+ */
+const DEFAULT_BOM_HELP_DOCUMENT =
+`
+    Analyze the recent chat message history to see how you can provide
+    help to the user's current question.
+`;
+
+// -------------------------- END  : SOME CONSTANTS ------------------------
+
 // -------------------------- BEGIN: SOME ERROR MESSAGES ------------------------
 
 /**
@@ -344,8 +359,8 @@ function validateBillOfMaterialsLineItem(billOfMaterialsLineItem: BillOfMaterial
             validationFailures.push(`The "preliminaryPromptForOptionalLineItem" field is missing or is assigned an empty string for a line items marked as "optional".`);
         }
 
-        if (typeof billOfMaterialsLineItem.helpTextForOptionalLineItem !== "string"
-            || (typeof billOfMaterialsLineItem.helpTextForOptionalLineItem === "string" && billOfMaterialsLineItem.helpTextForOptionalLineItem.length === 0)) {
+        if (typeof billOfMaterialsLineItem.helpDocumentForBomLineItem !== "string"
+            || (typeof billOfMaterialsLineItem.helpDocumentForBomLineItem === "string" && billOfMaterialsLineItem.helpDocumentForBomLineItem.length === 0)) {
             validationFailures.push(`The "helpTextForOptionalLineItem" field is missing or is assigned an empty string for a line items marked as "optional".`);
         }
     }
@@ -469,14 +484,75 @@ function buildBomStopAtStringsArray(recentlyAskedQuestion: string): string[] {
 }
 
 /**
+ * This function makes an LLM call get the next help text for
+ *  the user when the current bill-of-materials objective is
+ *  in HELP mode.
+ *
+ * @param runtime - The current agent/character.
+ * @param state - The current system state for the chat
+ * @param currentBomObjective - The current bill-of-materials
+ *  objective.
+ * @param category - The category the LLM determined reflects
+ *  best the user's help request.
+ *
+ * @returns - Returns a Content object that contains the
+ *  response the system should use as the chat volley
+ *  response, OR, returns NULL indicating the calling
+ *  code should continue
+ */
+async function askLlmBomHelpQuestion(runtime: IAgentRuntime, state: State, currentBomObjective: Objective, category: string): Promise<Content> {
+    const errPrefix = `(askLlmBomHelpQuestion) `;
+
+    elizaLogger.debug(`The category assigned to the user's last help request or response is: ${category}`);
+
+    // Put the objective's help text into the state before we compose the context.
+    state.helpDocument =
+        // We prefer there to be a full help document attached to the current
+        //  line item.
+        currentBomObjective.billOfMaterialsLineItem.helpDocumentForBomLineItem
+        ??
+        // If not, use the generic help text.
+        DEFAULT_BOM_HELP_DOCUMENT;
+
+    // Do the substitution variable replacements.
+    const useFormattedMessage = composeContext({
+        state: state,
+        template: helpModeMessageTemplate
+    });
+
+    // Default response, in case we fail to interpret the result
+    //  check properly.
+    let response: Content | null = null;
+
+    const responseFromLlm = await generateMessageResponse({
+        runtime: runtime,
+        context: useFormattedMessage,
+        modelClass: ModelClass.SMALL,
+    });
+
+    if (typeof responseFromLlm.text !== 'string') {
+        elizaLogger.debug(`${errPrefix}Unable to find a "text" property in the LLM output.`);
+    }
+
+    // The response should have a "text" properties.
+    const text = responseFromLlm.text ?? '(The bill-of-materials help LLM failed to produce a JSON object with a "text" property.)';
+
+    // Use the help text provided by the LLM.
+    response = {
+        text: text
+    }
+
+    return response;
+}
+
+/**
  * This function makes an LLM call to have the recent messages
  *  analyzed as part of a bill-of-materials HELP mode operation.
  *
  * @param runtime - The current agent/character.
+ * @param state - The current system state for the chat
  * @param currentBomObjective - The current bill-of-materials
  *  objective.
- * @param useFormattedMessage - The result check template to
- *  use to analyze the recent messages.
  *
  * @returns - Returns a Content object that contains the
  *  response the system should use as the chat volley
@@ -485,14 +561,20 @@ function buildBomStopAtStringsArray(recentlyAskedQuestion: string): string[] {
  */
 async function bomHelpModeCheckResultHandler(
         runtime: IAgentRuntime,
-        currentBomObjective: Objective,
-        useFormattedMessage: string): Promise<Content | null> {
+        state: State,
+        currentBomObjective: Objective): Promise<Content | null> {
     const errPrefix = `(bomHelpModeCheckResultHandler) `;
 
     // This function should only be called during HELP mode.
     if (!currentBomObjective.isInHelpMode) {
         throw new Error(`${errPrefix}This function should only be called in the context of a bill-of-materials HELP mode operation.`);
     }
+
+    // Do the substitution variable replacements.
+    const useFormattedMessage = composeContext({
+        state: state,
+        template: helpModeMessageTemplate
+    });
 
     // Default response, in case we fail to interpret the result
     //  check properly.
@@ -505,7 +587,7 @@ async function bomHelpModeCheckResultHandler(
     });
 
     // Examine the response and determine how it affects the current
-    //  chat.  The response should have  "category" and "text"
+    //  chat.  The response should have "category" and "text"
     //  properties.
 
     let category = responseFromLlm.category;
@@ -555,16 +637,20 @@ async function bomHelpModeCheckResultHandler(
             action: `SELECT_CHARACTER_${nextCharacterName}`
         }
     } else if (category === enumHelpResponseCategory.CONFUSED) {
-        // The user is confused by the help we have given them.  For now
-        //  treat this like a request for furtherhelp.  Leave the response object NULL so that
-        //  the calling code continues HELP mode.
+        // The user is confused by the help we have given them.  Create
+        //  a response that helps them with this confusion.
         //
         // TODO: Create something more powerful to handle specifically the
         //  situation where the user doesn't understand the help given
         //  so far.
+        response =
+            await askLlmBomHelpQuestion(runtime, state, currentBomObjective, category);
+
     } else if (category === enumHelpResponseCategory.HELP) {
-        // The user needs more help.  Leave the response object NULL so that
-        //  the calling code continues HELP mode.
+        // The user needs more help. Create a response that helps them with
+        //  this confusion.
+        response =
+            await askLlmBomHelpQuestion(runtime, state, currentBomObjective, category);
     } else {
         throw new Error(`${errPrefix}Unknown help response category: ${category}`);
     }
@@ -606,26 +692,19 @@ async function determineBomQuestionResult(
     if (currentBomObjective.isInHelpMode) {
         // -------------------------- BEGIN: HELP MODE ------------------------
 
-        // Do the substitution variable replacements.
-        const useFormattedMessage = composeContext({
-            state: state,
-            template: helpModeMessageTemplate
-        });
-
         // Have the LLM analyze the chat messages so far and update the
         //  goal and its objectives based on that analysis.
-        response = await bomHelpModeCheckResultHandler(runtime, currentBomObjective, useFormattedMessage);
+        response = await bomHelpModeCheckResultHandler(state, runtime, currentBomObjective);
 
         // -------------------------- END  : HELP MODE ------------------------
-
     }
 
     // Do we have a direct response, based on the result checks?
     if (response) {
         // Yes.  Use it as is.
     } else {
-
-        // Is the objective's bill-of-materials line item object optional?
+        // No.  Validate the current context and if OK, allow
+        //  the NULL response to be returned.
         if (currentBomObjective.billOfMaterialsLineItem.isOptional) {
             // -------------------------- BEGIN: OPTIONAL LINE ITEM ------------------------
 
@@ -636,7 +715,8 @@ async function determineBomQuestionResult(
             }
 
             // We should have asked the preliminary question in the previous chat volley
-            //  in the code that executes after this code. If not, that's an error.
+            //  in the buildBillOfMaterialQuestion() that executes after this code. If not,
+            //  that's an error.
             const stopAtStrings =
                 buildBomStopAtStringsArray(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
 
@@ -659,16 +739,15 @@ async function determineBomQuestionResult(
                 throw new Error(`${errPrefix}The preliminary question not asked, despite there being an open optional bill-of-materials line item.`);
             }
 
-            // Now we ask the LLM to analyze the recent messages history and
-            //  tell us if the preliminary question has been answered, or if
-            //  we should take a different action (e.g. - answer user's help
-            //  question, abort the session at the user's request, etc.).
+            // Leave the response null so that buildBillOfMaterialQuestion() is
+            //  executed to build the next response.
 
             // -------------------------- END  : OPTIONAL LINE ITEM ------------------------
         } else {
             // -------------------------- BEGIN: MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
 
-            // TODO:???
+            // Leave the response null so that buildBillOfMaterialQuestion() is
+            //  executed to build the next response.
 
             // -------------------------- END  : MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
         } // else/if (currentBomObjective.billOfMaterialsLineItem.isOptional)
@@ -683,44 +762,48 @@ async function determineBomQuestionResult(
  *  for the LLM that facilitates completing the bill-of-materials
  *  objectives.
  *
- * @param nextBomObjective - The current bill-of-materials Objective
+ * @param currentBomObjective - The current bill-of-materials Objective
  *   object that needs to be processed.
  *
  * @returns - Returns NULL if the goal has no
  *  bill-of-materials content, or if it does, returns the
  *  bill-of-materials sub-prompt made from that content.
  */
-function buildBillOfMaterialQuestion(nextBomObjective: Objective): string | null {
+function buildBillOfMaterialQuestion(currentBomObjective: Objective): string | null {
     const errPrefix = `(buildBillOfMaterialQuestion) `;
 
     let retStr: StringOrNull = null;
 
     const piecesOfPrompt: string[] = [];
 
-    if (nextBomObjective === null) {
+    if (currentBomObjective === null) {
         throw new Error(`${errPrefix}The nextBomObjective parameter is unassigned.`)
     }
+
+    // -------------------------- BEGIN: HELP MODE ------------------------
+
+    // -------------------------- END  : HELP MODE ------------------------
 
     // -------------------------- BEGIN: PROCESS NEW OBJECTIVE ------------------------
 
     let bIsTimeForThePreliminaryQuestion = false;
 
     // Is the objective's bill-of-materials line item object optional?
-    if (nextBomObjective.billOfMaterialsLineItem.isOptional) {
+    if (currentBomObjective.billOfMaterialsLineItem.isOptional) {
         // Yes. Check for a declined optional line item, since those
         //  should not be passed to this function.
-        if (nextBomObjective.resultData === null) {
+        if (currentBomObjective.resultData === null) {
             throw new Error(`${errPrefix}The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user decline interest in it, so it should never have been passed to buildBillOfMaterialQuestion() in the first place.`);
         }
 
         // If the objective does not have a result yet, then we need to ask the
         //  preliminary question now.
-        if (typeof nextBomObjective.resultData === 'undefined') {
+        if (typeof currentBomObjective.resultData === 'undefined') {
             // -------------------------- BEGIN: PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
 
             // Yes.  Ask the user the question that determines if they are interested
             //  in the optional line item or not.
-            piecesOfPrompt.push(nextBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+            piecesOfPrompt.push(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
 
             // -------------------------- END  : PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
 
@@ -737,7 +820,7 @@ function buildBillOfMaterialQuestion(nextBomObjective: Objective): string | null
 
         // -------------------------- BEGIN: MAIN LINE ITEM QUESTION ------------------------
 
-        piecesOfPrompt.push(nextBomObjective.billOfMaterialsLineItem.prompt);
+        piecesOfPrompt.push(currentBomObjective.billOfMaterialsLineItem.prompt);
 
         // -------------------------- END  : MAIN LINE ITEM QUESTION ------------------------
     }
@@ -1196,8 +1279,14 @@ export class DirectClient {
                         // First, we need to check for an answer to a recently
                         //  asked optional line item preliminary question,
                         //  optional line item main question, or non-optional
-                        //  line item main question.
-                        await determineBomQuestionResult(state, currentBomObjective);
+                        //  line item main question.  This function may
+                        //  come up with a response to show the user in
+                        //  certain contexts.  For example, like when
+                        //  HELP mode is active and the chat history
+                        //  indicates the user wants to cancel the
+                        //  bill-of-materials session.
+                        response =
+                            await determineBomQuestionResult(runtime, state, currentBomObjective);
 
                         // -------------------------- END  : ANALYZE STATUS OF CURRENT BOM OBJECTIVE ------------------------
                     }
@@ -1228,18 +1317,23 @@ export class DirectClient {
                     } else {
                         // -------------------------- BEGIN: ASK NEXT BOM QUESTION ------------------------
 
-                        // Determine what question we should ask the user now.
-                        const billOfMaterialsQuestion =
-                            buildBillOfMaterialQuestion(currentBomObjective);
+                        // If a response was already generated, then we use it.
+                        //  Otherwise, we determine what question we should ask
+                        //  the user now and build a response from that.
+                        if (!response) {
+                            elizaLogger.debug(`Building the next bill-of-materials question now, for objective: ${currentBomObjective.description}`);
 
-                        if (billOfMaterialsQuestion.trim().length === 0)
-                            throw new Error(`The billOfMaterialsQuestion variable is empty.`);
+                            const billOfMaterialsQuestion =
+                                buildBillOfMaterialQuestion(currentBomObjective);
 
-                        // Create a response that will ask the user the desired question.
-                        response = {
-                            text: billOfMaterialsQuestion
+                            if (billOfMaterialsQuestion.trim().length === 0)
+                                throw new Error(`The billOfMaterialsQuestion variable is empty.`);
+
+                            // Create a response that will ask the user the desired question.
+                            response = {
+                                text: billOfMaterialsQuestion
+                            }
                         }
-
 
                         // -------------------------- END  : ASK NEXT BOM QUESTION ------------------------
                     }
@@ -1283,7 +1377,7 @@ export class DirectClient {
                     });
 
                     // -------------------------- END  : LEGACY PROCESSING (Not bill-of-materials) ------------------------
-                }
+                } // else/if (mainBomGoal)
 
                 // save response to memory
                 const responseMessage = {
@@ -1315,6 +1409,7 @@ export class DirectClient {
                     }
                 );
 
+                // Return the response we created.
                 if (message) {
                     res.json([response, message]);
                 } else {
