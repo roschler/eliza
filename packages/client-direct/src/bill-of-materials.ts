@@ -324,17 +324,17 @@ const mainQuestionLLmResultTemplate =
 
     If the user provided a valid answer to the information request, then your answer
     should be that value and just the value, without any surrounding text that isn't
-    part of the value, and the category of the answer is "result".
+    part of the value, and the category of the answer is "RESULT".
 
     If the user asked a question about the subject matter the question involves, thus
     indicating the user wants more information on the subject, then your answer
     should be that question and just the question, without any surrounding text that isn't
-    related to the question, and the category of the answer is "query".
+    related to the question, and the category of the answer is "QUERY".
 
     If the user indicated that they have changed their mind and are no longer
     interested in the question asked, or want to do something completely different,
     or they want to cancel the current chat,  then your answer should be the user's statement,
-    and the category of the answer is "abort".
+    and the category of the answer is "CANCEL".
 
     Determine the category and then give your complete reply in JSON format as described here:
     \`\`\`json
@@ -967,6 +967,80 @@ export async function determineBomQuestionResult(
 }
 
 /**
+ * Build the main bill-of-materials question text from a bill-of-materials
+ *  objective.
+ *
+ * @param currentBomObjective - The current bill-of-materials objective.
+ *
+ * @returns - Returns the fully assembled text that asks the question contained
+ *  in the bill-of-materials objective.
+ */
+export function buildBomMainQuestion(currentBomObjective: Objective): string {
+    const errPrefix = `(buildBomMainQuestion) `;
+
+    // We need to adjust the question to encompass any validations
+    //  declared in the bill-of-materials line item.
+    let retText = currentBomObjective.billOfMaterialsLineItem.prompt;
+
+    if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
+        // -------------------------- BEGIN: STRING TYPE ------------------------
+
+        if (Array.isArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem.listOfValidValues.length > 0) {
+            // Add list of values if present.
+            const validChoices =
+                currentBomObjective.billOfMaterialsLineItem.listOfValidValues.join(', ');
+            retText +=
+                `Available choices are: ${validChoices}`;
+        }
+
+        // -------------------------- END  : STRING TYPE ------------------------
+    } else if (currentBomObjective.billOfMaterialsLineItem.type === 'number') {
+        // -------------------------- BEGIN: NUMBER TYPE ------------------------
+
+        // Add min/max constraints if present.
+        const bIsMinValPresent = typeof currentBomObjective.billOfMaterialsLineItem.minVal === 'number';
+        const bIsMaxValPresent = typeof currentBomObjective.billOfMaterialsLineItem.maxVal === 'number';
+
+        if (bIsMaxValPresent && bIsMinValPresent) {
+            // >>>>> Minimum AND Maximum values present.
+
+            // Sanity check on the min/max values.
+            if (currentBomObjective.billOfMaterialsLineItem.minVal > currentBomObjective.billOfMaterialsLineItem.maxVal) {
+                throw new Error(`${errPrefix}The minimum value for the bill-of-materials numeric line item(${currentBomObjective.billOfMaterialsLineItem.minVal}) is greater than the maximum value: ${currentBomObjective.billOfMaterialsLineItem.maxVal}`);
+            }
+
+            retText +=
+                `Please choose a number between: ${currentBomObjective.billOfMaterialsLineItem.minVal} && ${currentBomObjective.billOfMaterialsLineItem.maxVal}.`;
+        } else if (bIsMinValPresent) {
+            // >>>>> ONLY minimum value present.
+
+            retText +=
+                `Please choose a number greater than or equal to: ${currentBomObjective.billOfMaterialsLineItem.minVal}.`;
+
+        } else if (bIsMaxValPresent) {
+            // >>>>> ONLY maximum value present.
+
+            retText +=
+                `Please choose a number less than or equal to: ${currentBomObjective.billOfMaterialsLineItem.maxVal}.`;
+        } else {
+            throw new Error(`${errPrefix}Invalid logic pathway encountered during bill-of-materials numeric line item processing.`);
+        }
+
+        // -------------------------- END  : NUMBER TYPE ------------------------
+    } if (currentBomObjective.billOfMaterialsLineItem.type === 'boolean') {
+        // -------------------------- BEGIN: BOOLEAN TYPE ------------------------
+
+        // No text modifications needed for boolean questions.
+
+        // -------------------------- END  : BOOLEAN TYPE ------------------------
+    } else {
+        throw new Error(`${errPrefix}Unknown bill-of-materials type: ${currentBomObjective.billOfMaterialsLineItem.type}`);
+    }
+
+    return retText;
+}
+
+/**
  * Given an agent/character bill-of-materials goal, use
  *  its bill-of-materials Goal content to create the sub-prompt
  *  for the LLM that facilitates completing the bill-of-materials
@@ -1008,7 +1082,7 @@ export function buildBillOfMaterialQuestion(currentBomObjective: Objective): str
 
         // If the objective does not have a result yet, then we need to ask the
         //  preliminary question now.
-        if (typeof currentBomObjective.resultData === 'undefined') {
+        if (typeof currentBomObjective.resultData === 'undefined' && currentBomObjective.isOptionalFieldDesiredByUser) {
             // -------------------------- BEGIN: PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
 
             // Yes.  Ask the user the question that determines if they are interested
@@ -1030,7 +1104,10 @@ export function buildBillOfMaterialQuestion(currentBomObjective: Objective): str
 
         // -------------------------- BEGIN: MAIN LINE ITEM QUESTION ------------------------
 
-        piecesOfPrompt.push(currentBomObjective.billOfMaterialsLineItem.prompt);
+        const bomMainQuestion =
+            buildBomMainQuestion(currentBomObjective);
+
+        piecesOfPrompt.push(bomMainQuestion);
 
         // -------------------------- END  : MAIN LINE ITEM QUESTION ------------------------
     }
