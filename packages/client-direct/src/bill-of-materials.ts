@@ -290,9 +290,127 @@ export type resultCheckResponse = {
     text: string;
 }
 
+/**
+ * Simple type to bind a choice to the character name that should
+ *  be switched to if that choice is selected by the user.
+ */
+export type ChoiceAndCharacterName = {
+    // The choice value from a bill-of-materials line item's
+    //  listOfValidValues property
+    choice: string;
+    // The name of the agent/character that should be switched to
+    //  if the user selects this choice.  If NULL, then no switching
+    //  will take place.
+    characterName: StringOrNull;
+}
+
 // -------------------------- END  : HELP RESPONSE CATEGORIES ------------------------
 
 // -------------------------- BEGIN: UTILITY BOM RELATED FUNCTIONS ------------------------
+
+/**
+ * This function takes a choice, which may have an optional character/agent
+ *  name appended to it, and returns a ChoiceAndCharacterName object built
+ *  from it.
+ *
+ * @param choice - The raw text choice for one of the valid values in a
+ *  bill-of-materials line item's listOfValidValues field, found in the
+ *  character's JSON.
+ */
+function parseChoiceIntoChoiceAndCharacterName(choice: string): ChoiceAndCharacterName {
+    const errPrefix = `(parseChoiceIntoChoiceAndCharacterName) `;
+
+    const delimCharacterName = ':';
+
+    const choiceTrimmed = choice.trim();
+
+    if (choiceTrimmed.length === 0) {
+        throw new Error(`${errPrefix}The choice input parameter is empty or invalid.`);
+    }
+
+    let retChoiceAndCharacterName: ChoiceAndCharacterName = {
+        choice: choiceTrimmed,
+        characterName: null
+    }
+
+    const pieces = choiceTrimmed.split(delimCharacterName);
+
+    if (pieces.length > 1) {
+        const lastNdx = pieces.length - 1;
+
+        // The second parameter to the slice parameter is exclusive bound.
+        retChoiceAndCharacterName.choice = pieces.slice(0, lastNdx).join(' ').trim();
+
+        // Last element is the character name.
+        retChoiceAndCharacterName.characterName = pieces[lastNdx].trim();
+    }
+
+    return retChoiceAndCharacterName;
+}
+
+/**
+ * This function parses all the valid values in the list into an array of choice
+ *  and agent/character name objects.
+ *
+ * @param listOfValidValues - The list of valid values from a bill-of-materials
+ *  line item object.
+ *
+ * @returns - Returns an array of ChoiceAndCharacterName objects build from the
+ *  listOfValidValues given.  Any choices that did not have the agent/character
+ *  name suffix appended to the choice text, will have NULL for the the
+ *  characterName field in that object.
+ */
+function buildChoiceAndCharacterNamesArray(listOfValidValues: string[]): ChoiceAndCharacterName[] {
+    const errPrefix = `(buildChoiceAndCharacterNamesArray) `;
+
+    if (listOfValidValues.length === 0) {
+        throw new Error(`${errPrefix}The listOfValidValues array input parameter is empty.`);
+    }
+
+    const choiceAndCharacterNameArray: ChoiceAndCharacterName[] = [];
+
+    // Parse all the valid values in the list into an array of choice
+    //  and agent/character name objects.
+    listOfValidValues.forEach((choice) => {
+        const choiceAndCharacterNameObj =
+            parseChoiceIntoChoiceAndCharacterName(choice);
+        choiceAndCharacterNameArray.push(choiceAndCharacterNameObj)
+    });
+
+    return choiceAndCharacterNameArray;
+}
+
+/**
+ * This function takes an array of strings and creates an "or" statement
+ *  in natural language format.  (e.g. - ["cat", "dog", "emu"] would
+ *  become "cat, dog, or emu".
+ *
+ * @param strs - The array of strings to turn into an "or" statement.
+ *
+ * @returns - Returns the fully assembled "or" statement.  If the
+ *  strings array is empty, then an empty string is returned.
+ */
+export function buildBomOrStringStatement(strs: string[]): string {
+    // const errPrefix = `(buildBomOrStringStatement) `;
+    const delimChoices = ', ';
+
+    let orStatement: string = '';
+
+    if (strs.length > 0) {
+        if (strs.length === 1) {
+            orStatement = strs[0];
+        } else {
+            // The second argument to the slice function is bounds exclusive.
+            orStatement += strs.slice(0, strs.length - 1).join(delimChoices);
+
+            orStatement += `${delimChoices} or `;
+
+            orStatement += strs[strs.length - 1];
+        }
+    }
+
+    return orStatement;
+}
 
 /**
  * This function builds a CANCEL response for cancel request by the
@@ -957,54 +1075,100 @@ async function bomPreliminaryQuestionCheckResultHandler(
 
 /**
  * This function takes the text isolated by and returned by the LLM in
- *  an LLM check result operation, and cleans it up for use as a result
- *  value.
+ *  an LLM check result operation for the main question of an OPTIONAL
+ *  or non-optional bill-of-materials line item, and cleans it up for
+ *  use as a result value.
  *
  * @param currentBomObjective - The current bill-of-materials objective
  *  that is the source of the result text.
- * @param text - The text isolated by and returned by the LLM in
- *  an LLM check result operation.
+ * @param category - The category returned by the LLM during an LLM check
+ *  result operation.
+ * @param text - The text isolated by and returned by the LLM during an LLM check
+ *  result operation.
+ *
+ * @returns - Returns the result value found, or NULL if no result was found.
  */
-function extractResultValue(currentBomObjective: Objective, text: string): ResultAndCharacterName {
-    const errPrefix = `(extractResultValue) `;
+function extractMainQuestionResultValue(currentBomObjective: Objective, category: string, text: string): ResultAndCharacterName {
+    const errPrefix = `(extractMainQuestionResultValue) `;
+
+    const trimmedCategory = category.trim();
+
+    // We must have a category.
+    if (trimmedCategory.length === 0) {
+        throw new Error(`${errPrefix}The category input parameter is empty or invalid.`);
+    }
+
+    const trimmedCategoryUpperCase = trimmedCategory.toUpperCase();
+
+    // The category MUST be "RESULT".
+    if (trimmedCategoryUpperCase !== enumMainQuestionResultCategory.RESULT) {
+        throw new Error(`${errPrefix}The category input parameter must be equal to: "${enumMainQuestionResultCategory.RESULT}".`);
+    }
 
     const trimmedText = text.trim();
 
-    if (trimmedText.length === 0) {
-        throw new Error(`${errPrefix}The text input parameter is empty.`);
+    let resultAndCharacterNameObj: ResultAndCharacterName = {
+        resultValue: null,
+        characterName: null
     }
 
-    if (currentBomObjective.billOfMaterialsLineItem.type === 'boolean') {
-        // -------------------------- BEGIN: EXTRACT BOOLEAN VALUE ------------------------
+    const trimmedTextLowerCase = trimmedText.toLowerCase();
 
+    // If the trimmed text returned by the LLM is empty,then just allow
+    //  NULL to be returned to let the caller know this.
+    if (trimmedTextLowerCase.length > 0) {
 
+        if (currentBomObjective.billOfMaterialsLineItem.type === 'boolean') {
+            // -------------------------- BEGIN: EXTRACT BOOLEAN VALUE ------------------------
 
-        // -------------------------- END  : EXTRACT BOOLEAN VALUE ------------------------
-    }
-    else if (currentBomObjective.billOfMaterialsLineItem.type === 'number') {
-        // -------------------------- BEGIN: EXTRACT NUMBER VALUE ------------------------
+            // If the text is TRUE of FALSE then that is the result value.
+            if (trimmedTextLowerCase === "true") {
+                resultAndCharacterNameObj.resultValue = true;
+            } else if (trimmedTextLowerCase === "false") {
+                resultAndCharacterNameObj.resultValue = false;
+            } else {
+                // Just leave the return value as NULL to let the caller know
+                //  we did not receive a satisfactory response.
+            }
 
+            // -------------------------- END  : EXTRACT BOOLEAN VALUE ------------------------
+        } else if (currentBomObjective.billOfMaterialsLineItem.type === 'number') {
+            // -------------------------- BEGIN: EXTRACT NUMERIC VALUE ------------------------
 
+            // Try to parse the number as a valid numeric value.
+            try {
+                resultAndCharacterNameObj.resultValue = parseFloat(trimmedTextLowerCase);
+            } catch (err) {
+                elizaLogger.debug(`Unable to parse text value("${trimmedTextLowerCase}") as a number.  Error details: `, err);
+            }
 
-        // -------------------------- END  : EXTRACT NUMBER VALUE ------------------------
-    }
-    else if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
-        // -------------------------- BEGIN: EXTRACT STRING VALUE ------------------------
+            // -------------------------- END  : EXTRACT NUMERIC VALUE ------------------------
+        } else if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
+            // -------------------------- BEGIN: EXTRACT STRING VALUE ------------------------
 
-        if (Array.isArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem.listOfValidValues.length > 0) {
+            if (Array.isArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem.listOfValidValues.length > 0) {
+                // First, create an array of ChoiceAndCharacterName to separate the
+                //  list of choices values from their character name suffixes, if
+                //  any exist.
+                const listOfChoiceAndCharacterNames: ChoiceAndCharacterName[] =
+                    buildChoiceAndCharacterNamesArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues);
 
+                // Validate the text returned by the result check LLM as being one of the
+                //  valid choices.
 
+            }
+
+            // -------------------------- END  : EXTRACT STRING VALUE ------------------------
+        } else {
+            // -------------------------- BEGIN: UNKNOWN TYPE ------------------------
+
+            throw new Error(`${errPrefix}The bill-of-materials line item is of an unknown type: ${currentBomObjective.billOfMaterialsLineItem.type}`);
+
+            // -------------------------- END  : UNKNOWN TYPE ------------------------
         }
-
-        // -------------------------- END  : EXTRACT STRING VALUE ------------------------
     }
-    else {
-        // -------------------------- BEGIN: UNKNOWN TYPE ------------------------
 
-        throw new Error(`${errPrefix}The bill-of-materials line item is of an unknown type: ${currentBomObjective.billOfMaterialsLineItem.type}`);
-
-        // -------------------------- END  : UNKNOWN TYPE ------------------------
-    }
+    return resultValue;
 }
 
 /**
@@ -1054,7 +1218,7 @@ async function bomMainQuestionCheckResultHandler(
     } else if (currentBomObjective.billOfMaterialsLineItem.type === 'number') {
         // -------------------------- BEGIN: NUMBER TYPE ------------------------
 
-        llmExpectedResultValuesText +=
+        llmExpectedResultValuesText =
             `The result value should be a numeric value.`;
         // -------------------------- END  : NUMBER TYPE ------------------------
     } else if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
@@ -1066,6 +1230,7 @@ async function bomMainQuestionCheckResultHandler(
                 // Add list of values.
                 const validChoices =
                     currentBomObjective.billOfMaterialsLineItem.listOfValidValues.join(choiceDelimiter);
+
                 llmExpectedResultValuesText =
                     `
                 The result value should be equal or similar to one of the following choice values:
