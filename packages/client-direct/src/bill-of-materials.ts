@@ -425,11 +425,15 @@ const mainQuestionLLmResultCheckTemplate =
     CATEGORY: "HELP", The response text should be the user's input that expresses the "HELP" intent.  If the user asked a specific question then that and that alone should be the response text, This category is for when the user makes a query about the subject matter the question involves that indicates the user wants more information on the subject or just indicates in a generic manner that  they need help.
     CATEGORY: "RESULT", The response text should be the result value the user provided that matches the question asked and just that text alone, This category is for when the user provides a valid result value that answers the question that is the focus of this session
 
+    Here is the kind of result text you should expect for a result value:
+
+    {{resultValueHelp}}
+
     Determine the correct category and then give your answer in JSON format as described here:
     \`\`\`json
     {
         "category": "<put the category name here>",
-        "text": "<put response text here>"
+        "text": "<put the response text here>"
     }\`\`\`
     `;
 
@@ -978,21 +982,21 @@ function extractResultValue(currentBomObjective: Objective, text: string): Resul
         // -------------------------- END  : EXTRACT BOOLEAN VALUE ------------------------
     }
     else if (currentBomObjective.billOfMaterialsLineItem.type === 'number') {
-        // -------------------------- BEGIN: EXTRACT BOOLEAN VALUE ------------------------
+        // -------------------------- BEGIN: EXTRACT NUMBER VALUE ------------------------
 
 
 
-        // -------------------------- END  : EXTRACT BOOLEAN VALUE ------------------------
+        // -------------------------- END  : EXTRACT NUMBER VALUE ------------------------
     }
     else if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
-        // -------------------------- BEGIN: EXTRACT BOOLEAN VALUE ------------------------
+        // -------------------------- BEGIN: EXTRACT STRING VALUE ------------------------
 
         if (Array.isArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem.listOfValidValues.length > 0) {
 
 
         }
 
-        // -------------------------- END  : EXTRACT BOOLEAN VALUE ------------------------
+        // -------------------------- END  : EXTRACT STRING VALUE ------------------------
     }
     else {
         // -------------------------- BEGIN: UNKNOWN TYPE ------------------------
@@ -1031,6 +1035,57 @@ async function bomMainQuestionCheckResultHandler(
 
     // Put the objective's main question into the state before we compose the context.
     mergeBomFieldIntoState(state, "simpleQuestion", currentBomObjective.billOfMaterialsLineItem.prompt);
+
+    // Create text for the LLM that tells it what kind of values to expect
+    //  based on the type of bill-of-materials line item the current
+    //  objective is for, and the value constraints the line item has,
+    //  if any.
+    // -------------------------- BEGIN: LLM TEXT FOR EXPECTED RESULT VALUES ------------------------
+
+    let llmExpectedResultValuesText = null;
+
+    if (currentBomObjective.billOfMaterialsLineItem.type === 'boolean') {
+        // -------------------------- BEGIN: BOOLEAN TYPE ------------------------
+
+        llmExpectedResultValuesText +=
+            `The result value should be a user expression that evaluates to boolean value.  For example, "yes", "sure", "ok", "I want to do that", "Let's do that", "sounds good", etc.  would all resolve to the result value "true".  For example, "nah", "nope", "never", "hell no!", "Forget that", "I don't want to do that", etc. would all resolve to the result value "false".`;
+
+        // -------------------------- END  : BOOLEAN TYPE ------------------------
+    } else if (currentBomObjective.billOfMaterialsLineItem.type === 'number') {
+        // -------------------------- BEGIN: NUMBER TYPE ------------------------
+
+        llmExpectedResultValuesText +=
+            `The result value should be a numeric value.`;
+        // -------------------------- END  : NUMBER TYPE ------------------------
+    } else if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
+            // -------------------------- BEGIN: STRING TYPE ------------------------
+
+            if (Array.isArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem.listOfValidValues.length > 0) {
+                const choiceDelimiter = '\n- ';
+
+                // Add list of values.
+                const validChoices =
+                    currentBomObjective.billOfMaterialsLineItem.listOfValidValues.join(choiceDelimiter);
+                llmExpectedResultValuesText =
+                    `
+                The result value should be equal or similar to one of the following choice values:
+                 ${choiceDelimiter}${validChoices}
+                 If the user provided result value is one of these values or is closely similar to one of the above values, your response text should be the exact text of the choice value that the user text matches best.
+                 `;
+            }
+
+            // -------------------------- END  : STRING TYPE ------------------------    } else {
+        throw new Error(`${errPrefix}Unknown bill-of-materials type: ${currentBomObjective.billOfMaterialsLineItem.type}`);
+    }
+
+    // If we created help text of the LLM regarding the expected result values, then
+    //  merge the expected values text into the result check message template.
+    if (llmExpectedResultValuesText) {
+        mergeBomFieldIntoState(state, "resultValueHelp", llmExpectedResultValuesText);
+    }
+
+    // -------------------------- END  : LLM TEXT FOR EXPECTED RESULT VALUES ------------------------
+
 
     // Do the substitution variable replacements.
     const useFormattedMessage = composeContext({
@@ -1231,18 +1286,12 @@ export function buildBomMainQuestion(currentBomObjective: Objective): string {
     //  declared in the bill-of-materials line item.
     let retText = currentBomObjective.billOfMaterialsLineItem.prompt;
 
-    if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
-        // -------------------------- BEGIN: STRING TYPE ------------------------
+    if (currentBomObjective.billOfMaterialsLineItem.type === 'boolean') {
+        // -------------------------- BEGIN: BOOLEAN TYPE ------------------------
 
-        if (Array.isArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem.listOfValidValues.length > 0) {
-            // Add list of values if present.
-            const validChoices =
-                currentBomObjective.billOfMaterialsLineItem.listOfValidValues.join(', ');
-            retText +=
-                `Available choices are: ${validChoices}`;
-        }
+        // No text modifications needed for boolean questions.
 
-        // -------------------------- END  : STRING TYPE ------------------------
+        // -------------------------- END  : BOOLEAN TYPE ------------------------
     } else if (currentBomObjective.billOfMaterialsLineItem.type === 'number') {
         // -------------------------- BEGIN: NUMBER TYPE ------------------------
 
@@ -1276,12 +1325,18 @@ export function buildBomMainQuestion(currentBomObjective: Objective): string {
         }
 
         // -------------------------- END  : NUMBER TYPE ------------------------
-    } if (currentBomObjective.billOfMaterialsLineItem.type === 'boolean') {
-        // -------------------------- BEGIN: BOOLEAN TYPE ------------------------
+    } else if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
+            // -------------------------- BEGIN: STRING TYPE ------------------------
 
-        // No text modifications needed for boolean questions.
+            if (Array.isArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem.listOfValidValues.length > 0) {
+                // Add list of values if present.
+                const validChoices =
+                    currentBomObjective.billOfMaterialsLineItem.listOfValidValues.join(', ');
+                retText +=
+                    `The available choices are: ${validChoices}`;
+            }
 
-        // -------------------------- END  : BOOLEAN TYPE ------------------------
+            // -------------------------- END  : STRING TYPE ------------------------
     } else {
         throw new Error(`${errPrefix}Unknown bill-of-materials type: ${currentBomObjective.billOfMaterialsLineItem.type}`);
     }
