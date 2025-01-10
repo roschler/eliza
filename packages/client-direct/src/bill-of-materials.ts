@@ -226,6 +226,11 @@ export enum enumMainQuestionResultCategory {
     CANCEL = "CANCEL",
 
     /**
+     * The user has indicated that they want to change their answer
+     *  to something different.
+     */
+
+    /**
      * The user has asked a question about the subject matter
      *  the current bill-of-materials line item involves. The
      *  response text is the text the user used to is a request
@@ -410,31 +415,21 @@ const mainQuestionLLmResultCheckTemplate =
 
     {{recentMessages}}
 
-    If the user provided a valid answer to the information request, then your answer
-    should be that value and just the value, without any surrounding text that isn't
-    part of the value, and the category of the answer is "RESULT".
+    You need to decide the overall category of the user's most recent reply
+    in context of the recent chat history.
 
-    If the user asked a question about the subject matter the question involves, thus
-    indicating the user wants more information on the subject, then your answer
-    should be that question and just the question, without any surrounding text that isn't
-    related to the question, and the category of the answer is "QUERY".
+    The user's answer will fall into one of the following categories. Each line below is a category definition and is formatted like this:  Each comma delimited line starts with the string "CATEGORY:", followed by the category name in uppercase letters, then the nature of the text you should output based on that category, with everything after that followed by a description of the category that you can use to analyze the chat history, until the next category line begins.
 
-    If the user indicated that they have changed their mind and are no longer
-    interested in the question asked, or want to do something completely different,
-    or they want to cancel the current chat,  then your answer should be the user's statement,
-    and the category of the answer is "CANCEL".
-
-    The user's answer will fall into one of the following categories. Each line below is a category definition and is formatted like this:  Each line starts with the string "CATEGORY:", followed by the category name in uppercase letters, with everything after that followed by a description of the category, until the next category line begins.
-
-    CATEGORY: "CANCEL", The user has indicated that they want to stop the entire session.
-    CATEGORY: "HELP", A query about the subject matter the question involves that indicates the user wants more information on the subject.
-    CATEGORY: "RESULT", The user provided a valid result value that matches the question asked.  Your response text should be only the text that is the answer to the question asked.
+    CATEGORY: "CANCEL", The response text should be the user's input that expresses the "CANCEL" intent, This category is for when the user has indicated that they want to stop the entire session
+    CATEGORY: "CHANGE", The response text should be the user's input that expresses the "CHANGE" intent.  This category is for when the user has indicated that they want to change their answer to something different.
+    CATEGORY: "HELP", The response text should be the user's input that expresses the "HELP" intent.  If the user asked a specific question then that and that alone should be the response text, This category is for when the user makes a query about the subject matter the question involves that indicates the user wants more information on the subject or just indicates in a generic manner that  they need help.
+    CATEGORY: "RESULT", The response text should be the result value the user provided that matches the question asked and just that text alone, This category is for when the user provides a valid result value that answers the question that is the focus of this session
 
     Determine the correct category and then give your answer in JSON format as described here:
     \`\`\`json
     {
         "category": "<put the category name here>",
-        "text": "<put the user text here that is the result value for the question asked, or if the user expresed a cancel or help intent, then put here the that made you choose the category>"
+        "text": "<put response text here>"
     }\`\`\`
     `;
 
@@ -992,7 +987,10 @@ function extractResultValue(currentBomObjective: Objective, text: string): Resul
     else if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
         // -------------------------- BEGIN: EXTRACT BOOLEAN VALUE ------------------------
 
+        if (Array.isArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem.listOfValidValues.length > 0) {
 
+
+        }
 
         // -------------------------- END  : EXTRACT BOOLEAN VALUE ------------------------
     }
