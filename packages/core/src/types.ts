@@ -1,15 +1,16 @@
 import { Readable } from "stream";
 
 // Some simple types that are either NULL or some other primitive value.
-export type StringOrNull = string | null;
-export type NumberOrNull = number | null;
-export type ObjectOrNull = object | null;
-export type BooleanOrNull = boolean | null;
-export type ObjectiveOrNull = Objective | null;
 export type BillOfMaterialsLineItemOrNull = BillOfMaterialsLineItem | null;
+export type BooleanOrNull = boolean | null;
+export type ContentOrNull = Content | null;
 export type GoalOrNull = Goal | null;
-export type RelationshipOrNull = Relationship | null;
 export type IAgentRuntimeOrNull = IAgentRuntime | null;
+export type NumberOrNull = number | null;
+export type ObjectiveOrNull = Objective | null;
+export type ObjectOrNull = object | null;
+export type RelationshipOrNull = Relationship | null;
+export type StringOrNull = string | null;
 
 /**
  * Represents a UUID string in the format "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
