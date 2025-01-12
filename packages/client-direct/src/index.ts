@@ -506,6 +506,15 @@ export class DirectClient {
                             }
                         }
 
+
+                        // -------------------------- BEGIN: UPDATE GOAL ------------------------
+
+                        // We always update the goal in case we made changes to it or any of
+                        //  its objectives during processing.
+                        await runtime.databaseAdapter.updateGoal(mainBomGoal);
+
+                        // -------------------------- END  : UPDATE GOAL ------------------------
+
                         // -------------------------- END  : ASK NEXT BOM QUESTION ------------------------
                     }
                 } else {

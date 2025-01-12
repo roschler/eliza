@@ -12,6 +12,24 @@ export type ObjectOrNull = object | null;
 export type RelationshipOrNull = Relationship | null;
 export type StringOrNull = string | null;
 
+// -------------------------- BEGIN: BILL-OF-MATERIALS RESULT DATA TYPES ------------------------
+
+/**
+ * The types allowed for the Object resultData and defaultValue properties.
+ */
+export type BillOfMaterialsResultType = string | boolean | number | object;
+
+/**
+ * This is the type returned from a bill-of-materials main
+ *  question operation.
+ */
+export type ResultAndCharacterName = {
+    resultValue: BillOfMaterialsResultType;
+    characterName: string;
+}
+
+// -------------------------- END  : BILL-OF-MATERIALS RESULT DATA TYPES ------------------------
+
 /**
  * Represents a UUID string in the format "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
  */
@@ -98,11 +116,6 @@ export interface Actor {
 }
 
 /**
- * The types allowed for the Object resultData and defaultValue properties.
- */
-export type BillOfMaterialsResultType = string | boolean | number | object;
-
-/**
  * Represents a single objective within a goal
  */
 export interface Objective {
@@ -138,8 +151,15 @@ export interface Objective {
      * NOTE: If this objective carries an optional bill-of-materials
      *  line item object, and the user is not interested in the
      *  line item, then this field will contain specifically NULL.
+     *
+     * NOTE: Do NOT initialize this property to NULL!  If the
+     *  line item is an optional value that it has NOT been
+     *  asked yet, we expect this value to be undefined.  If
+     *  the line item is an optional value, and it HAS
+     *  been asked, AND the user declined interest in it,
+     *  then it will be NULL.
      */
-    resultData?: ObjectOrNull;
+    resultData?: BillOfMaterialsResultType;
 
     /**
      * If present, then this object is a bill of materials line

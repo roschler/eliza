@@ -1,5 +1,50 @@
 // This module contains the bill-of-materials form fill related code.
 
+/**
+ * BILL-OF-MATERIALS NOTES:
+ *
+ *  The general flow the bill-of-materials code consists of the following
+ *      functional groups, in order of usage during processing:
+ *
+ *      - Help mode facilitators for when the current bill-of-materials is in HELP mode
+ *      - Result check handlers that analyze the most recent chat messages to:
+ *
+ *              + If HELP mode is active, then check to see if the user's help query
+ *                 has been fully answered
+ *              + If the current bill-of-materials main question is an OPTIONAL
+ *                 line item, then check to see if the preliminary question has
+ *                 been answered
+ *              + OPTIONAL or not, then check to see if the current bill-of-materials
+ *                 main question has been answered with a valid result data value
+ *
+ *      - A question builder function that builds the correct question for the
+ *         current, or newly current, bill-of-materials objective.
+ *
+ *  RESPONSE GENERATION:
+ *
+ *  The bill-of-materials code chain works by the strategy of having the most
+ *   relevant code generate a response (e.g. - next help response, or result
+ *   value validation failure, etc.) that becomes the overall response returned
+ *   to the Eliza core.  Otherwise, no response is generated and then it
+ *   becomes the responsibility of the question builder function to create
+ *   the response.
+ *
+ * BILL-OF-MATERIALS MINI-MAP:
+ *
+ *         determineBomQuestionResult()
+ *              bomHelpModeCheckResultHandler()
+ *
+ *              bomPreliminaryQuestionCheckResultHandler()
+ *              | -> extractMainQuestionResultValue()
+ *
+ *              bomMainQuestionCheckResultHandler()
+ *              extractMainQuestionResultValue()
+ *                 [ switch character action ]
+ *
+ *              validateMainQuestionResultValue
+ *              | -> Object's resultData property is assigned here
+ */
+
 import {
     elizaLogger,
     BillOfMaterialsLineItem,
@@ -15,27 +60,8 @@ import {
     composeContext,
     ModelClass,
     generateMessageResponse,
-    messageCompletionFooter, ContentOrNull
+    messageCompletionFooter, ContentOrNull, ResultAndCharacterName, BillOfMaterialsResultType
 } from "@ai16z/eliza";
-
-// -------------------------- BEGIN: SOME TYPES ------------------------
-
-/**
- * This is the list of currently acceptable types that can be returned
- *  from a bill-of-materials main question operation.
- */
-type QuestionResultValueOrNull = string | number | boolean | null;
-
-/**
- * This is the type returned from a bill-of-materials main
- *  question operation.
- */
-type ResultAndCharacterName = {
-    resultValue: QuestionResultValueOrNull;
-    characterName: string;
-}
-
-// -------------------------- END  : SOME TYPES ------------------------
 
 // -------------------------- BEGIN: SOME CONSTANTS ------------------------
 
@@ -825,6 +851,11 @@ export function buildBomStopAtStringsArray(recentlyAskedQuestion: string): strin
  *  the user when the current bill-of-materials objective is
  *  in HELP mode.
  *
+ * NOTE: This function will set the isInHelp flag of the
+ *  current bill-of-materials objective to TRUE, so that
+ *  help mode stays in effect until the user's question
+ *  is answered or they cancel the session.
+ *
  * @param runtime - The current agent/character.
  * @param state - The current system state for the chat
  * @param currentBomObjective - The current bill-of-materials
@@ -840,7 +871,11 @@ export function buildBomStopAtStringsArray(recentlyAskedQuestion: string): strin
 async function askLlmBomHelpQuestion(runtime: IAgentRuntime, state: State, currentBomObjective: Objective, category: string): Promise<Content> {
     const errPrefix = `(askLlmBomHelpQuestion) `;
 
-    elizaLogger.debug(`The category assigned to the user's last help request or response is: ${category}`);
+    elizaLogger.debug(`${errPrefix}The category assigned to the user's last help request or response is: ${category}`);
+
+    currentBomObjective.isInHelpMode = true;
+
+    elizaLogger.debug(`${errPrefix}isInHelp flag set to true.`);
 
     // Put the objective's help text into the state before we compose the context.
     state.helpDocument =
@@ -1284,8 +1319,8 @@ function extractMainQuestionResultValue(currentBomObjective: Objective, text: st
  * @returns - Returns NULL if the result value passed all checks.  Otherwise, returns
  *  a Content response that should be passed on.
  */
-function validateMainQuestionResultValue(currentBomObjective: Objective, resultValue: QuestionResultValueOrNull): ContentOrNull {
-    const errPrefix = `(validateMainQuestionResultValue) `;
+function validateMainQuestionResultValue(currentBomObjective: Objective, resultValue: BillOfMaterialsResultType): ContentOrNull {
+    const errPrefix = `(validateAndExtractMainQuestionResultValue) `;
 
     // NULL is never an acceptable value.
     if (resultValue === null) {
@@ -1510,11 +1545,8 @@ async function bomMainQuestionCheckResultHandler(
         } else if (category === enumMainQuestionResultCategory.RESULT) {
             // The user gave the LLM a usable result value.  Extract it
             //  from the "text" property returned by the LLM.
-            const resultValue =
-                extractResultValue(currentBomObjective, text);
-
-            // Validate the value by its type and against any value constraints
-            //  in the bill-of-materials line item declaration.
+            response =
+                validateMainQuestionResultValue(currentBomObjective, text);
         } else {
             throw new Error(`${errPrefix}Unknown help response category: ${category}`);
         }
@@ -1534,8 +1566,6 @@ async function bomMainQuestionCheckResultHandler(
  *   valid, concrete result, then this function will write the
  *   result into the objective's resultData field and mark it
  *   as completed.
- *
- *
  *
  * @param runtime - The current agent/character.
  * @param state - The current system state.
@@ -1654,7 +1684,7 @@ export async function determineBomQuestionResult(
                     //  bill-of-materials objective and mark the objective as
                     //  completed.
                     currentBomObjective.completed = true;
-                    currentBomObjective.resultData = resultAndCharacterNameObj;
+                    currentBomObjective.resultData = resultAndCharacterNameObj.resultValue;
 
                     // -------------------------- BEGIN: LIST OF VALUES AGENT SWITCH ------------------------
 
