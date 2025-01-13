@@ -14,7 +14,7 @@ Optional unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:137](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L137)
+[packages/core/src/types.ts:185](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L185)
 
 ***
 
@@ -26,7 +26,22 @@ Room ID where goal exists
 
 #### Defined in
 
-[packages/core/src/types.ts:140](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L140)
+[packages/core/src/types.ts:188](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L188)
+
+***
+
+### agentId?
+
+> `optional` **agentId**: \`$\{string\}-$\{string\}-$\{string\}-$\{string\}-$\{string\}\`
+
+If specified, then this goal is
+  tied to a specific user to
+  agent/character relationship
+  belonging to the room.
+
+#### Defined in
+
+[packages/core/src/types.ts:195](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L195)
 
 ***
 
@@ -38,7 +53,7 @@ User ID of goal owner
 
 #### Defined in
 
-[packages/core/src/types.ts:143](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L143)
+[packages/core/src/types.ts:198](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L198)
 
 ***
 
@@ -50,7 +65,7 @@ Name/title of the goal
 
 #### Defined in
 
-[packages/core/src/types.ts:146](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L146)
+[packages/core/src/types.ts:201](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L201)
 
 ***
 
@@ -62,7 +77,7 @@ Current status
 
 #### Defined in
 
-[packages/core/src/types.ts:149](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L149)
+[packages/core/src/types.ts:204](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L204)
 
 ***
 
@@ -74,4 +89,4 @@ Component objectives
 
 #### Defined in
 
-[packages/core/src/types.ts:152](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L152)
+[packages/core/src/types.ts:207](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L207)

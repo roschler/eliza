@@ -14,7 +14,7 @@ Similar action descriptions
 
 #### Defined in
 
-[packages/core/src/types.ts:423](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L423)
+[packages/core/src/types.ts:493](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L493)
 
 ***
 
@@ -26,7 +26,7 @@ Detailed description
 
 #### Defined in
 
-[packages/core/src/types.ts:426](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L426)
+[packages/core/src/types.ts:496](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L496)
 
 ***
 
@@ -38,7 +38,7 @@ Example usages
 
 #### Defined in
 
-[packages/core/src/types.ts:429](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L429)
+[packages/core/src/types.ts:499](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L499)
 
 ***
 
@@ -50,7 +50,7 @@ Handler function
 
 #### Defined in
 
-[packages/core/src/types.ts:432](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L432)
+[packages/core/src/types.ts:502](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L502)
 
 ***
 
@@ -62,7 +62,7 @@ Action name
 
 #### Defined in
 
-[packages/core/src/types.ts:435](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L435)
+[packages/core/src/types.ts:505](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L505)
 
 ***
 
@@ -74,4 +74,4 @@ Validation function
 
 #### Defined in
 
-[packages/core/src/types.ts:438](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L438)
+[packages/core/src/types.ts:508](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L508)

@@ -106,10 +106,14 @@ Main Character schema
 
 > **billOfMaterials**: `ZodOptional`\<`ZodArray`\<`ZodObject`\<`object`, `"strip"`, `ZodTypeAny`, `object`, `object`\>, `"many"`\>\>
 
+### switchToCharacterWhenBomComplete
+
+> **switchToCharacterWhenBomComplete**: `ZodOptional`\<`ZodString`\>
+
 ### resetGoalsOnReceivingControl
 
 > **resetGoalsOnReceivingControl**: `ZodOptional`\<`ZodBoolean`\>
 
 ## Defined in
 
-[packages/core/src/environment.ts:82](https://github.com/roschler/eliza/blob/main/packages/core/src/environment.ts#L82)
+[packages/core/src/environment.ts:84](https://github.com/roschler/eliza/blob/main/packages/core/src/environment.ts#L84)

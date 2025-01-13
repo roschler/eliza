@@ -20,4 +20,4 @@ Get details for a list of actors.
 
 ## Defined in
 
-[packages/core/src/messages.ts:12](https://github.com/roschler/eliza/blob/main/packages/core/src/messages.ts#L12)
+[packages/core/src/messages.ts:19](https://github.com/roschler/eliza/blob/main/packages/core/src/messages.ts#L19)

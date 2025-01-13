@@ -14,7 +14,7 @@ Whether to always run
 
 #### Defined in
 
-[packages/core/src/types.ts:460](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L460)
+[packages/core/src/types.ts:530](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L530)
 
 ***
 
@@ -26,7 +26,7 @@ Detailed description
 
 #### Defined in
 
-[packages/core/src/types.ts:463](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L463)
+[packages/core/src/types.ts:533](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L533)
 
 ***
 
@@ -38,7 +38,7 @@ Similar evaluator descriptions
 
 #### Defined in
 
-[packages/core/src/types.ts:466](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L466)
+[packages/core/src/types.ts:536](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L536)
 
 ***
 
@@ -50,7 +50,7 @@ Example evaluations
 
 #### Defined in
 
-[packages/core/src/types.ts:469](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L469)
+[packages/core/src/types.ts:539](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L539)
 
 ***
 
@@ -62,7 +62,7 @@ Handler function
 
 #### Defined in
 
-[packages/core/src/types.ts:472](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L472)
+[packages/core/src/types.ts:542](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L542)
 
 ***
 
@@ -74,7 +74,7 @@ Evaluator name
 
 #### Defined in
 
-[packages/core/src/types.ts:475](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L475)
+[packages/core/src/types.ts:545](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L545)
 
 ***
 
@@ -86,4 +86,4 @@ Validation function
 
 #### Defined in
 
-[packages/core/src/types.ts:478](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L478)
+[packages/core/src/types.ts:548](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L548)

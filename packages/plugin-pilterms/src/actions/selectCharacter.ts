@@ -8,11 +8,10 @@ import {
     type Memory,
     setExclusiveUserToCharacterRelationship,
     type State,
-    UUID, buildRelationshipIdPair,
+    UUID, buildRelationshipIdPair, isRelated,
 } from "@ai16z/eliza";
 import {pickLicenseTemplate} from "../templates";
 import {ActorActionDetails} from "../system/types.ts";
-import {isRelated} from "@ai16z/client-direct";
 import {v4} from "uuid";
 
 // This is the name we assign to goals that are part of the bill-of-materials

@@ -14,7 +14,7 @@ Unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:498](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L498)
+[packages/core/src/types.ts:568](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L568)
 
 ***
 
@@ -26,7 +26,7 @@ First user ID
 
 #### Defined in
 
-[packages/core/src/types.ts:501](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L501)
+[packages/core/src/types.ts:571](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L571)
 
 ***
 
@@ -38,7 +38,7 @@ Second user ID
 
 #### Defined in
 
-[packages/core/src/types.ts:504](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L504)
+[packages/core/src/types.ts:574](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L574)
 
 ***
 
@@ -50,7 +50,7 @@ Primary user ID
 
 #### Defined in
 
-[packages/core/src/types.ts:507](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L507)
+[packages/core/src/types.ts:577](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L577)
 
 ***
 
@@ -62,7 +62,7 @@ Associated room ID
 
 #### Defined in
 
-[packages/core/src/types.ts:510](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L510)
+[packages/core/src/types.ts:580](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L580)
 
 ***
 
@@ -74,7 +74,7 @@ Relationship status
 
 #### Defined in
 
-[packages/core/src/types.ts:513](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L513)
+[packages/core/src/types.ts:583](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L583)
 
 ***
 
@@ -86,4 +86,4 @@ Optional creation timestamp
 
 #### Defined in
 
-[packages/core/src/types.ts:516](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L516)
+[packages/core/src/types.ts:586](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L586)

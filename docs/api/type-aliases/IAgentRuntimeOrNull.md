@@ -4,8 +4,6 @@
 
 > **IAgentRuntimeOrNull**: [`IAgentRuntime`](../interfaces/IAgentRuntime.md) \| `null`
 
-Type for functions that return an AgentRuntime object or null.
-
 ## Defined in
 
-[packages/core/src/types.ts:6](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L6)
+[packages/core/src/types.ts:8](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L8)

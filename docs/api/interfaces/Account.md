@@ -14,7 +14,7 @@ Unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:524](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L524)
+[packages/core/src/types.ts:594](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L594)
 
 ***
 
@@ -26,7 +26,7 @@ Display name
 
 #### Defined in
 
-[packages/core/src/types.ts:527](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L527)
+[packages/core/src/types.ts:597](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L597)
 
 ***
 
@@ -38,7 +38,7 @@ Username
 
 #### Defined in
 
-[packages/core/src/types.ts:530](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L530)
+[packages/core/src/types.ts:600](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L600)
 
 ***
 
@@ -54,7 +54,7 @@ Optional additional details
 
 #### Defined in
 
-[packages/core/src/types.ts:533](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L533)
+[packages/core/src/types.ts:603](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L603)
 
 ***
 
@@ -66,7 +66,7 @@ Optional email
 
 #### Defined in
 
-[packages/core/src/types.ts:536](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L536)
+[packages/core/src/types.ts:606](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L606)
 
 ***
 
@@ -78,4 +78,4 @@ Optional avatar URL
 
 #### Defined in
 
-[packages/core/src/types.ts:539](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L539)
+[packages/core/src/types.ts:609](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L609)

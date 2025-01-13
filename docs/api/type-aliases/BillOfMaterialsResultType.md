@@ -8,4 +8,4 @@ The types allowed for the Object resultData and defaultValue properties.
 
 ## Defined in
 
-[packages/core/src/types.ts:96](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L96)
+[packages/core/src/types.ts:20](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L20)

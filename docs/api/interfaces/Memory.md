@@ -14,7 +14,7 @@ Optional unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:352](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L352)
+[packages/core/src/types.ts:422](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L422)
 
 ***
 
@@ -26,7 +26,7 @@ Associated user ID
 
 #### Defined in
 
-[packages/core/src/types.ts:355](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L355)
+[packages/core/src/types.ts:425](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L425)
 
 ***
 
@@ -38,7 +38,7 @@ Associated agent ID
 
 #### Defined in
 
-[packages/core/src/types.ts:358](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L358)
+[packages/core/src/types.ts:428](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L428)
 
 ***
 
@@ -50,7 +50,7 @@ Optional creation timestamp
 
 #### Defined in
 
-[packages/core/src/types.ts:361](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L361)
+[packages/core/src/types.ts:431](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L431)
 
 ***
 
@@ -62,7 +62,7 @@ Memory content
 
 #### Defined in
 
-[packages/core/src/types.ts:364](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L364)
+[packages/core/src/types.ts:434](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L434)
 
 ***
 
@@ -74,7 +74,7 @@ Optional embedding vector
 
 #### Defined in
 
-[packages/core/src/types.ts:367](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L367)
+[packages/core/src/types.ts:437](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L437)
 
 ***
 
@@ -86,7 +86,7 @@ Associated room ID
 
 #### Defined in
 
-[packages/core/src/types.ts:370](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L370)
+[packages/core/src/types.ts:440](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L440)
 
 ***
 
@@ -98,7 +98,7 @@ Whether memory is unique
 
 #### Defined in
 
-[packages/core/src/types.ts:373](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L373)
+[packages/core/src/types.ts:443](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L443)
 
 ***
 
@@ -110,4 +110,4 @@ Embedding similarity score
 
 #### Defined in
 
-[packages/core/src/types.ts:376](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L376)
+[packages/core/src/types.ts:446](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L446)

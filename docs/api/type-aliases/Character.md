@@ -60,6 +60,31 @@ If billOfMaterialsJsonStr has a value when the character is loaded,
  character's bill of materials.  If present, it will contain
  an array of BillOfMaterialsLineItem objects.
 
+### switchToCharacterWhenBomComplete?
+
+> `optional` **switchToCharacterWhenBomComplete**: `string`
+
+If this field has a value,then when the bill-of-materials
+ goals is completed, control will be switched to the
+ agent/character that has this value in its "name"
+ field.
+
+ NOTE: This agent/character must be in collection of
+  available agents that were instantiated when the
+  client was created!
+
+### switchToCharacterWhenBomSessionCancelled?
+
+> `optional` **switchToCharacterWhenBomSessionCancelled**: `string`
+
+This is the agent/character that will be switched to
+ if the user wants to cancel the bill-of-materials
+ session.
+
+ NOTE: This agent/character must be in collection of
+  available agents that were instantiated when the
+  client was created!
+
 ### resetGoalsOnReceivingControl?
 
 > `optional` **resetGoalsOnReceivingControl**: `boolean`
@@ -370,4 +395,4 @@ Optional Twitter profile
 
 ## Defined in
 
-[packages/core/src/types.ts:712](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L712)
+[packages/core/src/types.ts:801](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L801)

@@ -12,7 +12,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:241](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L241)
+[packages/core/src/types.ts:296](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L296)
 
 ***
 
@@ -22,7 +22,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:242](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L242)
+[packages/core/src/types.ts:297](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L297)
 
 ***
 
@@ -32,7 +32,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:243](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L243)
+[packages/core/src/types.ts:298](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L298)
 
 ***
 
@@ -42,7 +42,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:244](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L244)
+[packages/core/src/types.ts:299](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L299)
 
 ***
 
@@ -52,7 +52,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:245](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L245)
+[packages/core/src/types.ts:300](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L300)
 
 ***
 
@@ -62,7 +62,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:246](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L246)
+[packages/core/src/types.ts:301](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L301)
 
 ***
 
@@ -72,7 +72,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:247](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L247)
+[packages/core/src/types.ts:302](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L302)
 
 ***
 
@@ -82,7 +82,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:248](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L248)
+[packages/core/src/types.ts:303](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L303)
 
 ***
 
@@ -92,7 +92,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:249](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L249)
+[packages/core/src/types.ts:304](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L304)
 
 ***
 
@@ -102,7 +102,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:250](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L250)
+[packages/core/src/types.ts:305](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L305)
 
 ***
 
@@ -112,7 +112,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:251](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L251)
+[packages/core/src/types.ts:306](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L306)
 
 ***
 
@@ -122,7 +122,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:252](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L252)
+[packages/core/src/types.ts:307](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L307)
 
 ***
 
@@ -132,7 +132,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:253](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L253)
+[packages/core/src/types.ts:308](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L308)
 
 ***
 
@@ -142,7 +142,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:254](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L254)
+[packages/core/src/types.ts:309](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L309)
 
 ***
 
@@ -152,7 +152,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:255](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L255)
+[packages/core/src/types.ts:310](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L310)
 
 ***
 
@@ -162,7 +162,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:256](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L256)
+[packages/core/src/types.ts:311](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L311)
 
 ***
 
@@ -172,7 +172,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:257](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L257)
+[packages/core/src/types.ts:312](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L312)
 
 ***
 
@@ -182,7 +182,7 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:258](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L258)
+[packages/core/src/types.ts:313](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L313)
 
 ***
 
@@ -192,4 +192,4 @@ Available model providers
 
 #### Defined in
 
-[packages/core/src/types.ts:259](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L259)
+[packages/core/src/types.ts:314](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L314)

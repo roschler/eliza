@@ -1,8 +1,8 @@
-[@ai16z/eliza v0.1.5-alpha.5](../index.md) / formatMessages
+[@ai16z/eliza v0.1.5-alpha.5](../index.md) / formatMessagesWithStopAtStrings
 
-# Function: formatMessages()
+# Function: formatMessagesWithStopAtStrings()
 
-> **formatMessages**(`__namedParameters`): `string`
+> **formatMessagesWithStopAtStrings**(`__namedParameters`): `string`
 
 Format messages into a string
 
@@ -14,6 +14,8 @@ Format messages into a string
 
 • **\_\_namedParameters.actors**: [`Actor`](../interfaces/Actor.md)[]
 
+• **\_\_namedParameters.stopAtStrings**: `string`[]
+
 ## Returns
 
 `string`
@@ -24,4 +26,4 @@ string - Returns all the relevant messages in newest first
 
 ## Defined in
 
-[packages/core/src/messages.ts:102](https://github.com/roschler/eliza/blob/main/packages/core/src/messages.ts#L102)
+[packages/core/src/messages.ts:171](https://github.com/roschler/eliza/blob/main/packages/core/src/messages.ts#L171)

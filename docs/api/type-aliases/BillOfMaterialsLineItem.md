@@ -43,10 +43,26 @@ If FALSE, then the character will ask the user for the field value
   the character will keep trying to get an answer until successful,
   or the user abandons the chat.
 
+### preliminaryPromptForOptionalLineItem?
+
+> `optional` **preliminaryPromptForOptionalLineItem**: `string`
+
+The PRELIMINARY question to ask the user to see if they are
+  interested or not in this line item, if and only if it is
+  an optional line item. get the desired value from them.
+
+### helpDocumentForBomLineItem?
+
+> `optional` **helpDocumentForBomLineItem**: `string`
+
+The help text to include that the LLM can use to answer
+ any questions the user may have about the line item.
+
 ### listOfValidValues?
 
 > `optional` **listOfValidValues**: `string`[]
 
+-------------------------- END  : OPTIONAL FIELDS ------------------------
 -------------------------- BEGIN: STRING TYPE ONLY ------------------------
 The following fields only apply to string type line items.
 Optional field that if present, must be an array of string values.
@@ -86,4 +102,4 @@ If present, then this string will be appended to any numeric values
 
 ## Defined in
 
-[packages/core/src/types.ts:639](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L639)
+[packages/core/src/types.ts:709](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L709)

@@ -9,4 +9,4 @@ Use this UUID for functions like getGoals() that require a room ID, but
 
 ## Defined in
 
-[packages/core/src/types.ts:17](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L17)
+[packages/core/src/types.ts:42](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L42)
