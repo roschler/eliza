@@ -42,6 +42,16 @@ export type UUID = `${string}-${string}-${string}-${string}-${string}`;
 export const JOKER_UUID_AS_ROOMS_ID_WILDCARD = "00000000-0000-0000-0000-000000000000";
 
 /**
+ * This is the "fake" USER ID we use to store the UUID we dynamically
+ *  create on-demand for the LOCALHOST user that is (may be) running the
+ *  system from a read-line loop, directly from the host PC.  The
+ *  dynamically created UUID is stored in the second user ID field belonging
+ *  to a relationship record we write into the database, with the "fake"
+ *  USER ID as the first user ID in that record.
+ */
+export const USER_A_ID_FOR_RELATIONSHIP_WITH_LOCALHOST_USER_ID = "00000000-0000-0000-0000-000000000001";
+
+/**
  * Represents the content of a message or communication
  */
 export interface Content {

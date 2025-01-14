@@ -162,6 +162,7 @@
 - [removeAllUserToCharacterRelationships](functions/removeAllUserToCharacterRelationships.md)
 - [setUserToCharacterRelationship](functions/setUserToCharacterRelationship.md)
 - [setExclusiveUserToCharacterRelationship](functions/setExclusiveUserToCharacterRelationship.md)
+- [isRelated](functions/isRelated.md)
 - [findNearestEnvFile](functions/findNearestEnvFile.md)
 - [configureSettings](functions/configureSettings.md)
 - [loadEnvConfig](functions/loadEnvConfig.md)

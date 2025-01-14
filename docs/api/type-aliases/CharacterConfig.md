@@ -8,4 +8,4 @@ Type inference
 
 ## Defined in
 
-[packages/core/src/environment.ts:152](https://github.com/roschler/eliza/blob/main/packages/core/src/environment.ts#L152)
+[packages/core/src/environment.ts:148](https://github.com/roschler/eliza/blob/main/packages/core/src/environment.ts#L148)

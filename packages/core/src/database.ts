@@ -443,7 +443,7 @@ export abstract class DatabaseAdapter<DB = any> implements IDatabaseAdapter {
     abstract removeRelationship(params: {userA: UUID, userB: UUID}): Promise<boolean>;
 
     /**
-     * Removes all relationships that exist userA is a
+     * Removes all relationships that exist with userA as a
      *  participant to the relationship, either side.
      *
      * @param params An object containing the UUID of the desired user.

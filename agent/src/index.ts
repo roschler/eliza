@@ -1,7 +1,7 @@
 // Agent level index file.
 
 import { AutoClientInterface } from "@ai16z/client-auto";
-import { DirectClientInterface } from "@ai16z/client-direct";
+import {DirectClient, DirectClientInterface, findAgentAssignedToUser} from "@ai16z/client-direct";
 import { DiscordClientInterface } from "@ai16z/client-discord";
 import { TelegramClientInterface } from "@ai16z/client-telegram";
 import { TwitterClientInterface } from "@ai16z/client-twitter";
@@ -23,6 +23,7 @@ import {
     settings,
     stringToUuid,
     validateCharacterConfig,
+    USER_A_ID_FOR_RELATIONSHIP_WITH_LOCALHOST_USER_ID, UUID,
 } from "@ai16z/eliza";
 import { zgPlugin } from "@ai16z/plugin-0g";
 import { goatPlugin } from "@ai16z/plugin-goat";
@@ -52,9 +53,16 @@ import { fileURLToPath } from "url";
 import pilTermsPlugin from "@ai16z/plugin-pilterms";
 import {prepareDatabase} from "./database-helpers.ts";
 import {isAllStrings, parseArguments, tryLoadFile} from "./utils.ts";
+import {v4} from "uuid";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
+
+// The name of the agent/character assigned to the current user (if any).
+let g_NameOfAssignedCharacter = null;
+
+// The user ID dynamically created for the localhost user.
+let g_LocalhostUserId = null;
 
 /**
  * Load the characters specified by the user for the system, using
@@ -390,6 +398,50 @@ function intializeDbCache(character: Character, db: IDatabaseCacheAdapter) {
 }
 
 /**
+ * This function looks for a user ID to use for the localhost
+ *  user in the database.  If not found, one is created, stored
+ *  and returned.
+ *   */
+async function getOrCreateLocalHostUserId(agentObj: IAgentRuntime): Promise<UUID> {
+    const errPrefix = `(getOrCreateLocalHostUserId) `;
+
+    // Do we already have a user ID for the localhost user?
+    let relationships =
+        await agentObj.databaseAdapter.getRelationships(
+            {
+                userId: USER_A_ID_FOR_RELATIONSHIP_WITH_LOCALHOST_USER_ID as UUID
+            }
+        );
+
+    let localhostUserId = null;
+
+    if (Array.isArray(relationships) && relationships.length > 0) {
+        // Take the userB field from the first element as the
+        //  localhost user ID.
+        localhostUserId = relationships[0].userB;
+    } else {
+        // No existing user ID for the localhost user.  Create one now.
+        localhostUserId = v4() as UUID;
+
+        // Create a relationship using the "fake" user ID we actually
+        //  use as a lookup key as the userA value, and the newly
+        //  created user ID as the userB value.
+        await agentObj.databaseAdapter.createRelationship(
+            {
+                userA: USER_A_ID_FOR_RELATIONSHIP_WITH_LOCALHOST_USER_ID,
+                userB: localhostUserId
+            }
+        );
+    }
+
+    if (!localhostUserId) {
+        throw new Error(`${errPrefix}Failed to create a local host user ID.`);
+    }
+
+    return localhostUserId;
+}
+
+/**
  * Start an agent using the specified character and client.
  *
  * @param character - The desired character.
@@ -474,7 +526,9 @@ const failsafeFindCharactersArg = (): string[] | null => {
 };
 
 const startAgents = async () => {
-    const directClient = await DirectClientInterface.start();
+    const directClient: DirectClient =
+        await DirectClientInterface.start() as DirectClient;
+
     const args = parseArguments();
 
     let charactersArg = args.characters || args.character;
@@ -509,10 +563,30 @@ const startAgents = async () => {
         elizaLogger.error("Error starting agents:", error);
     }
 
+    // -------------------------- BEGIN: GET/CREATE LOCALHOST USER ID ------------------------
+
+    // Get the first registered agent, solely to take advantage of its
+    //  database interface, since it is a shared interface across
+    //  the agents.
+    const utilityAgent = directClient.getFirstAgent();
+
+    // Get or create a dynamically created user ID for the local host
+    //  user.
+    g_LocalhostUserId = await getOrCreateLocalHostUserId(utilityAgent);
+
+    // See if we have a current agent/character to user assignment.
+    g_NameOfAssignedCharacter =
+        await findAgentAssignedToUser(g_LocalhostUserId, userId, this.agents);
+
+
+    // -------------------------- END  : GET/CREATE LOCALHOST USER ID ------------------------
+
     function chat() {
-        const agentId = characters[0].name ?? "Agent";
-        rl.question("You: ", async (input) => {
-            await handleUserInput(input, agentId);
+        const agentName = g_NameOfAssignedCharacter ?? characters[0].name ?? "Agent";
+
+        rl.question(`${agentName} -> You: `, async (input) => {
+            await handleUserInput(input, agentName);
+
             if (input.toLowerCase() !== "exit") {
                 chat(); // Loop back to ask another question
             }
@@ -520,6 +594,7 @@ const startAgents = async () => {
     }
 
     elizaLogger.log("Chat started. Type 'exit' to quit.");
+
     if (!args["non-interactive"]) {
         chat();
     }
@@ -535,7 +610,7 @@ const rl = readline.createInterface({
     output: process.stdout,
 });
 
-async function handleUserInput(input, agentId) {
+async function handleUserInput(input: string, agentId: string) {
     if (input.toLowerCase() === "exit") {
         gracefulExit();
     }
@@ -550,7 +625,7 @@ async function handleUserInput(input, agentId) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     text: input,
-                    userId: "user",
+                    userId: USER_A_ID_FOR_RELATIONSHIP_WITH_LOCALHOST_USER_ID,
                     userName: "User",
                 }),
             }

@@ -116,4 +116,4 @@ Main Character schema
 
 ## Defined in
 
-[packages/core/src/environment.ts:84](https://github.com/roschler/eliza/blob/main/packages/core/src/environment.ts#L84)
+[packages/core/src/environment.ts:80](https://github.com/roschler/eliza/blob/main/packages/core/src/environment.ts#L80)

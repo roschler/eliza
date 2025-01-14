@@ -46,7 +46,7 @@ const upload = multer({ storage: multer.memoryStorage() });
  * @param userId - The ID of the user.
  * @param agentsMap - A map of the available agents.
  */
-async function findAgentAssignedToUser(
+export async function findAgentAssignedToUser(
     roomId: UUID,
     userId: UUID,
     agentsMap: Map<string, AgentRuntime>): Promise<IAgentRuntimeOrNull> {
@@ -263,7 +263,7 @@ export class DirectClient {
                     runtime = overrideRuntimeOrNull;
                 }
 
-                // Make sure we have a valid agent/character to use from here one.
+                // Make sure we have a valid agent/character to use from here on.
                 if (!runtime) {
                     throw new Error(`The "runtime" agent/character variable is unassigned.`);
                 }
@@ -662,6 +662,43 @@ export class DirectClient {
                 }
             }
         );
+    }
+
+    /**
+     * Retrieve an agent from the agents collection using its ID.
+     *
+     * @param agentId - The ID of the agent to retrieve.
+     *
+     * @returns - Returns the agent object associated with the ID
+     *  if found, or NULL if no agent could be found with that ID.
+     */
+    public getAgentByAgentId(agentId: string): AgentRuntime {
+        const errPrefix = `(getAgentByAgentId) `;
+
+        if (agentId.trim().length === 0)
+            throw new Error(`${errPrefix}The agentId parameter is empty.`);
+
+        const agentFound = this.agents.get(agentId);
+
+        if (agentFound)
+            return agentFound;
+        else
+            return null;
+    }
+
+    /**
+     * Retrieve the first agent from the agents collection.
+     *
+     * @returns - Returns the first agent object found in the agents
+     *  collection or NULL, if the collection is empty.
+     */
+    public getFirstAgent(): AgentRuntime {
+        const agentFound = this.agents.values().next().value;
+
+        if (agentFound)
+            return agentFound;
+        else
+            return null;
     }
 
     public registerAgent(runtime: AgentRuntime) {

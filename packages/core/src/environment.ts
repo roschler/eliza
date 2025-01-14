@@ -67,7 +67,7 @@ const BillOfMaterialsLineItemSchema = z.object({
     type: z.string(),
     prompt: z.string(),
     isOptional: z.boolean(),
-    listOfValidValues: z.string().optional(),
+    listOfValidValues: z.array(z.string()).optional(),
     isInteger: z.number().optional(),
     minVal: z.number().optional(),
     maxVal: z.number().optional(),

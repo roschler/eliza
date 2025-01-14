@@ -1743,6 +1743,11 @@ export function buildBomMainQuestion(currentBomObjective: Objective): string {
     } else if (currentBomObjective.billOfMaterialsLineItem.type === 'number') {
         // -------------------------- BEGIN: NUMBER TYPE ------------------------
 
+        // Add units if present.
+        if (typeof currentBomObjective.billOfMaterialsLineItem.unitsDescription === 'string' && currentBomObjective.billOfMaterialsLineItem.unitsDescription.trim().length > 0) {
+            retText += ` Please give your answer in ${currentBomObjective.billOfMaterialsLineItem.unitsDescription.trim()}.`;
+        }
+
         // Add min/max constraints if present.
         const bIsMinValPresent = typeof currentBomObjective.billOfMaterialsLineItem.minVal === 'number';
         const bIsMaxValPresent = typeof currentBomObjective.billOfMaterialsLineItem.maxVal === 'number';
