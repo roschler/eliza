@@ -76,10 +76,6 @@ const BillOfMaterialsLineItemSchema = z.object({
     helpDocumentForBomLineItem: z.string().optional(),
 });
 
-const BillOfMaterialsSchema = z.object({
-    lineItems: z.array(BillOfMaterialsLineItemSchema),
-});
-
 // Main Character schema
 export const CharacterSchema = z.object({
     id: z.string().uuid().optional(),
@@ -143,7 +139,7 @@ export const CharacterSchema = z.object({
         })
         .optional(),
     messageTemplate: z.string().optional(),
-    billOfMaterials: z.array(BillOfMaterialsSchema).optional(),
+    billOfMaterials: z.array(BillOfMaterialsLineItemSchema).optional(),
     switchToCharacterWhenBomComplete: z.string().optional(),
     resetGoalsOnReceivingControl: z.boolean().optional(),
 });
@@ -151,19 +147,51 @@ export const CharacterSchema = z.object({
 // Type inference
 export type CharacterConfig = z.infer<typeof CharacterSchema>;
 
-// Validation function
+/**
+ * Validates a character configuration JSON object against the CharacterSchema.
+ *
+ * This function provides detailed error reporting, including the exact paths
+ * to invalid fields and descriptive messages for validation errors.
+ *
+ * @param {unknown} json - The JSON object to validate.
+ * @returns {CharacterConfig} - The validated character configuration.
+ * @throws {Error} - If validation fails, an error with detailed information is thrown.
+ */
 export function validateCharacterConfig(json: unknown): CharacterConfig {
     try {
+        // Attempt to parse and validate the input JSON against the schema.
         return CharacterSchema.parse(json);
     } catch (error) {
+        // Check if the error is a ZodError.
         if (error instanceof z.ZodError) {
-            const errorMessages = error.errors
-                .map((err) => `${err.path.join(".")}: ${err.message}`)
-                .join("\n");
+            // Format Zod errors into a detailed string.
+            const formattedErrors = formatZodErrors(error);
+
+            // Throw a new error with the detailed validation error messages.
             throw new Error(
-                `Character configuration validation failed:\n${errorMessages}`
+                `Character configuration validation failed:\n${formattedErrors}`
             );
         }
+
+        // Rethrow non-Zod errors for further handling.
         throw error;
     }
+}
+
+/**
+ * Formats Zod validation errors into a readable string.
+ *
+ * Each error includes the path to the invalid field and the corresponding
+ * error message, providing clarity on the validation issues.
+ *
+ * @param {z.ZodError} error - The ZodError to format.
+ * @returns {string} - A formatted string of validation errors.
+ */
+function formatZodErrors(error: z.ZodError): string {
+    return error.issues
+        .map(
+            (issue) =>
+                `Path: ${issue.path.join(".")}, Error: ${issue.message}`
+        )
+        .join("\n");
 }
