@@ -23,7 +23,7 @@ import {
     settings,
     stringToUuid,
     validateCharacterConfig,
-    USER_A_ID_FOR_RELATIONSHIP_WITH_LOCALHOST_USER_ID, UUID,
+    USER_A_ID_FOR_RELATIONSHIP_WITH_LOCALHOST_USER_ID, UUID, JOKER_UUID_AS_ROOMS_ID_WILDCARD,
 } from "@ai16z/eliza";
 import { zgPlugin } from "@ai16z/plugin-0g";
 import { goatPlugin } from "@ai16z/plugin-goat";
@@ -575,8 +575,9 @@ const startAgents = async () => {
     g_LocalhostUserId = await getOrCreateLocalHostUserId(utilityAgent);
 
     // See if we have a current agent/character to user assignment.
+    //  We use the "joker" room ID because the direct client
     g_NameOfAssignedCharacter =
-        await findAgentAssignedToUser(g_LocalhostUserId, userId, this.agents);
+        await findAgentAssignedToUser(directClient.roomId, g_LocalhostUserId, directClient.agents);
 
 
     // -------------------------- END  : GET/CREATE LOCALHOST USER ID ------------------------
@@ -601,6 +602,17 @@ const startAgents = async () => {
 };
 
 startAgents().catch((error) => {
+    // The current elizaLogger code has a problem with certain errors whereby
+    //  the error strings don't print correctly.  So that is why we
+    //  have our own error printing here.
+    if (typeof error.message === 'string') {
+        console.error(`Error during startAgents(): ${error.message}`);
+    }
+
+    if (typeof error.stack === 'string') {
+        console.error(`Stack: ${error.stack}`);
+    }
+
     elizaLogger.error("Unhandled error in startAgents:", error);
     process.exit(1); // Exit the process after logging
 });

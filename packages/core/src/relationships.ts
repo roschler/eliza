@@ -81,6 +81,8 @@ export async function formatRelationships({
  * - `characterName` is empty after trimming.
  */
 export function buildCharacterNameForRelationship(characterName: string): string {
+    const errPrefix = `(buildCharacterNameForRelationship) `;
+
     // Trim the input
     const trimmedCharacterName = characterName.trim();
 
@@ -88,7 +90,7 @@ export function buildCharacterNameForRelationship(characterName: string): string
      * Validate that `characterName` is a non-empty string after trimming.
      */
     if (!trimmedCharacterName) {
-        throw new Error("The 'characterName' parameter must be a non-empty string after trimming.");
+        throw new Error(`${errPrefix}The 'characterName' parameter must be a non-empty string after trimming.`);
     }
 
     /**
@@ -112,6 +114,8 @@ export function buildCharacterNameForRelationship(characterName: string): string
  * - `roomId` and `userId` have the same value after trimming.
  */
 export function buildFullRelationshipId(roomId: UUID, userId: UUID): UUID {
+    const errPrefix = `(buildFullRelationshipId) `;
+
     // Trim the inputs
     const trimmedRoomId = roomId.trim();
     const trimmedUserId = userId.trim();
@@ -120,21 +124,21 @@ export function buildFullRelationshipId(roomId: UUID, userId: UUID): UUID {
      * Validate that `roomId` is a non-empty string after trimming.
      */
     if (!trimmedRoomId) {
-        throw new Error("The 'roomId' parameter must be a non-empty string after trimming.");
+        throw new Error(`${errPrefix}The 'roomId' parameter must be a non-empty string after trimming.`);
     }
 
     /**
      * Validate that `userId` is a non-empty string after trimming.
      */
     if (!trimmedUserId) {
-        throw new Error("The 'userId' parameter must be a non-empty string after trimming.");
+        throw new Error(`${errPrefix}The 'userId' parameter must be a non-empty string after trimming.`);
     }
 
     /**
      * Ensure that `roomId` and `userId` are not the same.
      */
     if (trimmedRoomId === trimmedUserId) {
-        throw new Error("The 'roomId' and 'userId' parameters must not have the same value.");
+        throw new Error(`${errPrefix}The 'roomId' ("${roomId}") and 'userId' ("${userId}") parameters must not have the same value.`);
     }
 
     /**
