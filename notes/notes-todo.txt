@@ -8,3 +8,13 @@ NOTES:
     - [AGENT] The agent workspace creates the database and starts/loads the agents
     - [DIRECT CLIENT] The direct client (in our fork) starts the server that the agent POST's requests to.  The agent uses a "localhost" URL to post to this server.
     - [CORE] The core provides the guts of the database code that does the database operations.
+
+LATER:
+
+    - Need to update the other database adapters to match the changes made to the SQLite code, which now has an agentId column and has the description column being field in now (wasn't before).
+
+
+TEST PROMPTS:
+
+I want to make money off of my image NFT.
+

@@ -609,7 +609,7 @@ export class SqliteDatabaseAdapter
                 goal.status,
                 JSON.stringify(goal.objectives),
                 goal.agentId ?? null,
-                goal.description
+                goal.description ?? null
             );
     }
 

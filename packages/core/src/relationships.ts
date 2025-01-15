@@ -165,7 +165,7 @@ export function buildRelationshipIdPair(roomId: UUID, userId: UUID, characterNam
     // Let the builder functions validate the input parameters.
     const retObj: FullUserIdCharacterIdPair = {
         fullUserId: buildFullRelationshipId(roomId, userId),
-        fullCharacterId: buildFullRelationshipId(roomId,  buildFullRelationshipId(roomId, buildCharacterNameForRelationship(characterName) as UUID))
+        fullCharacterId: buildFullRelationshipId(roomId,  buildCharacterNameForRelationship(characterName) as UUID)
     }
 
     return retObj;
@@ -271,6 +271,7 @@ export async function setExclusiveUserToCharacterRelationship(
         roomId: UUID,
         userId: UUID,
         desiredAgent: IAgentRuntime): Promise<boolean> {
+    const errPrefix = `(setExclusiveUserToCharacterRelationship) `;
 
     try {
         const fullUserToCharacterIdPair =
@@ -291,10 +292,10 @@ export async function setExclusiveUserToCharacterRelationship(
             }
         );
 
-        elizaLogger.debug(`RELATIONSHIP CREATED: Room Id(${roomId}), User Id(${userId}), Character name: ${desiredAgent.character.name}`);
+        elizaLogger.debug(`${errPrefix}RELATIONSHIP CREATED: Room Id(${roomId}), Full user Id(${fullUserToCharacterIdPair.fullUserId}), Full character name: ${fullUserToCharacterIdPair.fullCharacterId}`);
     } catch (error) {
         // This is a serious error that will impact system operations.
-        elizaLogger.error(`The attempt to create a relationship using the following parameters FAILED:\nroomId: ${roomId}\nuserId: ${userId}\nAgent/character name: ${desiredAgent?.character?.name}\nError details:\n`, error);
+        elizaLogger.error(`${errPrefix}The attempt to create a relationship using the following parameters FAILED:\nroomId: ${roomId}\nuserId: ${userId}\nAgent/character name: ${desiredAgent?.character?.name}\nError details:\n`, error);
 
         return false;
     }
@@ -317,6 +318,8 @@ export async function setExclusiveUserToCharacterRelationship(
  *  null will be returned.
  */
 export async function isRelated(roomId: UUID, userId: UUID, agentObj: IAgentRuntime): Promise<IAgentRuntimeOrNull> {
+    const errPrefix = `(isRelated) `;
+
     const characterName =
         agentObj.character.name;
 
@@ -340,6 +343,8 @@ export async function isRelated(roomId: UUID, userId: UUID, agentObj: IAgentRunt
         const fullCharacterId =
             buildFullRelationshipId(roomId, fullCharacterName as UUID);
 
+        elizaLogger.debug(`${errPrefix}Looking for relationship in roomId("${roomId}") between userA("${fullUserId}") and userB/character: "${fullCharacterId}`);
+
         // Search for a relationship between the user and the selected character.
         //  runtime.databaseAdapter.createRelationship().  ALWAYS put
         // the user before the character!
@@ -358,8 +363,13 @@ export async function isRelated(roomId: UUID, userId: UUID, agentObj: IAgentRunt
         //  SELECT_CHARACTER_* action occurrence.
         const bIsRelated = relationshipObjOrNull !== null;
 
-        if (bIsRelated)
+
+        if (bIsRelated) {
+            elizaLogger.debug(`${errPrefix}userA("${fullUserId}") and userB/character("${fullCharacterId}") relationship status: RELATED`);
             return agentObj;
+        } else {
+            elizaLogger.debug(`${errPrefix}userA("${fullUserId}") and userB/character("${fullCharacterId}") relationship status: NONE`);
+        }
     }
 
     return null;

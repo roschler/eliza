@@ -49,3 +49,21 @@ export function stringToUuid(target: string | number): UUID {
         "-" +
         _uint8ArrayToHex(hashBuffer.slice(10, 16))) as UUID;
 }
+
+/**
+ * Checks if a given string is in the UUID format.
+ *
+ * The UUID format is defined as:
+ * 00000000-0000-0000-0000-000000000000
+ * Where "0" represents a hexadecimal digit (0-9, a-f).
+ *
+ * @param str - The string to be validated.
+ * @returns `true` if the string matches the UUID format, otherwise `false`.
+ */
+export function isUuid(str: string): boolean {
+    // Regular expression to match the UUID pattern
+    const uuidRegex = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+
+    // Test the string against the UUID pattern
+    return uuidRegex.test(str);
+}

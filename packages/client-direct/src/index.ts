@@ -11,7 +11,7 @@ import {
     FullUserIdCharacterIdPair,
     buildRelationshipIdPair,
     GoalOrNull,
-    GoalStatus, isRelated, JOKER_UUID_AS_ROOMS_ID_WILDCARD
+    GoalStatus, isRelated, JOKER_UUID_AS_ROOMS_ID_WILDCARD, setExclusiveUserToCharacterRelationship, isUuid
 } from "@ai16z/eliza";
 import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
@@ -215,9 +215,19 @@ export class DirectClient {
 
                 try {
                     const agentId = req.params.agentId;
-                    const roomId = stringToUuid(
-                        req.body.roomId ?? "default-room-" + agentId
-                    );
+                    const trimmedRoomIdInBody = req.body.roomId?.trim();
+
+                    // If the incoming room ID is already a UUID, use it as is.
+                    //  Otherwise, build one dynamically from the incoming
+                    //  room ID, falling back to a "default" value built
+                    //  from the agent ID if the incoming room ID is empty.
+                    const strRoomId =
+                        isUuid(trimmedRoomIdInBody)
+                            ? trimmedRoomIdInBody
+                            : stringToUuid(trimmedRoomIdInBody ?? "default-room-" + agentId);
+
+                    const roomId = strRoomId as UUID;
+
                     const userId = stringToUuid(req.body.userId ?? "user");
                     const userInput = req.body.text.trim();
 
@@ -233,10 +243,14 @@ export class DirectClient {
                     if (bIsResetCommand)
                         elizaLogger.debug(`Direct client message route received a RESET instruction.`);
 
+                    // Initialize the runtime to the first agent created with the system.
+                    //  That is considered the "starting" agent.
                     let runtime = this.agents.get(agentId);
 
-                    // if runtime is null, look for runtime with the same name
-                    if (!runtime) {
+                    // if runtime is null, look for runtime with the same ID/name
+                    //  as that this API route was called with, if one was
+                    //  provided in the route parameters.
+                    if (!runtime && agentId.trim().length > 0) {
                         runtime = Array.from(this.agents.values()).find(
                             (a) =>
                                 a.character.name.toLowerCase() ===
@@ -244,6 +258,7 @@ export class DirectClient {
                         );
                     }
 
+                    /*
                     if (!runtime) {
                         const infoMsg = `Unable to find an agent with ID: ${agentId}`;
 
@@ -252,6 +267,7 @@ export class DirectClient {
                         res.status(404).send(infoMsg);
                         return;
                     }
+                     */
 
                     // -------------------------- BEGIN: CHARACTER/AGENT SWITCH HANDLING ------------------------
 
@@ -274,6 +290,22 @@ export class DirectClient {
                     if (!runtime) {
                         throw new Error(`The "runtime" agent/character variable is unassigned.`);
                     }
+
+                    // -------------------------- BEGIN: ESTABLISH INITIAL RELATIONSHIP ------------------------
+
+                    // If an existing user to agent/character relationship was not found,
+                    //  make that association now.
+                    if (!overrideRuntimeOrNull) {
+                        elizaLogger.debug(`Creating starting relationship for user ID("${userId}") with character: ${runtime.character.name}`);
+
+                        // Make an exclusive relationship between the given user ID and the
+                        //  selected agent/character.  All other relationships for that user
+                        //  in the current room will be broken.
+                        await setExclusiveUserToCharacterRelationship(roomId, userId, runtime);
+                    }
+
+
+                    // -------------------------- END  : ESTABLISH INITIAL RELATIONSHIP ------------------------
 
                     // -------------------------- BEGIN: HOT-LOAD CHARACTER CONTENT ------------------------
 

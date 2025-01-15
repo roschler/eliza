@@ -586,7 +586,7 @@ const startAgents = async () => {
         const agentName = g_NameOfAssignedCharacter ?? characters[0].name ?? "Agent";
 
         rl.question(`${agentName} -> You: `, async (input) => {
-            await handleUserInput(input, agentName);
+            await handleUserInput(directClient.roomId, input, agentName);
 
             if (input.toLowerCase() !== "exit") {
                 chat(); // Loop back to ask another question
@@ -622,7 +622,26 @@ const rl = readline.createInterface({
     output: process.stdout,
 });
 
-async function handleUserInput(input: string, agentId: string) {
+/**
+ * Make the call to our local Eliza agent server using the given parameters.
+ *
+ * @param roomId - The current room ID
+ * @param input - The user input
+ * @param agentId - The ID of the agent that should handle the chat volley.
+ */
+async function handleUserInput(roomId: string, input: string, agentId: string) {
+    const errPrefix = `(handleUserInput) `;
+
+    if (roomId.trim().length === 0) {
+        throw new Error(`${errPrefix}The roomId parameter is empty.`);
+    }
+    if (input.trim().length === 0) {
+        throw new Error(`${errPrefix}The input parameter is empty.`);
+    }
+    if (agentId.trim().length === 0) {
+        throw new Error(`${errPrefix}The agentId parameter is empty.`);
+    }
+
     if (input.toLowerCase() === "exit") {
         gracefulExit();
     }
@@ -639,6 +658,7 @@ async function handleUserInput(input: string, agentId: string) {
                     text: input,
                     userId: USER_A_ID_FOR_RELATIONSHIP_WITH_LOCALHOST_USER_ID,
                     userName: "User",
+                    roomId: roomId
                 }),
             }
         );

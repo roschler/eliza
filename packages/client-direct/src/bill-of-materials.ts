@@ -1477,6 +1477,7 @@ async function bomMainQuestionCheckResultHandler(
             }
 
             // -------------------------- END  : STRING TYPE ------------------------    } else {
+    } else {
         throw new Error(`${errPrefix}Unknown bill-of-materials type: ${currentBomObjective.billOfMaterialsLineItem.type}`);
     }
 
