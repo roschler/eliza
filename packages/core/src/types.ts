@@ -215,6 +215,9 @@ export interface Goal {
 
     /** Component objectives */
     objectives: Objective[];
+
+    /** A brief description of the goal. */
+    description?: string;
 }
 
 /**

@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS "memories" (
 CREATE TABLE IF NOT EXISTS "goals" (
     "id" TEXT PRIMARY KEY,
     "createdAt" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "agentId" TEXT,
     "userId" TEXT,
     "name" TEXT,
     "status" TEXT,

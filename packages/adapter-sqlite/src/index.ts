@@ -598,7 +598,7 @@ export class SqliteDatabaseAdapter
 
     async createGoal(goal: Goal): Promise<void> {
         const sql =
-            "INSERT INTO goals (id, roomId, userId, name, status, objectives, agentId) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            "INSERT INTO goals (id, roomId, userId, name, status, objectives, agentId, description) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         this.db
             .prepare(sql)
             .run(
@@ -609,6 +609,7 @@ export class SqliteDatabaseAdapter
                 goal.status,
                 JSON.stringify(goal.objectives),
                 goal.agentId ?? null,
+                goal.description
             );
     }
 
