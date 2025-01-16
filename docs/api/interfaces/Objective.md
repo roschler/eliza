@@ -14,7 +14,7 @@ Optional unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:123](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L123)
+[packages/core/src/types.ts:133](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L133)
 
 ***
 
@@ -26,7 +26,7 @@ Description of what needs to be achieved
 
 #### Defined in
 
-[packages/core/src/types.ts:126](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L126)
+[packages/core/src/types.ts:136](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L136)
 
 ***
 
@@ -38,7 +38,7 @@ Whether objective is completed
 
 #### Defined in
 
-[packages/core/src/types.ts:129](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L129)
+[packages/core/src/types.ts:139](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L139)
 
 ***
 
@@ -53,7 +53,7 @@ This flag is set to TRUE if the user indicated they
 
 #### Defined in
 
-[packages/core/src/types.ts:137](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L137)
+[packages/core/src/types.ts:147](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L147)
 
 ***
 
@@ -69,7 +69,7 @@ This flag is set to TRUE if the users asks a help
 
 #### Defined in
 
-[packages/core/src/types.ts:146](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L146)
+[packages/core/src/types.ts:156](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L156)
 
 ***
 
@@ -93,7 +93,7 @@ NOTE: Do NOT initialize this property to NULL!  If the
 
 #### Defined in
 
-[packages/core/src/types.ts:162](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L162)
+[packages/core/src/types.ts:172](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L172)
 
 ***
 
@@ -106,4 +106,4 @@ If present, then this object is a bill of materials line
 
 #### Defined in
 
-[packages/core/src/types.ts:168](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L168)
+[packages/core/src/types.ts:178](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L178)

@@ -10,7 +10,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1164](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1164)
+[packages/core/src/types.ts:1177](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1177)
 
 ***
 
@@ -20,7 +20,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1165](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1165)
+[packages/core/src/types.ts:1178](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1178)
 
 ***
 
@@ -30,7 +30,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1166](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1166)
+[packages/core/src/types.ts:1179](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1179)
 
 ## Methods
 
@@ -48,7 +48,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1168](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1168)
+[packages/core/src/types.ts:1181](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1181)
 
 ***
 
@@ -76,7 +76,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1170](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1170)
+[packages/core/src/types.ts:1183](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1183)
 
 ***
 
@@ -94,7 +94,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1178](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1178)
+[packages/core/src/types.ts:1191](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1191)
 
 ***
 
@@ -112,7 +112,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1182](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1182)
+[packages/core/src/types.ts:1195](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1195)
 
 ***
 
@@ -132,7 +132,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1183](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1183)
+[packages/core/src/types.ts:1196](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1196)
 
 ***
 
@@ -160,7 +160,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1184](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1184)
+[packages/core/src/types.ts:1197](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1197)
 
 ***
 
@@ -180,7 +180,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1194](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1194)
+[packages/core/src/types.ts:1207](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1207)
 
 ***
 
@@ -198,7 +198,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1196](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1196)
+[packages/core/src/types.ts:1209](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1209)
 
 ***
 
@@ -216,7 +216,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1198](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1198)
+[packages/core/src/types.ts:1211](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1211)
 
 ***
 
@@ -236,4 +236,4 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1200](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1200)
+[packages/core/src/types.ts:1213](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1213)

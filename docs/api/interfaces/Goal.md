@@ -14,7 +14,7 @@ Optional unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:185](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L185)
+[packages/core/src/types.ts:195](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L195)
 
 ***
 
@@ -26,7 +26,7 @@ Room ID where goal exists
 
 #### Defined in
 
-[packages/core/src/types.ts:188](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L188)
+[packages/core/src/types.ts:198](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L198)
 
 ***
 
@@ -41,7 +41,7 @@ If specified, then this goal is
 
 #### Defined in
 
-[packages/core/src/types.ts:195](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L195)
+[packages/core/src/types.ts:205](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L205)
 
 ***
 
@@ -53,7 +53,7 @@ User ID of goal owner
 
 #### Defined in
 
-[packages/core/src/types.ts:198](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L198)
+[packages/core/src/types.ts:208](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L208)
 
 ***
 
@@ -65,7 +65,7 @@ Name/title of the goal
 
 #### Defined in
 
-[packages/core/src/types.ts:201](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L201)
+[packages/core/src/types.ts:211](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L211)
 
 ***
 
@@ -77,7 +77,7 @@ Current status
 
 #### Defined in
 
-[packages/core/src/types.ts:204](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L204)
+[packages/core/src/types.ts:214](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L214)
 
 ***
 
@@ -89,4 +89,16 @@ Component objectives
 
 #### Defined in
 
-[packages/core/src/types.ts:207](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L207)
+[packages/core/src/types.ts:217](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L217)
+
+***
+
+### description?
+
+> `optional` **description**: `string`
+
+A brief description of the goal.
+
+#### Defined in
+
+[packages/core/src/types.ts:220](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L220)

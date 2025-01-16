@@ -31,4 +31,4 @@ If:
 
 ## Defined in
 
-[packages/core/src/relationships.ts:114](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L114)
+[packages/core/src/relationships.ts:116](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L116)

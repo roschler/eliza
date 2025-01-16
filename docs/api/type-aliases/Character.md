@@ -395,4 +395,4 @@ Optional Twitter profile
 
 ## Defined in
 
-[packages/core/src/types.ts:801](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L801)
+[packages/core/src/types.ts:814](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L814)

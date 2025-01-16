@@ -200,6 +200,60 @@ class ElizaLogger {
     }
 
     error(...strings) {
+        /**
+         * The current elizaLogger code has a problem with certain errors whereby
+         *  the error strings don't print correctly or at all.  This "failsafe" method
+         *  will at least print the "message" and "stack" properties of an
+         *  error object, if that is the type of the first parameter.
+         */
+
+        /**
+         * Logs error elements to the console using console.error().
+         * - Each element is logged on a separate line.
+         * - Objects are logged property by property, each on a separate line with the format `propertyName: propertyValue`.
+         * - Handles null and undefined elements gracefully without interruption.
+         *
+         * @param {...unknown[]} errElements - The elements to log. Can include strings, numbers, objects, etc.
+         */
+        function failsafeErrorLogging(...errElements: unknown[]): void {
+            errElements.forEach((element, index) => {
+                try {
+                    if (element === null || element === undefined) {
+                        // Log null or undefined explicitly
+                        console.error(`[Element ${index}]:`, element);
+                    } else if (typeof element === 'object' && !Array.isArray(element)) {
+                        // Handle plain objects by logging each property on a new line
+                        const entries = Object.entries(element);
+                        if (entries.length === 0) {
+                            console.error(`[Element ${index}] (Object): (empty object)`);
+                        } else {
+                            console.error(`[Element ${index}] (Object):`);
+                            for (const [key, value] of entries) {
+                                console.error(`  ${key}: ${value}`);
+                            }
+                        }
+                    } else if (Array.isArray(element)) {
+                        // Log arrays as a single line
+                        console.error(`[Element ${index}] (Array):`, JSON.stringify(element));
+                    } else if (element instanceof Error) {
+                        // Handle Error objects specifically
+                        console.error(`[Element ${index}] (Error):`, element.message);
+                        if (element.stack) {
+                            console.error(`  Stack Trace: ${element.stack}`);
+                        }
+                    } else {
+                        // Log primitive types directly
+                        console.error(`[Element ${index}]:`, element);
+                    }
+                } catch (loggingError) {
+                    // If logging fails, output a fallback error message
+                    console.error(`[Element ${index}] (Logging Error):`, loggingError);
+                }
+            });
+        }
+
+        failsafeErrorLogging(...strings);
+
         this.#logWithStyle(strings, {
             fg: "red",
             bg: "",

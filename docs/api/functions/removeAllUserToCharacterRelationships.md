@@ -36,4 +36,4 @@ An array of IAgentRuntime objects that contains
 
 ## Defined in
 
-[packages/core/src/relationships.ts:187](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L187)
+[packages/core/src/relationships.ts:191](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L191)

@@ -60,7 +60,10 @@ import {
     composeContext,
     ModelClass,
     generateMessageResponse,
-    messageCompletionFooter, ContentOrNull, ResultAndCharacterName, BillOfMaterialsResultType
+    messageCompletionFooter,
+    ContentOrNull,
+    ResultAndCharacterName,
+    ExtractedResultValueOrErrorResponse
 } from "@ai16z/eliza";
 
 // -------------------------- BEGIN: SOME CONSTANTS ------------------------
@@ -965,7 +968,7 @@ async function bomHelpModeCheckResultHandler(
     //  properties.
 
     let category = responseFromLlm.category;
-    let text = responseFromLlm.text ?? '(none)';
+    const text = responseFromLlm.text ?? '(none)';
 
     if (typeof category !== 'string' || (typeof category === 'string'  && !isValidHelpResponseCategory(category))) {
         elizaLogger.debug(`Unable to find a valid help response category in the LLM output.  Setting response category to RETRY.`);
@@ -1068,7 +1071,7 @@ async function bomPreliminaryQuestionCheckResultHandler(
     //  chat.  The response should have a "category" and "text"
     //  properties.
     let category = responseFromLlm.category;
-    let text = responseFromLlm.text ?? '(none)';
+    const text = responseFromLlm.text ?? '(none)';
 
     // WE MUST have a category.  If not, we create a RETRY response in the
     //  hope the next chat volley will result in a category being generated
@@ -1081,14 +1084,15 @@ async function bomPreliminaryQuestionCheckResultHandler(
         // Set the category to RETRY and try asking the user the current
         //  bill-of-materials line item question again.
         category = enumPreliminaryQuestionResultCategory.RETRY;
-        text = `Sorry, I did not understand your response.  Let's try this again.`;
+
+        response = defaultInvalidResultValueResponse;
 
         // -------------------------- END  : RETRY PROCESSING ------------------------
     } else {
 
         category = (category as string).toUpperCase();
 
-        elizaLogger.debug(`${errPrefix}The selected CATEGORY for optional line item preliminary mode is: ${category}\nAssociated text: ${text}\nObjective description: ${currentBomObjective.description}`);
+        elizaLogger.debug(`${errPrefix}The selected CATEGORY for optional line item, preliminary mode is: ${category}\nAssociated text: ${text}\nObjective description: ${currentBomObjective.description}`);
 
         // -------------------------- BEGIN: CATEGORY BASED UPDATES ------------------------
 
@@ -1313,18 +1317,22 @@ function extractMainQuestionResultValue(currentBomObjective: Objective, text: st
  *
  * @param currentBomObjective - The current bill-of-materials objective
  *  that is the source of the result value.
- * @param resultValue - The result value extracted by the extractMainQuestionResultValue()
- *  function.
+ * @param resultAndCharacterNameObj - The character name and result value
+ *  extracted by the extractMainQuestionResultValue() function.
  *
- * @returns - Returns NULL if the result value passed all checks.  Otherwise, returns
- *  a Content response that should be passed on.
+ * @returns - Returns a ExtractedResultValueOrErrorResponse that contains either
+ *  a valid result value if the result value passed all checks.  Otherwise, it returns
+ *  a Content response that should be used as an error response shown to the user
+ *  or used by downstream code.
  */
-function validateMainQuestionResultValue(currentBomObjective: Objective, resultValue: BillOfMaterialsResultType): ContentOrNull {
+function validateMainQuestionResultValue(currentBomObjective: Objective, resultAndCharacterNameObj: ResultAndCharacterName): ExtractedResultValueOrErrorResponse {
     const errPrefix = `(validateAndExtractMainQuestionResultValue) `;
 
+    elizaLogger.debug(`${errPrefix}Validating main question result value for current bill-of-materials objective: ${currentBomObjective.description}`)
+
     // NULL is never an acceptable value.
-    if (resultValue === null) {
-        throw new Error(`${errPrefix}The resultValue parameter is NULL.`);
+    if (resultAndCharacterNameObj.resultValue === null) {
+        throw new Error(`${errPrefix}The resultAndCharacterNameObj parameter's resultValue field is unassigned.`);
     }
 
     let response: ContentOrNull = null;
@@ -1332,8 +1340,8 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultV
     if (currentBomObjective.billOfMaterialsLineItem.type === 'boolean') {
         // -------------------------- BEGIN: EXTRACT BOOLEAN VALUE ------------------------
 
-        if (typeof resultValue !== 'boolean') {
-            // Ask the use to try again.
+        if (typeof resultAndCharacterNameObj.resultValue !== 'boolean') {
+            // Ask the user to try again.
             response = defaultInvalidResultValueResponse;
         }
 
@@ -1341,8 +1349,8 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultV
     } else if (currentBomObjective.billOfMaterialsLineItem.type === 'number') {
         // -------------------------- BEGIN: EXTRACT NUMERIC VALUE ------------------------
 
-        if (typeof resultValue !== 'number' || (typeof resultValue === 'number' && !isFinite(resultValue))) {
-            // Ask the use to try again.
+        if (typeof resultAndCharacterNameObj.resultValue !== 'number' || (typeof resultAndCharacterNameObj.resultValue === 'number' && !isFinite(resultAndCharacterNameObj.resultValue))) {
+            // Ask the user to try again.
             response = defaultInvalidResultValueResponse;
         } else {
             // Do we have any constraints?
@@ -1353,7 +1361,7 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultV
             if (bIsMaxValPresent && bIsMinValPresent) {
                 // >>>>> Minimum AND Maximum values present.  Is the number between these
                 //  values?
-                if (resultValue < currentBomObjective.billOfMaterialsLineItem.minVal || resultValue > currentBomObjective.billOfMaterialsLineItem.maxVal) {
+                if (resultAndCharacterNameObj.resultValue < currentBomObjective.billOfMaterialsLineItem.minVal || resultAndCharacterNameObj.resultValue > currentBomObjective.billOfMaterialsLineItem.maxVal) {
                     response = {
                         text: `Please specify a number between ${currentBomObjective.billOfMaterialsLineItem.minVal} and ${currentBomObjective.billOfMaterialsLineItem.maxVal}`
                     }
@@ -1361,7 +1369,7 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultV
             } else if (bIsMinValPresent) {
                 // >>>>> ONLY minimum value present.  Is the number greater than or
                 //  equal to that value.
-                if (resultValue < currentBomObjective.billOfMaterialsLineItem.minVal) {
+                if (resultAndCharacterNameObj.resultValue < currentBomObjective.billOfMaterialsLineItem.minVal) {
                     response = {
                         text: `Please specify a number greater than or equal to ${currentBomObjective.billOfMaterialsLineItem.minVal}`
                     }
@@ -1369,7 +1377,7 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultV
             } else if (bIsMaxValPresent) {
                 // >>>>> ONLY maximum value present.  Is the number less than or
                 //  equal to that value.
-                if (resultValue < currentBomObjective.billOfMaterialsLineItem.maxVal) {
+                if (resultAndCharacterNameObj.resultValue < currentBomObjective.billOfMaterialsLineItem.maxVal) {
                     response = {
                         text: `Please specify a number less than or equal to ${currentBomObjective.billOfMaterialsLineItem.maxVal}`
                     }
@@ -1383,8 +1391,10 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultV
     } else if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
         // -------------------------- BEGIN: EXTRACT STRING VALUE ------------------------
 
-        if (typeof resultValue !== 'string' || (typeof resultValue === 'string' && resultValue.trim().length < 1)) {
-            // Ask the use to try again.
+        // TODO: Where is the check to see if it is a list of values bill-of-materials line
+        //  item and if so, the check to see if it is one of the valid choices?
+        if (typeof resultAndCharacterNameObj.resultValue !== 'string' || (typeof resultAndCharacterNameObj.resultValue === 'string' && resultAndCharacterNameObj.resultValue.trim().length < 1)) {
+            // Ask the user to try again.
             response = defaultInvalidResultValueResponse;
         }
 
@@ -1394,7 +1404,7 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultV
          *  done implicitly in extractMainQuestionResultValue().  In that function, if
          *  the bill-of-materials objective had a list of values field, and the LLM
          *  response text didn't match any of the choices, then this function will not
-         *  be called.
+         *  be called because an error response will have already been generated.
          */
         // -------------------------- END  : EXTRACT STRING VALUE ------------------------
     } else {
@@ -1405,7 +1415,25 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultV
         // -------------------------- END  : UNKNOWN TYPE ------------------------
     }
 
-    return response;
+    let retExtractedResultValueOrErrorResponse: ExtractedResultValueOrErrorResponse;
+
+    // Did we generate an error response?
+    if (response) {
+        // Yes. Create a ExtractedResultValueOrErrorResponse to contain it.
+        retExtractedResultValueOrErrorResponse = {
+            resultAndCharacterNameOrNull: null,
+            contentAsErrorResponseOrNull: response,
+        }
+    } else {
+        // No. Then we have a valid numeric result value.  Create a
+        //  ExtractedResultValueOrErrorResponse to contain it.
+        retExtractedResultValueOrErrorResponse = {
+            resultAndCharacterNameOrNull: resultAndCharacterNameObj,
+            contentAsErrorResponseOrNull: null
+        }
+    }
+
+    return retExtractedResultValueOrErrorResponse;
 }
 
 /**
@@ -1418,15 +1446,23 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultV
  * @param currentBomObjective - The current bill-of-materials
  *  objective.
  *
- * @returns - Returns a Content object that contains the
- *  response the system should use as the chat volley
- *  response, OR, returns NULL indicating the calling
- *  code should continue
+ * @returns - Returns the following based on the context of the result
+ *  found or not found in the LLM response to the current bill-of-materials
+ *  line item's main question:
+ *
+ *      - If the LLM response contained a valid result value, then it
+ *         will be found in the ExtractedResultValueOrErrorResponse's
+ *         resultAndCharacterNameOrNull field.
+ *
+ *      - If an error response was generated by any of the code executed
+ *         in this function, it will be found in the ExtractedResultValueOrErrorResponse's
+ *         contentAsErrorResponseOrNull field, which should be shown to the user
+ *         or used by subsequent code as an error response.
  */
 async function bomMainQuestionCheckResultHandler(
     runtime: IAgentRuntime,
     state: State,
-    currentBomObjective: Objective): Promise<ContentOrNull> {
+    currentBomObjective: Objective): Promise<ExtractedResultValueOrErrorResponse> {
     const errPrefix = `(bomMainQuestionCheckResultHandler) `;
 
     // This function should NOT be called during HELP mode.
@@ -1496,9 +1532,11 @@ async function bomMainQuestionCheckResultHandler(
         template: mainQuestionLLmResultCheckTemplate
     });
 
-    // Default response, in case we fail to interpret the result
-    //  check properly.
-    let response: ContentOrNull = null;
+    let retExtractedResultValueOrErrorResponse: ExtractedResultValueOrErrorResponse =
+        {
+            contentAsErrorResponseOrNull: null,
+            resultAndCharacterNameOrNull: null
+        }
 
     const responseFromLlm = await generateMessageResponse({
         runtime: runtime,
@@ -1523,31 +1561,34 @@ async function bomMainQuestionCheckResultHandler(
         // Set the category to RETRY and try asking the user the current
         //  bill-of-materials line item question again.
         category = enumMainQuestionResultCategory.RETRY;
-        text = `Sorry, I did not understand your response.  Let's try this again.`;
+        retExtractedResultValueOrErrorResponse.contentAsErrorResponseOrNull = defaultInvalidResultValueResponse;
 
         // -------------------------- END  : RETRY PROCESSING ------------------------
     } else {
 
         category = (category as string).toUpperCase();
 
-        elizaLogger.debug(`${errPrefix}The selected CATEGORY for optional line item main mode is: ${category}\nAssociated text: ${text}\nObjective description: ${currentBomObjective.description}`);
+        elizaLogger.debug(`${errPrefix}The selected CATEGORY for line item main question is: ${category}\nAssociated text: ${text}\nObjective description: ${currentBomObjective.description}`);
 
         // -------------------------- BEGIN: CATEGORY BASED UPDATES ------------------------
 
         if (category === enumMainQuestionResultCategory.CANCEL) {
             // Build a CANCEL response.
-            response =
+            retExtractedResultValueOrErrorResponse.contentAsErrorResponseOrNull =
                 buildBomCancelResponse(runtime, errPrefix);
         } else if (category === enumMainQuestionResultCategory.HELP) {
             // The user needs more help. Create a response that helps them with
             //  this confusion.
-            response =
+            retExtractedResultValueOrErrorResponse.contentAsErrorResponseOrNull =
                 await askLlmBomHelpQuestion(runtime, state, currentBomObjective, category);
         } else if (category === enumMainQuestionResultCategory.RESULT) {
             // The user gave the LLM a usable result value.  Extract it
             //  from the "text" property returned by the LLM.
-            response =
-                validateMainQuestionResultValue(currentBomObjective, text);
+            const resultAndCharacterNameObj =
+                extractMainQuestionResultValue(currentBomObjective, text);
+
+            retExtractedResultValueOrErrorResponse =
+                validateMainQuestionResultValue(currentBomObjective, resultAndCharacterNameObj);
         } else {
             throw new Error(`${errPrefix}Unknown help response category: ${category}`);
         }
@@ -1555,7 +1596,13 @@ async function bomMainQuestionCheckResultHandler(
 
     // -------------------------- END  : CATEGORY BASED UPDATES ------------------------
 
-    return response;
+    // We should either have a valid result value or an error response at this point.
+    //  If not, then that is an error.
+    if (retExtractedResultValueOrErrorResponse.resultAndCharacterNameOrNull === null && retExtractedResultValueOrErrorResponse.contentAsErrorResponseOrNull === null) {
+        throw new Error(`${errPrefix}The resultAndCharacterNameOrNull and contentAsErrorResponseOrNull are both unassigned for the current bill-of-materials line item: ${currentBomObjective.description}.`);
+    }
+
+    return retExtractedResultValueOrErrorResponse;
 }
 
 /**
@@ -1672,44 +1719,41 @@ export async function determineBomQuestionResult(
             //  involves validating the result, if present, against the line item's
             //  value constraint fields, if any, while checking for non-result
             //  oriented items like the HELP and CANCEL intents expressed by the user.
-            response =
+            const retExtractedResultValueOrErrorResponse: ExtractedResultValueOrErrorResponse =
                 await bomMainQuestionCheckResultHandler(runtime, state, currentBomObjective);
 
-            if (!response) {
-                // Extract the result from the LLM response.
-                const resultAndCharacterNameObj: ResultAndCharacterName =
-                    extractMainQuestionResultValue(currentBomObjective, response.text);
+            if (!retExtractedResultValueOrErrorResponse.contentAsErrorResponseOrNull) {
+                // If we don't have an error response, then we MUST have a result value.
+                if (!retExtractedResultValueOrErrorResponse.resultAndCharacterNameOrNull) {
+                    throw new Error(`${errPrefix}The result and character name field in the extracted result value object is unassigned.`);
+                }
 
-                if (resultAndCharacterNameObj) {
-                    // We now have a concrete result value.  Save it into the
-                    //  bill-of-materials objective and mark the objective as
-                    //  completed.
-                    currentBomObjective.completed = true;
-                    currentBomObjective.resultData = resultAndCharacterNameObj.resultValue;
+                // We now have a concrete result value.  Save it into the
+                //  bill-of-materials objective and mark the objective as
+                //  completed.
+                currentBomObjective.completed = true;
+                currentBomObjective.resultData =
+                    retExtractedResultValueOrErrorResponse.resultAndCharacterNameOrNull.resultValue;
 
-                    // -------------------------- BEGIN: LIST OF VALUES AGENT SWITCH ------------------------
+                // -------------------------- BEGIN: LIST OF VALUES AGENT SWITCH ------------------------
 
-                    // If the result and character name object indicates an agent
-                    //  switch, due to a list of values choice having an agent
-                    //  switch attached to it, output a response that makes the
-                    //  switch.
-                    if (resultAndCharacterNameObj.characterName) {
-                        const switchAction =
-                            `SELECT_CHARACTER_${resultAndCharacterNameObj.characterName.toUpperCase().trim()}`;
+                // If the result and character name object indicates an agent
+                //  switch, due to a list of values choice having an agent
+                //  switch attached to it, output a response that makes the
+                //  switch.
+                if (retExtractedResultValueOrErrorResponse.resultAndCharacterNameOrNull.characterName) {
+                    const switchAction =
+                        `SELECT_CHARACTER_${retExtractedResultValueOrErrorResponse.resultAndCharacterNameOrNull.characterName.toUpperCase().trim()}`;
 
-                        response = {
-                            text: `Ok.`,
-                            action: switchAction
-                        }
-
-                        elizaLogger.debug(`Switching to agent/character("${switchAction}") due to the following list of values choice that had an associated agent/character name: ${response.text}`);
+                    response = {
+                        text: `Ok.`,
+                        action: switchAction
                     }
 
-                    // -------------------------- END  : LIST OF VALUES AGENT SWITCH ------------------------
-                } else {
-                    // Could not resolve a valid result value. Ask the user to try again.
-                    response = defaultInvalidResultValueResponse;
+                    elizaLogger.debug(`Switching to agent/character("${switchAction}") due to the following list of values choice that had an associated agent/character name: ${response.text}`);
                 }
+
+                // -------------------------- END  : LIST OF VALUES AGENT SWITCH ------------------------
             }
 
             // -------------------------- END  : MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
@@ -1785,7 +1829,7 @@ export function buildBomMainQuestion(currentBomObjective: Objective): string {
             if (Array.isArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem.listOfValidValues.length > 0) {
                 // Add list of values if present.
                 const validChoices =
-                    currentBomObjective.billOfMaterialsLineItem.listOfValidValues.join(', ');
+                    buildBomOrStringStatement(currentBomObjective.billOfMaterialsLineItem.listOfValidValues);
                 retText +=
                     `The available choices are: ${validChoices}`;
             }

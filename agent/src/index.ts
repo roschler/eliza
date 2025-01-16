@@ -126,6 +126,7 @@ export async function loadCharacters(
                 elizaLogger.error(
                     `Error loading character from ${characterPath}: File not found in any of the expected locations`
                 );
+
                 elizaLogger.error("Tried the following paths:");
                 pathsToTry.forEach((p) => elizaLogger.error(` - ${p}`));
                 process.exit(1);
@@ -602,18 +603,7 @@ const startAgents = async () => {
 };
 
 startAgents().catch((error) => {
-    // The current elizaLogger code has a problem with certain errors whereby
-    //  the error strings don't print correctly.  So that is why we
-    //  have our own error printing here.
-    if (typeof error.message === 'string') {
-        console.error(`Error during startAgents(): ${error.message}`);
-    }
-
-    if (typeof error.stack === 'string') {
-        console.error(`Stack: ${error.stack}`);
-    }
-
-    elizaLogger.error("Unhandled error in startAgents:", error);
+    elizaLogger.error(error);
     process.exit(1); // Exit the process after logging
 });
 

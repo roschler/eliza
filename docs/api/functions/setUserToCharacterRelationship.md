@@ -28,4 +28,4 @@ A valid agent object.
 
 ## Defined in
 
-[packages/core/src/relationships.ts:227](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L227)
+[packages/core/src/relationships.ts:231](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L231)

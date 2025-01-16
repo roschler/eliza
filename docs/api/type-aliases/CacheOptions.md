@@ -12,4 +12,4 @@
 
 ## Defined in
 
-[packages/core/src/types.ts:1203](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1203)
+[packages/core/src/types.ts:1216](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1216)

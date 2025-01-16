@@ -12,7 +12,7 @@ Status enum for goals
 
 #### Defined in
 
-[packages/core/src/types.ts:175](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L175)
+[packages/core/src/types.ts:185](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L185)
 
 ***
 
@@ -22,7 +22,7 @@ Status enum for goals
 
 #### Defined in
 
-[packages/core/src/types.ts:176](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L176)
+[packages/core/src/types.ts:186](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L186)
 
 ***
 
@@ -32,4 +32,4 @@ Status enum for goals
 
 #### Defined in
 
-[packages/core/src/types.ts:177](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L177)
+[packages/core/src/types.ts:187](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L187)

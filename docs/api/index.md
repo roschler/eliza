@@ -103,6 +103,7 @@
 - [stringArrayFooter](variables/stringArrayFooter.md)
 - [settings](variables/settings.md)
 - [JOKER\_UUID\_AS\_ROOMS\_ID\_WILDCARD](variables/JOKER_UUID_AS_ROOMS_ID_WILDCARD.md)
+- [USER\_A\_ID\_FOR\_RELATIONSHIP\_WITH\_LOCALHOST\_USER\_ID](variables/USER_A_ID_FOR_RELATIONSHIP_WITH_LOCALHOST_USER_ID.md)
 
 ## Functions
 
@@ -169,3 +170,4 @@
 - [getEnvVariable](functions/getEnvVariable.md)
 - [hasEnvVariable](functions/hasEnvVariable.md)
 - [stringToUuid](functions/stringToUuid.md)
+- [isUuid](functions/isUuid.md)

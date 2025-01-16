@@ -33,4 +33,4 @@ The agent/character that should be only one
 
 ## Defined in
 
-[packages/core/src/relationships.ts:266](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L266)
+[packages/core/src/relationships.ts:270](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L270)

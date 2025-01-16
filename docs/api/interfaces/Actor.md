@@ -14,7 +14,7 @@ Display name
 
 #### Defined in
 
-[packages/core/src/types.ts:97](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L97)
+[packages/core/src/types.ts:107](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L107)
 
 ***
 
@@ -26,7 +26,7 @@ Username/handle
 
 #### Defined in
 
-[packages/core/src/types.ts:100](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L100)
+[packages/core/src/types.ts:110](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L110)
 
 ***
 
@@ -56,7 +56,7 @@ Favorite quote
 
 #### Defined in
 
-[packages/core/src/types.ts:103](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L103)
+[packages/core/src/types.ts:113](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L113)
 
 ***
 
@@ -68,4 +68,4 @@ Unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:115](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L115)
+[packages/core/src/types.ts:125](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L125)

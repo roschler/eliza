@@ -14,7 +14,7 @@ Evaluation context
 
 #### Defined in
 
-[packages/core/src/types.ts:516](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L516)
+[packages/core/src/types.ts:529](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L529)
 
 ***
 
@@ -26,7 +26,7 @@ Example messages
 
 #### Defined in
 
-[packages/core/src/types.ts:519](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L519)
+[packages/core/src/types.ts:532](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L532)
 
 ***
 
@@ -38,4 +38,4 @@ Expected outcome
 
 #### Defined in
 
-[packages/core/src/types.ts:522](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L522)
+[packages/core/src/types.ts:535](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L535)

@@ -1332,7 +1332,7 @@ A Promise that resolves to TRUE if the relationship was
 
 > `abstract` **removeAllRelationships**(`params`): `Promise`\<`boolean`\>
 
-Removes all relationships that exist userA is a
+Removes all relationships that exist with userA as a
  participant to the relationship, either side.
 
 #### Parameters

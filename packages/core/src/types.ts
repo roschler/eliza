@@ -28,6 +28,27 @@ export type ResultAndCharacterName = {
     characterName: string;
 }
 
+export type ResultAndCharacterNameOrNull = ResultAndCharacterName | null;
+
+/**
+ * This type is returned by functions like validateMainQuestionResultValue()
+ *  that either return a ResultAndCharacterName if the LLM response contained
+ *  a valid bill-of-materials result, or ContentOrNull object that should
+ *  be used as an error response, if the LLM failed to contain a valid
+ *  result value.
+ */
+export type ExtractedResultValueOrErrorResponse = {
+    // If the LLM response contained a valid bill-of-materials result
+    //  value, then this property will contain it.  Otherwise, it
+    //  should be NULL.
+    resultAndCharacterNameOrNull: ResultAndCharacterName,
+    // If the LLM response did NOT contain a valid bill-of-materials result
+    //  value, then this property will a Content object that will
+    //  contain the error response that should be shown to the user,
+    //  or handled by downstream code.  Otherwise, it should be NULL.
+    contentAsErrorResponseOrNull: ContentOrNull
+}
+
 // -------------------------- END  : BILL-OF-MATERIALS RESULT DATA TYPES ------------------------
 
 /**

@@ -33,4 +33,4 @@ An agent object.
 
 ## Defined in
 
-[packages/core/src/relationships.ts:315](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L315)
+[packages/core/src/relationships.ts:320](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L320)

@@ -31,4 +31,4 @@ The name of the character as found in the character
 
 ## Defined in
 
-[packages/core/src/relationships.ts:160](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L160)
+[packages/core/src/relationships.ts:164](https://github.com/roschler/eliza/blob/main/packages/core/src/relationships.ts#L164)

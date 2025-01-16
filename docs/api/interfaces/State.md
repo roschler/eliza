@@ -18,7 +18,7 @@ ID of user who sent current message
 
 #### Defined in
 
-[packages/core/src/types.ts:322](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L322)
+[packages/core/src/types.ts:335](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L335)
 
 ***
 
@@ -30,7 +30,7 @@ ID of agent in conversation
 
 #### Defined in
 
-[packages/core/src/types.ts:325](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L325)
+[packages/core/src/types.ts:338](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L338)
 
 ***
 
@@ -42,7 +42,7 @@ Agent's biography
 
 #### Defined in
 
-[packages/core/src/types.ts:328](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L328)
+[packages/core/src/types.ts:341](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L341)
 
 ***
 
@@ -54,7 +54,7 @@ Agent's background lore
 
 #### Defined in
 
-[packages/core/src/types.ts:331](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L331)
+[packages/core/src/types.ts:344](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L344)
 
 ***
 
@@ -66,7 +66,7 @@ Message handling directions
 
 #### Defined in
 
-[packages/core/src/types.ts:334](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L334)
+[packages/core/src/types.ts:347](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L347)
 
 ***
 
@@ -78,7 +78,7 @@ Post handling directions
 
 #### Defined in
 
-[packages/core/src/types.ts:337](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L337)
+[packages/core/src/types.ts:350](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L350)
 
 ***
 
@@ -90,7 +90,7 @@ Current room/conversation ID
 
 #### Defined in
 
-[packages/core/src/types.ts:340](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L340)
+[packages/core/src/types.ts:353](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L353)
 
 ***
 
@@ -102,7 +102,7 @@ Optional agent name
 
 #### Defined in
 
-[packages/core/src/types.ts:343](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L343)
+[packages/core/src/types.ts:356](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L356)
 
 ***
 
@@ -114,7 +114,7 @@ Optional message sender name
 
 #### Defined in
 
-[packages/core/src/types.ts:346](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L346)
+[packages/core/src/types.ts:359](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L359)
 
 ***
 
@@ -126,7 +126,7 @@ String representation of conversation actors
 
 #### Defined in
 
-[packages/core/src/types.ts:349](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L349)
+[packages/core/src/types.ts:362](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L362)
 
 ***
 
@@ -138,7 +138,7 @@ Optional array of actor objects
 
 #### Defined in
 
-[packages/core/src/types.ts:352](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L352)
+[packages/core/src/types.ts:365](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L365)
 
 ***
 
@@ -150,7 +150,7 @@ Optional string representation of goals
 
 #### Defined in
 
-[packages/core/src/types.ts:355](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L355)
+[packages/core/src/types.ts:368](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L368)
 
 ***
 
@@ -162,7 +162,7 @@ Optional array of goal objects
 
 #### Defined in
 
-[packages/core/src/types.ts:358](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L358)
+[packages/core/src/types.ts:371](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L371)
 
 ***
 
@@ -174,7 +174,7 @@ Recent message history as string
 
 #### Defined in
 
-[packages/core/src/types.ts:361](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L361)
+[packages/core/src/types.ts:374](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L374)
 
 ***
 
@@ -186,7 +186,7 @@ Recent message objects
 
 #### Defined in
 
-[packages/core/src/types.ts:364](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L364)
+[packages/core/src/types.ts:377](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L377)
 
 ***
 
@@ -198,7 +198,7 @@ Optional valid action names
 
 #### Defined in
 
-[packages/core/src/types.ts:367](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L367)
+[packages/core/src/types.ts:380](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L380)
 
 ***
 
@@ -210,7 +210,7 @@ Optional action descriptions
 
 #### Defined in
 
-[packages/core/src/types.ts:370](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L370)
+[packages/core/src/types.ts:383](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L383)
 
 ***
 
@@ -222,7 +222,7 @@ Optional action objects
 
 #### Defined in
 
-[packages/core/src/types.ts:373](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L373)
+[packages/core/src/types.ts:386](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L386)
 
 ***
 
@@ -234,7 +234,7 @@ Optional action examples
 
 #### Defined in
 
-[packages/core/src/types.ts:376](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L376)
+[packages/core/src/types.ts:389](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L389)
 
 ***
 
@@ -246,7 +246,7 @@ Optional provider descriptions
 
 #### Defined in
 
-[packages/core/src/types.ts:379](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L379)
+[packages/core/src/types.ts:392](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L392)
 
 ***
 
@@ -258,7 +258,7 @@ Optional response content
 
 #### Defined in
 
-[packages/core/src/types.ts:382](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L382)
+[packages/core/src/types.ts:395](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L395)
 
 ***
 
@@ -270,7 +270,7 @@ Optional recent interaction objects
 
 #### Defined in
 
-[packages/core/src/types.ts:385](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L385)
+[packages/core/src/types.ts:398](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L398)
 
 ***
 
@@ -282,7 +282,7 @@ Optional recent interactions string
 
 #### Defined in
 
-[packages/core/src/types.ts:388](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L388)
+[packages/core/src/types.ts:401](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L401)
 
 ***
 
@@ -294,7 +294,7 @@ Optional formatted conversation
 
 #### Defined in
 
-[packages/core/src/types.ts:391](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L391)
+[packages/core/src/types.ts:404](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L404)
 
 ***
 
@@ -306,7 +306,7 @@ Optional formatted knowledge
 
 #### Defined in
 
-[packages/core/src/types.ts:394](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L394)
+[packages/core/src/types.ts:407](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L407)
 
 ***
 
@@ -318,7 +318,7 @@ Optional knowledge data
 
 #### Defined in
 
-[packages/core/src/types.ts:396](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L396)
+[packages/core/src/types.ts:409](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L409)
 
 ***
 
@@ -333,7 +333,7 @@ Optional direct question that the current chat interaction
 
 #### Defined in
 
-[packages/core/src/types.ts:403](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L403)
+[packages/core/src/types.ts:416](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L416)
 
 ***
 
@@ -348,4 +348,4 @@ Optional help document that should be used when the chat
 
 #### Defined in
 
-[packages/core/src/types.ts:411](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L411)
+[packages/core/src/types.ts:424](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L424)
