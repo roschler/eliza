@@ -52,4 +52,4 @@ Optional clients
 
 ## Defined in
 
-[packages/core/src/types.ts:684](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L684)
+[packages/core/src/types.ts:705](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L705)

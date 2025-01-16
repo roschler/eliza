@@ -27,4 +27,4 @@ The full character ID comprised of the room ID prefixed to the
 
 ## Defined in
 
-[packages/core/src/types.ts:1435](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1435)
+[packages/core/src/types.ts:1456](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1456)

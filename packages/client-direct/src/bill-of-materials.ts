@@ -576,7 +576,7 @@ const mainQuestionLLmResultCheckTemplate =
     You need to decide the overall category of the user's most recent reply
     in context of the recent chat history.
 
-    The user's answer will fall into one of the following categories. Each line below is a category definition and is formatted like this:  Each comma delimited line starts with the string "CATEGORY:", followed by the category name in uppercase letters, then the nature of the text you should output based on that category, with everything after that followed by a description of the category that you can use to analyze the chat history, until the next category line begins.
+    The user's answer will fall into one of the following categories. Each line below is a category definition and is formatted like this:  Each comma-delimited line starts with the string "CATEGORY:", followed by the category name in uppercase letters, then the nature of the text you should output based on that category, with everything after that followed by a description of the category that you can use to analyze the chat history, until the next category line begins.
 
     CATEGORY: "CANCEL", The response text should be the user's input that expresses the "CANCEL" intent, This category is for when the user has indicated that they want to stop the entire session
     CATEGORY: "CHANGE", The response text should be the user's input that expresses the "CHANGE" intent.  This category is for when the user has indicated that they want to change their answer to something different.

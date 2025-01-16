@@ -14,7 +14,7 @@ Optional unique identifier
 
 #### Defined in
 
-[packages/core/src/types.ts:195](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L195)
+[packages/core/src/types.ts:216](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L216)
 
 ***
 
@@ -26,7 +26,7 @@ Room ID where goal exists
 
 #### Defined in
 
-[packages/core/src/types.ts:198](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L198)
+[packages/core/src/types.ts:219](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L219)
 
 ***
 
@@ -41,7 +41,7 @@ If specified, then this goal is
 
 #### Defined in
 
-[packages/core/src/types.ts:205](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L205)
+[packages/core/src/types.ts:226](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L226)
 
 ***
 
@@ -53,7 +53,7 @@ User ID of goal owner
 
 #### Defined in
 
-[packages/core/src/types.ts:208](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L208)
+[packages/core/src/types.ts:229](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L229)
 
 ***
 
@@ -65,7 +65,7 @@ Name/title of the goal
 
 #### Defined in
 
-[packages/core/src/types.ts:211](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L211)
+[packages/core/src/types.ts:232](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L232)
 
 ***
 
@@ -77,7 +77,7 @@ Current status
 
 #### Defined in
 
-[packages/core/src/types.ts:214](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L214)
+[packages/core/src/types.ts:235](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L235)
 
 ***
 
@@ -89,7 +89,7 @@ Component objectives
 
 #### Defined in
 
-[packages/core/src/types.ts:217](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L217)
+[packages/core/src/types.ts:238](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L238)
 
 ***
 
@@ -101,4 +101,4 @@ A brief description of the goal.
 
 #### Defined in
 
-[packages/core/src/types.ts:220](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L220)
+[packages/core/src/types.ts:241](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L241)

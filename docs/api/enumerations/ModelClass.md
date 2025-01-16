@@ -12,7 +12,7 @@ Model size/type classification
 
 #### Defined in
 
-[packages/core/src/types.ts:227](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L227)
+[packages/core/src/types.ts:248](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L248)
 
 ***
 
@@ -22,7 +22,7 @@ Model size/type classification
 
 #### Defined in
 
-[packages/core/src/types.ts:228](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L228)
+[packages/core/src/types.ts:249](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L249)
 
 ***
 
@@ -32,7 +32,7 @@ Model size/type classification
 
 #### Defined in
 
-[packages/core/src/types.ts:229](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L229)
+[packages/core/src/types.ts:250](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L250)
 
 ***
 
@@ -42,7 +42,7 @@ Model size/type classification
 
 #### Defined in
 
-[packages/core/src/types.ts:230](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L230)
+[packages/core/src/types.ts:251](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L251)
 
 ***
 
@@ -52,4 +52,4 @@ Model size/type classification
 
 #### Defined in
 
-[packages/core/src/types.ts:231](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L231)
+[packages/core/src/types.ts:252](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L252)

@@ -100,4 +100,4 @@ Model names by size class
 
 ## Defined in
 
-[packages/core/src/types.ts:237](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L237)
+[packages/core/src/types.ts:258](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L258)

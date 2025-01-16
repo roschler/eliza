@@ -12,7 +12,7 @@ Available client platforms
 
 #### Defined in
 
-[packages/core/src/types.ts:711](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L711)
+[packages/core/src/types.ts:732](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L732)
 
 ***
 
@@ -22,7 +22,7 @@ Available client platforms
 
 #### Defined in
 
-[packages/core/src/types.ts:712](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L712)
+[packages/core/src/types.ts:733](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L733)
 
 ***
 
@@ -32,7 +32,7 @@ Available client platforms
 
 #### Defined in
 
-[packages/core/src/types.ts:713](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L713)
+[packages/core/src/types.ts:734](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L734)
 
 ***
 
@@ -42,7 +42,7 @@ Available client platforms
 
 #### Defined in
 
-[packages/core/src/types.ts:714](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L714)
+[packages/core/src/types.ts:735](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L735)
 
 ***
 
@@ -52,4 +52,4 @@ Available client platforms
 
 #### Defined in
 
-[packages/core/src/types.ts:715](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L715)
+[packages/core/src/types.ts:736](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L736)

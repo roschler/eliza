@@ -13,4 +13,4 @@ This is the "fake" USER ID we use to store the UUID we dynamically
 
 ## Defined in
 
-[packages/core/src/types.ts:52](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L52)
+[packages/core/src/types.ts:73](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L73)

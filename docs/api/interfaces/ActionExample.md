@@ -14,7 +14,7 @@ User associated with the example
 
 #### Defined in
 
-[packages/core/src/types.ts:85](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L85)
+[packages/core/src/types.ts:106](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L106)
 
 ***
 
@@ -26,4 +26,4 @@ Content of the example
 
 #### Defined in
 
-[packages/core/src/types.ts:88](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L88)
+[packages/core/src/types.ts:109](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L109)

@@ -102,4 +102,4 @@ If present, then this string will be appended to any numeric values
 
 ## Defined in
 
-[packages/core/src/types.ts:722](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L722)
+[packages/core/src/types.ts:743](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L743)

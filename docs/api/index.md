@@ -70,6 +70,8 @@
 - [StringOrNull](type-aliases/StringOrNull.md)
 - [BillOfMaterialsResultType](type-aliases/BillOfMaterialsResultType.md)
 - [ResultAndCharacterName](type-aliases/ResultAndCharacterName.md)
+- [ResultAndCharacterNameOrNull](type-aliases/ResultAndCharacterNameOrNull.md)
+- [ExtractedResultValueOrErrorResponse](type-aliases/ExtractedResultValueOrErrorResponse.md)
 - [UUID](type-aliases/UUID.md)
 - [Model](type-aliases/Model.md)
 - [Models](type-aliases/Models.md)

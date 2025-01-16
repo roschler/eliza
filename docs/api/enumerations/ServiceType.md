@@ -10,7 +10,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1410](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1410)
+[packages/core/src/types.ts:1431](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1431)
 
 ***
 
@@ -20,7 +20,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1411](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1411)
+[packages/core/src/types.ts:1432](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1432)
 
 ***
 
@@ -30,7 +30,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1412](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1412)
+[packages/core/src/types.ts:1433](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1433)
 
 ***
 
@@ -40,7 +40,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1413](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1413)
+[packages/core/src/types.ts:1434](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1434)
 
 ***
 
@@ -50,7 +50,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1414](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1414)
+[packages/core/src/types.ts:1435](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1435)
 
 ***
 
@@ -60,7 +60,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1415](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1415)
+[packages/core/src/types.ts:1436](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1436)
 
 ***
 
@@ -70,7 +70,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1416](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1416)
+[packages/core/src/types.ts:1437](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1437)
 
 ***
 
@@ -80,4 +80,4 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1417](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1417)
+[packages/core/src/types.ts:1438](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1438)

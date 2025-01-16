@@ -24,7 +24,7 @@
 
 #### Defined in
 
-[packages/core/src/types.ts:1240](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1240)
+[packages/core/src/types.ts:1261](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1261)
 
 ## Methods
 
@@ -48,7 +48,7 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:1245](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1245)
+[packages/core/src/types.ts:1266](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1266)
 
 ***
 
@@ -62,7 +62,7 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:1354](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1354)
+[packages/core/src/types.ts:1375](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1375)
 
 ***
 
@@ -90,7 +90,7 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:1355](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1355)
+[packages/core/src/types.ts:1376](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1376)
 
 ***
 
@@ -118,7 +118,7 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:1363](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1363)
+[packages/core/src/types.ts:1384](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1384)
 
 ***
 
@@ -136,4 +136,4 @@ Add abstract initialize method that must be implemented by derived classes
 
 #### Defined in
 
-[packages/core/src/types.ts:1371](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1371)
+[packages/core/src/types.ts:1392](https://github.com/roschler/eliza/blob/main/packages/core/src/types.ts#L1392)

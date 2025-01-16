@@ -6,4 +6,4 @@
 
 ## Defined in
 
-[packages/core/src/logger.ts:267](https://github.com/roschler/eliza/blob/main/packages/core/src/logger.ts#L267)
+[packages/core/src/logger.ts:321](https://github.com/roschler/eliza/blob/main/packages/core/src/logger.ts#L321)
