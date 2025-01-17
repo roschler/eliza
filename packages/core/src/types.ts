@@ -161,11 +161,19 @@ export interface Objective {
 
     /**
      * This flag is set to TRUE if the user indicated they
-     *  are interested in (this) optional line item, if it
-     *  is optional, or FALSE if they indicated they are not
+     *  are interested in an optional bill-of-materials line
+     *  item, or FALSE if they indicated they are not
      *  interested in it.
      */
     isOptionalFieldDesiredByUser?: boolean;
+
+    /**
+     * This flag is set to TRUE if the user has already been
+     *  asked the preliminary question for an optional
+     *  bill-of-materials line item, or FALSE if the
+     *  preliminary question still needs to be asked.
+     */
+    isPreliminaryQuestionAlreadyAsked?: boolean;
 
     /** The optional data object that is the result of the objective
      *   being completed.

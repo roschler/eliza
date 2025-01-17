@@ -829,7 +829,7 @@ export function getNextBomObjective(bomGoal: Goal): ObjectiveOrNull {
  * @returns - Returns an array with the new session demarcating
  *  string along with the additional stop-at-strings in it.
  */
-export function buildBomStopAtLastSession(...additionalStopAtStrings: string[]): string[] {
+export function buildBomStopAtStringsLastSession(...additionalStopAtStrings: string[]): string[] {
     // const errPrefix = `(buildBomStopAtStringsArray) `;
 
     const retStopAtStrings: string[] = [
@@ -856,7 +856,7 @@ export function buildBomStopAtLastSession(...additionalStopAtStrings: string[]):
  *  string along with the additional stop-at-strings in it, AND
  *  the new session demarcating string in it.
  */
-export function buildBomStopAtLastObjective(...additionalStopAtStrings: string[]): string[] {
+export function buildBomStopAtStringsLastObjective(...additionalStopAtStrings: string[]): string[] {
     const retStopAtStrings: string[] = [
         END_OBJECTIVE_MESSAGE_AS_DELIMITER,
         ...additionalStopAtStrings,
@@ -864,7 +864,7 @@ export function buildBomStopAtLastObjective(...additionalStopAtStrings: string[]
 
     // We always want to stop at the end of the last
     //  session.
-    return buildBomStopAtLastSession(...retStopAtStrings);
+    return buildBomStopAtStringsLastSession(...retStopAtStrings);
 }
 
 /**
@@ -1680,10 +1680,10 @@ export async function determineBomQuestionResult(
             //  which should have happened via the buildBillOfMaterialQuestion() function call
             //  made during that volley. If not, that's an error.
             const stopAtStrings =
-                buildBomStopAtLastObjective(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+                buildBomStopAtStringsLastObjective(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
 
-            // Retrieve the message history up until the preliminary question or
-            //  the start of the latest session.  We limit the scope of the
+            // Retrieve the message history up until the last END OBJECTIVE
+            //  message or the last END SESSION message.  We limit the scope of the
             //  chat message history this way to avoid processing user responses
             //  that don't belong to the current session, but belong to an
             //  old session instead.
