@@ -155,7 +155,6 @@ export async function billOfMaterialsToObjectives(runtime: IAgentRuntime): Promi
                 billOfMaterialsLineItem:  bomLineItem,
                 // Use the bill of materials line item name for the description.
                 description: bomLineItem.name,
-                isInHelpMode: false,
                 id: v4(),
                 completed: false,
             }

@@ -7,11 +7,19 @@ import {
 } from "./types.ts";
 
 /**
- * String to add to the messages history to demarcate the beginning
- *  of a new session with the user.  The definition of a session
- *  is application dependent.  (e.g. - a new take-out order, etc.).
+ * String to add to the messages history to demarcate the END
+ *  of a bill-of materials session with the user.  The definition
+ *  of a session is the point at which the bill-of-materials
+ *  session's data collection efforts are finished, or aborted.
  */
-export const NEW_SESSION_MESSAGE_AS_DELIMITER = '----------------------------'
+export const END_SESSION_MESSAGE_AS_DELIMITER = '---------------------------- END SESSION ----------------------------';
+
+/**
+ * String to add to the messages history to demarcate the END
+ *  the processing of the first or the next bill-of-materials
+ *  objective with the user.
+ */
+export const END_OBJECTIVE_MESSAGE_AS_DELIMITER = '---------------------------- END OBJECTIVE ----------------------------';
 
 /**
  * Get details for a list of actors.

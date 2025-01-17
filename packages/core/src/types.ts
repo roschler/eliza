@@ -167,15 +167,6 @@ export interface Objective {
      */
     isOptionalFieldDesiredByUser?: boolean;
 
-    /**
-     * This flag is set to TRUE if the users asks a help
-     *  question about the line item, and we have switched
-     *  to HELP mode until the user indicates we have
-     *  properly answered their question, or they cancel
-     *  the session.
-     */
-    isInHelpMode: boolean;
-
     /** The optional data object that is the result of the objective
      *   being completed.
      *

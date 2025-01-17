@@ -53,7 +53,7 @@ import {
     StringOrNull,
     State,
     formatMessagesWithStopAtStrings,
-    NEW_SESSION_MESSAGE_AS_DELIMITER,
+    END_SESSION_MESSAGE_AS_DELIMITER,
     IAgentRuntime,
     Content,
     Goal,
@@ -63,7 +63,7 @@ import {
     messageCompletionFooter,
     ContentOrNull,
     ResultAndCharacterName,
-    ExtractedResultValueOrErrorResponse
+    ExtractedResultValueOrErrorResponse, END_OBJECTIVE_MESSAGE_AS_DELIMITER
 } from "@ai16z/eliza";
 
 // -------------------------- BEGIN: SOME CONSTANTS ------------------------
@@ -77,12 +77,13 @@ const defaultInvalidResultValueResponse: Content = {
  * If the developer did not assign a help document to the bill-of-materials
  *  line item's helpDocumentForBomLineItem property, then we will use this
  *  generic help.
- */
+ *
 const DEFAULT_BOM_HELP_DOCUMENT =
     `
     Analyze the recent chat message history to see how you can provide
     help to the user's current question.
 `;
+*/
 
 // -------------------------- END  : SOME CONSTANTS ------------------------
 
@@ -93,7 +94,7 @@ const DEFAULT_BOM_HELP_DOCUMENT =
  *  that interprets the response from a bill-of-materials related
  *  LLM operation in a useful manner.
  */
-export const ERROR_MESSAGE_FAILED_BOM_LLM_RESPONSE_ANALYSIS = `(The system failed to interpret the LLM response properly.)`;
+// export const ERROR_MESSAGE_FAILED_BOM_LLM_RESPONSE_ANALYSIS = `(The system failed to interpret the LLM response properly.)`;
 
 // -------------------------- END  : SOME ERROR MESSAGES ------------------------
 
@@ -106,7 +107,7 @@ export const ERROR_MESSAGE_FAILED_BOM_LLM_RESPONSE_ANALYSIS = `(The system faile
  *  HELP mode (i.e. - switching from data collection mode
  *  to answering questions from the user about the current
  *  bill-of-materials line item.
- */
+ *
 export enum enumHelpResponseCategory {
 
     // >>>>> These help response categories are output by the LLM that
@@ -115,21 +116,21 @@ export enum enumHelpResponseCategory {
     /**
      * The user wants to abandon the session. The response
      *  text is the text the user used to indicate that.
-     */
+     *
     CANCEL = "CANCEL",
 
     /**
      * The user has indicated that their question has been
      *  fully answered.  The response text is the text the
      *  user used to indicate that.
-     */
+     *
     ANSWERED = "ANSWERED",
 
     /**
      * The user doesn't understand the help information you
      * have just gave them. The response text is the text the
      * user used to indicate that.
-     */
+     *
     CONFUSED = "CONFUSED",
 
     /**
@@ -137,7 +138,7 @@ export enum enumHelpResponseCategory {
      * on the current subject. The response text is the text
      * the user used to ask another question or request more
      * details on the current subject.
-     */
+     *
     HELP = "HELP",
 
     // These values are NOT output by the LLM, but by the
@@ -150,9 +151,10 @@ export enum enumHelpResponseCategory {
      *  a recent question, or to clarify a current one,
      *  hoping that on the next pass a usable result is
      *  found in the recent messages.
-     */
+     *
     RETRY = "RETRY",
 }
+*/
 
 /**
  * Checks if a given string matches any value in the enumHelpResponseCategory enum,
@@ -160,7 +162,7 @@ export enum enumHelpResponseCategory {
  *
  * @param str - The input string to check.
  * @returns `true` if the input matches any enum value (case-insensitive), otherwise `false`.
- */
+ *
 export function isValidHelpResponseCategory(str: string): boolean {
     if (!str) {
         return false; // Handle empty or null input
@@ -169,6 +171,7 @@ export function isValidHelpResponseCategory(str: string): boolean {
     // Convert the input string to uppercase and compare with the enum values
     return Object.values(enumHelpResponseCategory).includes(str.toUpperCase() as enumHelpResponseCategory);
 }
+*/
 
 /**
  * These are various preliminary question category values that are used
@@ -199,14 +202,6 @@ export enum enumPreliminaryQuestionResultCategory {
      *  optional bill-of-materials line item.
      */
     FALSE = "FALSE",
-
-    /**
-     * The user has asked a question about the subject matter
-     *  the current bill-of-materials line item involves. The
-     *  response text is the text the user used to is a request
-     *  for more information.
-     */
-    HELP = "HELP",
 
     // These values are NOT output by the LLM, but by the
     //  bill-of-materials related JavaScript code instead.
@@ -263,14 +258,6 @@ export enum enumMainQuestionResultCategory {
      * The user has indicated that they want to change their answer
      *  to something different.
      */
-
-    /**
-     * The user has asked a question about the subject matter
-     *  the current bill-of-materials line item involves. The
-     *  response text is the text the user used to is a request
-     *  for more information.
-     */
-    HELP = "HELP",
 
     /**
      * This value is used when the LLM is determined that
@@ -601,7 +588,7 @@ const mainQuestionLLmResultCheckTemplate =
  *  LLM to have it analyze the recent chat history and let us
  *  know if the user has indicated that it's help query has
  *  been properly answered.
- */
+ *
 const helpModeResultCheckTemplate =
     `
     You are a helpful assistant whose goal is to analyze recent
@@ -627,6 +614,7 @@ const helpModeResultCheckTemplate =
         "text": "<put your response text here>"
     }\`\`\`
     `;
+*/
 
 // -------------------------- END  : RESULT CHECK MESSAGE TEMPLATES ------------------------
 
@@ -641,7 +629,7 @@ const helpModeResultCheckTemplate =
  *  HELP mode, in response to a user request for information
  *  (query) during a bill-of-materials line item answering
  *  operation.
- */
+ *
 const helpModeMessageTemplate =
     `
     You are a helpful assistant whose goal is to answer a user's
@@ -671,6 +659,7 @@ const helpModeMessageTemplate =
         "text": "<put your response text to the user here>"
     }\`\`\`
     `;
+*/
 
 // -------------------------- END  : UTILITY MESSAGE TEMPLATES ------------------------
 
@@ -823,30 +812,53 @@ export function getNextBomObjective(bomGoal: Goal): ObjectiveOrNull {
  * This function builds a stop-at-strings array that when used with
  *  the formatMessagesWithStopAtStrings() function, will stop collecting
  *  messages when the beginning of a new session is found, or when
- *  a recently asked question was found.  This is to prevent the
- *  mistaking of old answers to bill-of-materials questions from
- *  the previous session, as current answers.
+ *  any of the additional stop-at-strings is found.  This is to prevent
+ *  the mistaking of old answers belonging to previous bill-of-materials
+ *  sessions from being mistaken as current answers.
  *
- * @param recentlyAskedQuestion - The recently asked bill-of-materials
- *  question we are checking the message history for to find an
- *  answer to that question..
+ * @param additionalStopAtStrings - Optional extra strings that
+ *  you want to formatMessagesWithStopAtStrings() to use
+ *  to end the reverse chronological search through messages.
  *
  * @returns - Returns an array with the new session demarcating
- *  string in it along with the recently asked bill-of-materials
- *  question.
+ *  string along with the additional stop-at-strings in it.
  */
-export function buildBomStopAtStringsArray(recentlyAskedQuestion: string): string[] {
-    const errPrefix = `(buildBomStopAtStringsArray) `;
+export function buildBomStopAtLastSession(...additionalStopAtStrings: string[]): string[] {
+    // const errPrefix = `(buildBomStopAtStringsArray) `;
 
-    if (recentlyAskedQuestion.trim().length < 1) {
-        throw new Error(`${errPrefix}The recentlyAskedQuestion parameter is an empty string. `);
-
-    }
-
-    return [
-        NEW_SESSION_MESSAGE_AS_DELIMITER,
-        recentlyAskedQuestion
+    const retStopAtStrings: string[] = [
+        END_SESSION_MESSAGE_AS_DELIMITER,
+        ...additionalStopAtStrings,
     ];
+
+    return retStopAtStrings;
+}
+
+/**
+ * This function builds a stop-at-strings array that when used with
+ *  the formatMessagesWithStopAtStrings() function, will stop collecting
+ *  messages when the end of a new objective's processing is found, or when
+ *  any of the additional stop-at-strings is found.  This is to prevent
+ *  the mistaking of old answers belonging to previous bill-of-materials
+ *  objectives from being mistaken as current answers.
+ *
+ * @param additionalStopAtStrings - Optional extra strings that
+ *  you want to formatMessagesWithStopAtStrings() to use
+ *  to end the reverse chronological search through messages.
+ *
+ * @returns - Returns an array with the new objective demarcating
+ *  string along with the additional stop-at-strings in it, AND
+ *  the new session demarcating string in it.
+ */
+export function buildBomStopAtLastObjective(...additionalStopAtStrings: string[]): string[] {
+    const retStopAtStrings: string[] = [
+        END_OBJECTIVE_MESSAGE_AS_DELIMITER,
+        ...additionalStopAtStrings,
+    ];
+
+    // We always want to stop at the end of the last
+    //  session.
+    return buildBomStopAtLastSession(...retStopAtStrings);
 }
 
 /**
@@ -870,7 +882,7 @@ export function buildBomStopAtStringsArray(recentlyAskedQuestion: string): strin
  *  response the system should use as the chat volley
  *  response, OR, returns NULL indicating the calling
  *  code should continue
- */
+ *
 async function askLlmBomHelpQuestion(runtime: IAgentRuntime, state: State, currentBomObjective: Objective, category: string): Promise<Content> {
     const errPrefix = `(askLlmBomHelpQuestion) `;
 
@@ -919,6 +931,7 @@ async function askLlmBomHelpQuestion(runtime: IAgentRuntime, state: State, curre
 
     return response;
 }
+*/
 
 /**
  * This function makes an LLM call to have the recent messages
@@ -935,7 +948,7 @@ async function askLlmBomHelpQuestion(runtime: IAgentRuntime, state: State, curre
  *  code should continue to determine what to do and
  *  say next, based on the current state of the chat
  *  and system.
- */
+ *
 async function bomHelpModeCheckResultHandler(
     runtime: IAgentRuntime,
     state: State,
@@ -1021,6 +1034,7 @@ async function bomHelpModeCheckResultHandler(
 
     return response;
 }
+*/
 
 /**
  * This function makes an LLM call to have the recent messages
@@ -1042,11 +1056,6 @@ async function bomPreliminaryQuestionCheckResultHandler(
     state: State,
     currentBomObjective: Objective): Promise<ContentOrNull> {
     const errPrefix = `(bomPreliminaryQuestionCheckResultHandler) `;
-
-    // This function should NOT be called during HELP mode.
-    if (currentBomObjective.isInHelpMode) {
-        throw new Error(`${errPrefix}This function should NOT be called in the context of a bill-of-materials HELP mode operation.`);
-    }
 
     // Put the objective's preliminary question into the state before we compose the context.
     mergeBomFieldIntoState(state, "simpleQuestion", currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
@@ -1108,11 +1117,6 @@ async function bomPreliminaryQuestionCheckResultHandler(
             // The user is NOT interested in the OPTIONAL bill-of-materials line
             //  item.  Update the current objective to indicate that.
             currentBomObjective.isOptionalFieldDesiredByUser = false;
-        } else if (category === enumPreliminaryQuestionResultCategory.HELP) {
-            // The user needs more help. Create a response that helps them with
-            //  this confusion.
-            response =
-                await askLlmBomHelpQuestion(runtime, state, currentBomObjective, category);
         } else {
             throw new Error(`${errPrefix}Unknown help response category: ${category}`);
         }
@@ -1465,11 +1469,6 @@ async function bomMainQuestionCheckResultHandler(
     currentBomObjective: Objective): Promise<ExtractedResultValueOrErrorResponse> {
     const errPrefix = `(bomMainQuestionCheckResultHandler) `;
 
-    // This function should NOT be called during HELP mode.
-    if (currentBomObjective.isInHelpMode) {
-        throw new Error(`${errPrefix}This function should NOT be called in the context of a bill-of-materials HELP mode operation.`);
-    }
-
     // Put the objective's main question into the state before we compose the context.
     mergeBomFieldIntoState(state, "simpleQuestion", currentBomObjective.billOfMaterialsLineItem.prompt);
 
@@ -1576,11 +1575,6 @@ async function bomMainQuestionCheckResultHandler(
             // Build a CANCEL response.
             retExtractedResultValueOrErrorResponse.contentAsErrorResponseOrNull =
                 buildBomCancelResponse(runtime, errPrefix);
-        } else if (category === enumMainQuestionResultCategory.HELP) {
-            // The user needs more help. Create a response that helps them with
-            //  this confusion.
-            retExtractedResultValueOrErrorResponse.contentAsErrorResponseOrNull =
-                await askLlmBomHelpQuestion(runtime, state, currentBomObjective, category);
         } else if (category === enumMainQuestionResultCategory.RESULT) {
             // The user gave the LLM a usable result value.  Extract it
             //  from the "text" property returned by the LLM.
@@ -1646,17 +1640,6 @@ export async function determineBomQuestionResult(
 
     let response: ContentOrNull = null;
 
-    // Are we in help mode?
-    if (currentBomObjective.isInHelpMode) {
-        // -------------------------- BEGIN: HELP MODE ------------------------
-
-        // Have the LLM analyze the chat messages so far and update the
-        //  goal and its objectives based on that analysis.
-        response = await bomHelpModeCheckResultHandler(runtime, state, currentBomObjective);
-
-        // -------------------------- END  : HELP MODE ------------------------
-    }
-
     // Do we have a direct response, based on the result checks?
     if (response) {
         // Yes.  Use it as is.
@@ -1679,7 +1662,7 @@ export async function determineBomQuestionResult(
             //  which should have happened via the buildBillOfMaterialQuestion() function call
             //  made during that volley. If not, that's an error.
             const stopAtStrings =
-                buildBomStopAtStringsArray(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+                buildBomStopAtLastObjective(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
 
             // Retrieve the message history up until the preliminary question or
             //  the start of the latest session.  We limit the scope of the
@@ -1758,7 +1741,7 @@ export async function determineBomQuestionResult(
 
             // -------------------------- END  : MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
         } // else/if (currentBomObjective.billOfMaterialsLineItem.isOptional)
-    } // else/if (currentBomObjective.isInHelpMode)
+    }
 
     return response;
 }
