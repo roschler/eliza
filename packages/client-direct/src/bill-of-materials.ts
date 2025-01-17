@@ -857,7 +857,7 @@ export function buildBomStopAtStringsArray(recentlyAskedQuestion: string): strin
  * NOTE: This function will set the isInHelp flag of the
  *  current bill-of-materials objective to TRUE, so that
  *  help mode stays in effect until the user's question
- *  is answered or they cancel the session.
+ *  is answered, or they cancel the session.
  *
  * @param runtime - The current agent/character.
  * @param state - The current system state for the chat
@@ -939,7 +939,7 @@ async function askLlmBomHelpQuestion(runtime: IAgentRuntime, state: State, curre
 async function bomHelpModeCheckResultHandler(
     runtime: IAgentRuntime,
     state: State,
-    currentBomObjective: Objective): Promise<ContentOrNull> {
+    currentBomObjective: Objective): Promise<ExtractedResultValueOrErrorResponse> {
     const errPrefix = `(bomHelpModeCheckResultHandler) `;
 
     // This function should only be called during HELP mode.
