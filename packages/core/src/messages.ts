@@ -5,7 +5,6 @@ import {
     type Memory,
     type UUID,
 } from "./types.ts";
-import {AgentRuntime} from "./runtime.ts";
 import {isUuid, stringToUuid} from "./uuid.ts";
 
 /**
@@ -33,7 +32,7 @@ export const END_OBJECTIVE_MESSAGE_AS_DELIMITER = '---------------------------- 
  * @param userId - The current user ID.
  * @param text - The string to write.
  */
-export async function createSimpleStringMemory(runtime: AgentRuntime, clientName: string, roomId: UUID, userId: UUID, text: string): Promise<void> {
+export async function createSimpleStringMemory(runtime: IAgentRuntime, clientName: string, roomId: UUID, userId: UUID, text: string): Promise<void> {
     const errPrefix = `(createSimpleStringMemory) `;
 
     if (clientName.trim().length === 0) {
@@ -42,10 +41,6 @@ export async function createSimpleStringMemory(runtime: AgentRuntime, clientName
 
     if (!isUuid(roomId)) {
         throw new Error(`${errPrefix}The roomId parameter does not contain a valid room ID.`);
-    }
-
-    if (!isUuid(userId)) {
-        throw new Error(`${errPrefix}The userId parameter does not contain a valid room ID.`);
     }
 
     if (!isUuid(userId)) {
@@ -87,7 +82,7 @@ export async function createSimpleStringMemory(runtime: AgentRuntime, clientName
  * @param userId - The current user ID.
  *
  */
-export async function createEndObjectiveMemory(runtime: AgentRuntime, clientName: string, roomId: UUID, userId: UUID): Promise<void> {
+export async function createEndObjectiveMemory(runtime: IAgentRuntime, clientName: string, roomId: UUID, userId: UUID): Promise<void> {
     await createSimpleStringMemory(runtime, clientName, roomId, userId, END_OBJECTIVE_MESSAGE_AS_DELIMITER);
 }
 
@@ -101,7 +96,7 @@ export async function createEndObjectiveMemory(runtime: AgentRuntime, clientName
  * @param userId - The current user ID.
  *
  */
-export async function createEndSessionMemory(runtime: AgentRuntime, clientName: string, roomId: UUID, userId: UUID): Promise<void> {
+export async function createEndSessionMemory(runtime: IAgentRuntime, clientName: string, roomId: UUID, userId: UUID): Promise<void> {
     await createSimpleStringMemory(runtime, clientName, roomId, userId, END_SESSION_MESSAGE_AS_DELIMITER);
 }
 

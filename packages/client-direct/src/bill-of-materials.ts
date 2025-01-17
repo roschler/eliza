@@ -63,8 +63,14 @@ import {
     messageCompletionFooter,
     ContentOrNull,
     ResultAndCharacterName,
-    ExtractedResultValueOrErrorResponse, END_OBJECTIVE_MESSAGE_AS_DELIMITER
+    ExtractedResultValueOrErrorResponse,
+    END_OBJECTIVE_MESSAGE_AS_DELIMITER,
+    createEndSessionMemory,
+    UUID,
+    isUuid,
+    createEndObjectiveMemory
 } from "@ai16z/eliza";
+import {CLIENT_NAME} from "./common.ts";
 
 // -------------------------- BEGIN: SOME CONSTANTS ------------------------
 
@@ -1610,6 +1616,8 @@ async function bomMainQuestionCheckResultHandler(
  *   as completed.
  *
  * @param runtime - The current agent/character.
+ * @param roomId - The current room ID.
+ * @param userId - The current user ID.
  * @param state - The current system state.
  * @param currentBomObjective - The current bill-of-materials objective.
  *
@@ -1623,10 +1631,20 @@ async function bomMainQuestionCheckResultHandler(
  *   response that triggers that switch.
  */
 export async function determineBomQuestionResult(
-    runtime: IAgentRuntime,
-    state: State,
-    currentBomObjective: Objective): Promise<Content> {
+        runtime: IAgentRuntime,
+        roomId: UUID,
+        userId: UUID,
+        state: State,
+        currentBomObjective: Objective): Promise<Content> {
     const errPrefix = `(determineBomQuestionResult) `;
+
+    if (!isUuid(roomId)) {
+        throw new Error(`${errPrefix}The roomId parameter does not contain a valid room ID.`);
+    }
+
+    if (!isUuid(userId)) {
+        throw new Error(`${errPrefix}The userId parameter does not contain a valid room ID.`);
+    }
 
     if (currentBomObjective === null) {
         throw new Error(`${errPrefix}The currentBomObjective parameter is unassigned.`);
@@ -1718,6 +1736,10 @@ export async function determineBomQuestionResult(
                 currentBomObjective.resultData =
                     retExtractedResultValueOrErrorResponse.resultAndCharacterNameOrNull.resultValue;
 
+                // Write an END OBJECTIVE message into the recent messages stream, now that this
+                //  bill-of-materials objective is completed.
+                await createEndObjectiveMemory(runtime, CLIENT_NAME, roomId, userId);
+
                 // -------------------------- BEGIN: LIST OF VALUES AGENT SWITCH ------------------------
 
                 // If the result and character name object indicates an agent
@@ -1737,7 +1759,7 @@ export async function determineBomQuestionResult(
 
                     // Write an END SESSION message into the recent messages stream.  Switching
                     //  characters implicitly ends the session.
-                    await createEndSessionMemory(runtime);
+                    await createEndSessionMemory(runtime, CLIENT_NAME, roomId, userId);
                 }
 
                 // -------------------------- END  : LIST OF VALUES AGENT SWITCH ------------------------

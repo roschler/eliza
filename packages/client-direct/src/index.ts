@@ -11,7 +11,12 @@ import {
     FullUserIdCharacterIdPair,
     buildRelationshipIdPair,
     GoalOrNull,
-    GoalStatus, isRelated, JOKER_UUID_AS_ROOMS_ID_WILDCARD, setExclusiveUserToCharacterRelationship, isUuid
+    GoalStatus,
+    isRelated,
+    JOKER_UUID_AS_ROOMS_ID_WILDCARD,
+    setExclusiveUserToCharacterRelationship,
+    isUuid,
+    createEndSessionMemory
 } from "@ai16z/eliza";
 import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
@@ -36,6 +41,7 @@ import {
     isBomAgentCharacter,
     messageHandlerTemplate
 } from "./bill-of-materials.ts";
+import {CLIENT_NAME} from "./common.ts";
 const upload = multer({ storage: multer.memoryStorage() });
 
 /**
@@ -422,7 +428,7 @@ export class DirectClient {
                             //  indicates the user wants to cancel the
                             //  bill-of-materials session.
                             response =
-                                await determineBomQuestionResult(runtime, state, currentBomObjective);
+                                await determineBomQuestionResult(runtime, roomId, userId, state, currentBomObjective);
 
                             // -------------------------- END  : ANALYZE STATUS OF CURRENT BOM OBJECTIVE ------------------------
                         }
@@ -447,6 +453,11 @@ export class DirectClient {
                                 text: `Transferring you over to the next agent: ${nextCharacterName}`,
                                 action: `SELECT_CHARACTER_${nextCharacterName}`
                             }
+
+                            // Write an END SESSION message into the recent messages stream.  The
+                            //  completion of the goal marks the end of the bill-of-materials
+                            //  session.
+                            await createEndSessionMemory(runtime, CLIENT_NAME, roomId, userId);
 
                             // -------------------------- END  : BILL-OF-MATERIALS GOAL COMPLETE ------------------------
 
