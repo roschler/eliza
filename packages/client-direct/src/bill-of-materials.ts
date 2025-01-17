@@ -1666,8 +1666,9 @@ export async function determineBomQuestionResult(
         //  the NULL response to be returned so buildBillOfMaterialQuestion()
         //  can craft a new bill-of-materials question.
         //
-        // Is the current bill-of-materials line item optional?
-        if (currentBomObjective.billOfMaterialsLineItem.isOptional) {
+        // Is the current bill-of-materials line item optional and does the
+        //  preliminary question still need to be asked.?
+        if (currentBomObjective.billOfMaterialsLineItem.isOptional && !currentBomObjective.isPreliminaryQuestionAlreadyAsked) {
             // -------------------------- BEGIN: OPTIONAL LINE ITEM ------------------------
 
             // Yes. Check for a declined optional line item, since those
@@ -1676,38 +1677,18 @@ export async function determineBomQuestionResult(
                 throw new Error(`${errPrefix}The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user declined it.  This objective should never have been passed to buildBillOfMaterialQuestion() in the first place.`);
             }
 
-            // Check to make sure we asked the preliminary question in a previous chat volley,
-            //  which should have happened via the buildBillOfMaterialQuestion() function call
-            //  made during that volley. If not, that's an error.
-            const stopAtStrings =
-                buildBomStopAtStringsLastObjective(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+            // Ask the preliminary question now.
+            elizaLogger.debug(`${errPrefix}Asking the preliminary question for bill-of-materials objective: ${currentBomObjective.description}`);
 
-            // Retrieve the message history up until the last END OBJECTIVE
-            //  message or the last END SESSION message.  We limit the scope of the
-            //  chat message history this way to avoid processing user responses
-            //  that don't belong to the current session, but belong to an
-            //  old session instead.
-            const recentMessagesFilteredString =
-                formatMessagesWithStopAtStrings(
-                    {
-                        messages: state.recentMessagesData,
-                        actors: state.actorsData,
-                        stopAtStrings: stopAtStrings
-                    });
-
-            // Was the preliminary question asked?
-            const bIsPreliminaryQuestionAsked =
-                recentMessagesFilteredString.includes(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
-
-            if (!bIsPreliminaryQuestionAsked) {
-                // No.  That's a serious error.
-                throw new Error(`${errPrefix}The preliminary question for the current optional bill-of-materials line item has not been asked, which should have happened by now.`);
-            }
-
-            // Has the preliminary question been properly answered?  Analyze
-            //  the chat message history for a result.
             response =
                 await bomPreliminaryQuestionCheckResultHandler(runtime, state, currentBomObjective);
+
+            // Did the user give a valid answer to the preliminary question?
+            if (currentBomObjective.isOptionalFieldDesiredByUser === true || currentBomObjective.isOptionalFieldDesiredByUser === false) {
+                // Yes.  Mark the optional bill-of-materials line item objective has
+                //  having already asked the preliminary question.
+                currentBomObjective.isPreliminaryQuestionAlreadyAsked = true;
+            }
 
             // Leave the response null so that buildBillOfMaterialQuestion() is
             //  executed to build the next response.
