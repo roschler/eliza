@@ -1734,6 +1734,10 @@ export async function determineBomQuestionResult(
                     }
 
                     elizaLogger.debug(`Switching to agent/character("${switchAction}") due to the following list of values choice that had an associated agent/character name: ${response.text}`);
+
+                    // Write an END SESSION message into the recent messages stream.  Switching
+                    //  characters implicitly ends the session.
+                    await createEndSessionMemory(runtime);
                 }
 
                 // -------------------------- END  : LIST OF VALUES AGENT SWITCH ------------------------

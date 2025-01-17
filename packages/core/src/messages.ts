@@ -5,6 +5,8 @@ import {
     type Memory,
     type UUID,
 } from "./types.ts";
+import {AgentRuntime} from "./runtime.ts";
+import {isUuid, stringToUuid} from "./uuid.ts";
 
 /**
  * String to add to the messages history to demarcate the END
@@ -20,6 +22,88 @@ export const END_SESSION_MESSAGE_AS_DELIMITER = '---------------------------- EN
  *  objective with the user.
  */
 export const END_OBJECTIVE_MESSAGE_AS_DELIMITER = '---------------------------- END OBJECTIVE ----------------------------';
+
+/**
+ * This function writes a simple string into the recent messages stream.
+ *
+ * @param clientName - The source of the request.  For example, "direct"
+ *  would be for the direct client.
+ * @param runtime - The current agent/character.
+ * @param roomId - The current room ID.
+ * @param userId - The current user ID.
+ * @param text - The string to write.
+ */
+export async function createSimpleStringMemory(runtime: AgentRuntime, clientName: string, roomId: UUID, userId: UUID, text: string): Promise<void> {
+    const errPrefix = `(createSimpleStringMemory) `;
+
+    if (clientName.trim().length === 0) {
+        throw new Error(`${errPrefix}The clientName parameter is empty or invalid.`);
+    }
+
+    if (!isUuid(roomId)) {
+        throw new Error(`${errPrefix}The roomId parameter does not contain a valid room ID.`);
+    }
+
+    if (!isUuid(userId)) {
+        throw new Error(`${errPrefix}The userId parameter does not contain a valid room ID.`);
+    }
+
+    if (!isUuid(userId)) {
+        throw new Error(`${errPrefix}The userId parameter does not contain a valid room ID.`);
+    }
+
+    if (text.trim().length === 0) {
+        throw new Error(`${errPrefix}The text parameter is empty or invalid.`);
+    }
+
+    const messageId = stringToUuid(Date.now().toString());
+
+    const content: Content = {
+        text: END_SESSION_MESSAGE_AS_DELIMITER,
+        attachments: [],
+        source: clientName,
+        inReplyTo: undefined,
+    };
+
+    const memory: Memory = {
+        id: messageId,
+        agentId: runtime.agentId,
+        userId,
+        roomId,
+        content,
+        createdAt: Date.now(),
+    };
+
+    await runtime.messageManager.createMemory(memory);
+}
+
+/**
+ * This function writes an END OBJECTIVE message into the recent messages stream.
+ *
+ * @param clientName - The source of the request.  For example, "direct"
+ *  would be for the direct client.
+ * @param runtime - The current agent/character.
+ * @param roomId - The current room ID.
+ * @param userId - The current user ID.
+ *
+ */
+export async function createEndObjectiveMemory(runtime: AgentRuntime, clientName: string, roomId: UUID, userId: UUID): Promise<void> {
+    await createSimpleStringMemory(runtime, clientName, roomId, userId, END_OBJECTIVE_MESSAGE_AS_DELIMITER);
+}
+
+/**
+ * This function writes an END SESSION message into the recent messages stream.
+ *
+ * @param clientName - The source of the request.  For example, "direct"
+ *  would be for the direct client.
+ * @param runtime - The current agent/character.
+ * @param roomId - The current room ID.
+ * @param userId - The current user ID.
+ *
+ */
+export async function createEndSessionMemory(runtime: AgentRuntime, clientName: string, roomId: UUID, userId: UUID): Promise<void> {
+    await createSimpleStringMemory(runtime, clientName, roomId, userId, END_SESSION_MESSAGE_AS_DELIMITER);
+}
 
 /**
  * Get details for a list of actors.
