@@ -103,7 +103,7 @@ export class GitHubClient {
 
             console.log(
                 "Processing knowledge for ",
-                this.runtime.character.name,
+                this.runtime.characterTemplate.name,
                 " - ",
                 relativePath
             );

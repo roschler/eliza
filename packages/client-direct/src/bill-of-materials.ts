@@ -78,6 +78,7 @@ import {CLIENT_NAME} from "./common.ts";
 const defaultInvalidResultValueResponse: Content = {
     text: `Sorry.  I didn't understand your response.  Please try again.`
 }
+
 /**
  * If the developer did not assign a help document to the bill-of-materials
  *  line item's helpDocumentForBomLineItem property, then we will use this
@@ -465,7 +466,7 @@ export function buildBomCancelResponse(runtime: IAgentRuntime, callerErrPrefix: 
     //  in the event of a user cancellation request, then that is
     //  an error.
     const nextCharacterName =
-        runtime.character.switchToCharacterWhenBomSessionCancelled;
+        runtime.characterTemplate.switchToCharacterWhenBomSessionCancelled;
 
     if (typeof nextCharacterName !== "string" || typeof nextCharacterName === "string" && nextCharacterName.trim().length === 0) {
         throw new Error(`${callerErrPrefix}The user has requested the cancelling of the bill-of-materials session, but the character does not specify the next agent to transfer control to (i.e. - switchToCharacterWhenBomSessionCancelled is unassigned or invalid.`);
@@ -680,7 +681,7 @@ const helpModeMessageTemplate =
  *  agent/character, FALSE if not.
  */
 export function isBomAgentCharacter(runtime: IAgentRuntime): boolean {
-    return Array.isArray(runtime.character.billOfMaterials) && runtime.character.billOfMaterials.length > 0;
+    return Array.isArray(runtime.characterTemplate.billOfMaterials) && runtime.characterTemplate.billOfMaterials.length > 0;
 }
 
 /**
@@ -865,6 +866,64 @@ export function buildBomStopAtStringsLastObjective(...additionalStopAtStrings: s
     //  session.
     return buildBomStopAtStringsLastSession(...retStopAtStrings);
 }
+
+/**
+ * This function makes an LLM call get the next response text for
+ *  the user for the current bill-of-materials objective's MAIN
+ *  question.
+ *
+ * @param runtime - The current agent/character.
+ * @param state - The current system state for the chat
+ * @param currentBomObjective - The current bill-of-materials
+ *  objective.
+ *
+ * @returns - Returns a Content object that contains the
+ *  response the system should use as the chat volley
+ *  response.
+ */
+ async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, currentBomObjective: Objective): Promise<Content> {
+     const errPrefix = `(askLlmBomMainQuestion) `;
+
+     // Put the objective's help text into the state before we compose the context.
+     state.helpDocument =
+         // We prefer there to be a full help document attached to the current
+         //  line item.
+         currentBomObjective.billOfMaterialsLineItem.helpDocumentForBomLineItem
+         ??
+         // If not, use the generic help text.
+         DEFAULT_BOM_HELP_DOCUMENT;
+
+     // Do the substitution variable replacements.
+     const useFormattedMessage = composeContext({
+         state: state,
+         template: helpModeMessageTemplate
+     });
+
+     // Default response, in case we fail to interpret the result
+     //  check properly.
+     let response: ContentOrNull = null;
+
+     const responseFromLlm = await generateMessageResponse({
+         runtime: runtime,
+         context: useFormattedMessage,
+         modelClass: ModelClass.SMALL,
+     });
+
+     if (typeof responseFromLlm.text !== 'string') {
+         elizaLogger.debug(`${errPrefix}Unable to find a "text" property in the LLM output.`);
+     }
+
+     // The response should have a "text" properties.
+     const text = responseFromLlm.text ?? '(The bill-of-materials help LLM failed to produce a JSON object with a "text" property.)';
+
+     // Use the help text provided by the LLM.
+         response = {
+         text: text
+     }
+
+     return response;
+     }
+
 
 /**
  * This function makes an LLM call get the next help text for

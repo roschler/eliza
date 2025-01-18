@@ -142,7 +142,7 @@ export class FarcasterInteractionManager {
         });
 
         const formattedTimeline = formatTimeline(
-            this.runtime.character,
+            this.runtime.characterTemplate,
             timeline
         );
 
@@ -170,9 +170,9 @@ export class FarcasterInteractionManager {
         const shouldRespondContext = composeContext({
             state,
             template:
-                this.runtime.character.templates
+                this.runtime.characterTemplate.templates
                     ?.farcasterShouldRespondTemplate ||
-                this.runtime.character?.templates?.shouldRespondTemplate ||
+                this.runtime.characterTemplate?.templates?.shouldRespondTemplate ||
                 shouldRespondTemplate,
         });
 
@@ -208,9 +208,9 @@ export class FarcasterInteractionManager {
         const context = composeContext({
             state,
             template:
-                this.runtime.character.templates
+                this.runtime.characterTemplate.templates
                     ?.farcasterMessageHandlerTemplate ??
-                this.runtime.character?.templates?.messageHandlerTemplate ??
+                this.runtime.characterTemplate?.templates?.messageHandlerTemplate ??
                 messageHandlerTemplate,
         });
 

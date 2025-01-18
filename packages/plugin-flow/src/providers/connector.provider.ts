@@ -72,7 +72,7 @@ export class FlowConnectorProvider {
     constructor(private readonly instance: FlowConnector) {}
 
     getConnectorStatus(runtime: IAgentRuntime): string {
-        let output = `${runtime.character.name}[${runtime.character.id ?? 0}] Connected to\n`;
+        let output = `${runtime.characterTemplate.name}[${runtime.characterTemplate.id ?? 0}] Connected to\n`;
         output += `Flow network: ${this.instance.network}\n`;
         output += `Flow Endpoint: ${this.instance.rpcEndpoint}\n`;
         return output;

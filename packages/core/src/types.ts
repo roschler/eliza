@@ -3,6 +3,7 @@ import { Readable } from "stream";
 // Some simple types that are either NULL or some other primitive value.
 export type BillOfMaterialsLineItemOrNull = BillOfMaterialsLineItem | null;
 export type BooleanOrNull = boolean | null;
+export type CharacterOrUndefined = Character | undefined
 export type ContentOrNull = Content | null;
 export type GoalOrNull = Goal | null;
 export type IAgentRuntimeOrNull = IAgentRuntime | null;
@@ -1006,6 +1007,44 @@ export type Character = {
 };
 
 /**
+ * This function makes a shallow copy of a "Character" object so
+ *  that the fields in the cloned object are decoupled from the
+ *  original object.
+ *
+ * @param srcCharacter - The source object for the cloning
+ *  operation.
+ *
+ * @returns - Returns a new "Character" object with decoupled
+ *  fields.
+ */
+export function shallowCloneCharacter(srcCharacter: Character): Character {
+    const errPrefix = `(shallowCloneCharacter) `;
+
+    // Cast srcCharacter as a Record for dynamic iteration
+    const srcRecord = (srcCharacter as unknown) as Record<string, string | number | boolean>;
+    const newObj = {} as Record<string, string | number | boolean>; // Create a plain Record
+
+    for (const key in srcRecord) {
+        if (Object.prototype.hasOwnProperty.call(srcRecord, key)) {
+            const value = srcRecord[key];
+
+            // Copy primitive values directly
+            if (typeof value === "string") {
+                newObj[key] = value.slice(); // Copy string
+            } else if (typeof value === "number" || typeof value === "boolean") {
+                newObj[key] = value;
+            } else {
+                // Handle unsupported types
+                throw new Error(`${errPrefix}Unsupported type for property: ${key}`);
+            }
+        }
+    }
+
+    // Cast the result back to the Character type
+    return (newObj as unknown) as Character;
+}
+
+/**
  * Interface for database operations
  */
 export interface IDatabaseAdapter {
@@ -1273,7 +1312,8 @@ export interface IAgentRuntime {
     token: string | null;
     modelProvider: ModelProviderName;
     imageModelProvider: ModelProviderName;
-    character: Character;
+    characterTemplate: Character;
+    characterProcessed?: Character;
     providers: Provider[];
     actions: Action[];
     evaluators: Evaluator[];

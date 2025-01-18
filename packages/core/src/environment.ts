@@ -141,7 +141,7 @@ export const CharacterSchema = z.object({
     messageTemplate: z.string().optional(),
     billOfMaterials: z.array(BillOfMaterialsLineItemSchema).optional(),
     switchToCharacterWhenBomComplete: z.string().optional(),
-    resetGoalsOnReceivingControl: z.boolean().optional(),
+    resetGoalsOnReceivingControl: z.boolean().optional()
 });
 
 // Type inference

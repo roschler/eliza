@@ -53,7 +53,7 @@ export class FarcasterPostManager {
             await this.runtime.ensureUserExists(
                 this.runtime.agentId,
                 profile.username,
-                this.runtime.character.name,
+                this.runtime.characterTemplate.name,
                 "farcaster"
             );
 
@@ -65,7 +65,7 @@ export class FarcasterPostManager {
             this.cache.set("farcaster/timeline", timeline);
 
             const formattedHomeTimeline = formatTimeline(
-                this.runtime.character,
+                this.runtime.characterTemplate,
                 timeline
             );
 
@@ -88,7 +88,7 @@ export class FarcasterPostManager {
             const context = composeContext({
                 state,
                 template:
-                    this.runtime.character.templates?.farcasterPostTemplate ||
+                    this.runtime.characterTemplate.templates?.farcasterPostTemplate ||
                     postTemplate,
             });
 

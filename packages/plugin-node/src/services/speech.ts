@@ -39,7 +39,7 @@ async function getVoiceSettings(runtime: IAgentRuntime) {
     const useVits = !hasElevenLabs;
 
     // Get voice settings from character card
-    const voiceSettings = runtime.character.settings?.voice;
+    const voiceSettings = runtime.characterTemplate.settings?.voice;
     const elevenlabsSettings = voiceSettings?.elevenlabs;
 
     elizaLogger.debug("Voice settings:", {

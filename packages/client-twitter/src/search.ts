@@ -67,8 +67,8 @@ export class TwitterSearchClient extends ClientBase {
     private async engageWithSearchTerms() {
         console.log("Engaging with search terms");
         try {
-            const searchTerm = [...this.runtime.character.topics][
-                Math.floor(Math.random() * this.runtime.character.topics.length)
+            const searchTerm = [...this.runtime.characterTemplate.topics][
+                Math.floor(Math.random() * this.runtime.characterTemplate.topics.length)
             ];
 
             console.log("Fetching search tweets");
@@ -86,7 +86,7 @@ export class TwitterSearchClient extends ClientBase {
             await this.cacheTimeline(homeTimeline);
 
             const formattedHomeTimeline =
-                `# ${this.runtime.character.name}'s Home Timeline\n\n` +
+                `# ${this.runtime.characterTemplate.name}'s Home Timeline\n\n` +
                 homeTimeline
                     .map((tweet) => {
                         return `ID: ${tweet.id}\nFrom: ${tweet.name} (@${tweet.username})${tweet.inReplyToStatusId ? ` In reply to: ${tweet.inReplyToStatusId}` : ""}\nText: ${tweet.text}\n---\n`;
@@ -108,7 +108,7 @@ export class TwitterSearchClient extends ClientBase {
 
             const prompt = `
   Here are some tweets related to the search term "${searchTerm}":
-  
+
   ${[...slicedTweets, ...homeTimeline]
       .filter((tweet) => {
           // ignore tweets where any of the thread tweets contain a tweet by the bot
@@ -126,7 +126,7 @@ export class TwitterSearchClient extends ClientBase {
   `
       )
       .join("\n")}
-  
+
   Which tweet is the most interesting and relevant for Ruby to reply to? Please provide only the ID of the tweet in your response.
   Notes:
     - Respond to English tweets only
@@ -241,7 +241,7 @@ export class TwitterSearchClient extends ClientBase {
                 twitterUserName: this.runtime.getSetting("TWITTER_USERNAME"),
                 timeline: formattedHomeTimeline,
                 tweetContext: `${tweetBackground}
-  
+
   Original Post:
   By @${selectedTweet.username}
   ${selectedTweet.text}${replyContext.length > 0 && `\nReplies to original post:\n${replyContext}`}
@@ -255,7 +255,7 @@ export class TwitterSearchClient extends ClientBase {
             const context = composeContext({
                 state,
                 template:
-                    this.runtime.character.templates?.twitterSearchTemplate ||
+                    this.runtime.characterTemplate.templates?.twitterSearchTemplate ||
                     twitterSearchTemplate,
             });
 

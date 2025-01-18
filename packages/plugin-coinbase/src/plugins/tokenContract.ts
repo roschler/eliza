@@ -61,11 +61,11 @@ export const deployTokenContractAction: Action = {
         elizaLogger.log("Validating runtime for DEPLOY_TOKEN_CONTRACT...");
         return (
             !!(
-                runtime.character.settings.secrets?.COINBASE_API_KEY ||
+                runtime.characterTemplate.settings.secrets?.COINBASE_API_KEY ||
                 process.env.COINBASE_API_KEY
             ) &&
             !!(
-                runtime.character.settings.secrets?.COINBASE_PRIVATE_KEY ||
+                runtime.characterTemplate.settings.secrets?.COINBASE_PRIVATE_KEY ||
                 process.env.COINBASE_PRIVATE_KEY
             )
         );
@@ -290,11 +290,11 @@ export const invokeContractAction: Action = {
         elizaLogger.log("Validating runtime for INVOKE_CONTRACT...");
         return (
             !!(
-                runtime.character.settings.secrets?.COINBASE_API_KEY ||
+                runtime.characterTemplate.settings.secrets?.COINBASE_API_KEY ||
                 process.env.COINBASE_API_KEY
             ) &&
             !!(
-                runtime.character.settings.secrets?.COINBASE_PRIVATE_KEY ||
+                runtime.characterTemplate.settings.secrets?.COINBASE_PRIVATE_KEY ||
                 process.env.COINBASE_PRIVATE_KEY
             )
         );
@@ -449,10 +449,10 @@ export const readContractAction: Action = {
     validate: async (runtime: IAgentRuntime, _message: Memory) => {
         elizaLogger.log("Validating runtime for READ_CONTRACT...");
         return !!(
-            runtime.character.settings.secrets?.COINBASE_API_KEY ||
+            runtime.characterTemplate.settings.secrets?.COINBASE_API_KEY ||
             process.env.COINBASE_API_KEY
         ) && !!(
-            runtime.character.settings.secrets?.COINBASE_PRIVATE_KEY ||
+            runtime.characterTemplate.settings.secrets?.COINBASE_PRIVATE_KEY ||
             process.env.COINBASE_PRIVATE_KEY
         );
     },

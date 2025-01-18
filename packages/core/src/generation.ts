@@ -77,7 +77,7 @@ export async function generateText({
 
     const provider = runtime.modelProvider;
     const endpoint =
-        runtime.character.modelEndpointOverride || models[provider].endpoint;
+        runtime.characterTemplate.modelEndpointOverride || models[provider].endpoint;
     let model = models[provider].model[modelClass];
 
     // if runtime.getSetting("LLAMACLOUD_MODEL_LARGE") is true and modelProvider is LLAMACLOUD, then use the large model
@@ -141,7 +141,7 @@ export async function generateText({
                     model: openai.languageModel(model),
                     prompt: context,
                     system:
-                        runtime.character.system ??
+                        runtime.characterTemplate.system ??
                         settings.SYSTEM_PROMPT ??
                         undefined,
                     temperature: temperature,
@@ -162,7 +162,7 @@ export async function generateText({
                     model: google(model),
                     prompt: context,
                     system:
-                        runtime.character.system ??
+                        runtime.characterTemplate.system ??
                         settings.SYSTEM_PROMPT ??
                         undefined,
                     temperature: temperature,
@@ -185,7 +185,7 @@ export async function generateText({
                     model: anthropic.languageModel(model),
                     prompt: context,
                     system:
-                        runtime.character.system ??
+                        runtime.characterTemplate.system ??
                         settings.SYSTEM_PROMPT ??
                         undefined,
                     temperature: temperature,
@@ -208,7 +208,7 @@ export async function generateText({
                     model: anthropic.languageModel(model),
                     prompt: context,
                     system:
-                        runtime.character.system ??
+                        runtime.characterTemplate.system ??
                         settings.SYSTEM_PROMPT ??
                         undefined,
                     temperature: temperature,
@@ -234,7 +234,7 @@ export async function generateText({
                     }),
                     prompt: context,
                     system:
-                        runtime.character.system ??
+                        runtime.characterTemplate.system ??
                         settings.SYSTEM_PROMPT ??
                         undefined,
                     temperature: temperature,
@@ -256,7 +256,7 @@ export async function generateText({
                     prompt: context,
                     temperature: temperature,
                     system:
-                        runtime.character.system ??
+                        runtime.characterTemplate.system ??
                         settings.SYSTEM_PROMPT ??
                         undefined,
                     maxTokens: max_response_length,
@@ -303,7 +303,7 @@ export async function generateText({
                     prompt: context,
                     temperature: temperature,
                     system:
-                        runtime.character.system ??
+                        runtime.characterTemplate.system ??
                         settings.SYSTEM_PROMPT ??
                         undefined,
                     maxTokens: max_response_length,
@@ -326,7 +326,7 @@ export async function generateText({
                     prompt: context,
                     temperature: temperature,
                     system:
-                        runtime.character.system ??
+                        runtime.characterTemplate.system ??
                         settings.SYSTEM_PROMPT ??
                         undefined,
                     maxTokens: max_response_length,
@@ -375,7 +375,7 @@ export async function generateText({
                     model: heurist.languageModel(model),
                     prompt: context,
                     system:
-                        runtime.character.system ??
+                        runtime.characterTemplate.system ??
                         settings.SYSTEM_PROMPT ??
                         undefined,
                     temperature: temperature,
@@ -414,7 +414,7 @@ export async function generateText({
                     model: openai.languageModel(model),
                     prompt: context,
                     system:
-                        runtime.character.system ??
+                        runtime.characterTemplate.system ??
                         settings.SYSTEM_PROMPT ??
                         undefined,
                     temperature: temperature,
@@ -439,7 +439,7 @@ export async function generateText({
                     model: galadriel.languageModel(model),
                     prompt: context,
                     system:
-                        runtime.character.system ??
+                        runtime.characterTemplate.system ??
                         settings.SYSTEM_PROMPT ??
                         undefined,
                     temperature: temperature,
@@ -820,7 +820,7 @@ export async function generateMessageResponse({
 
                     parsedContent =
                         {
-                            user: runtime.character.name,
+                            user: runtime.characterTemplate.name,
                             text: response,
                             action: "NONE"
                         } as Content;

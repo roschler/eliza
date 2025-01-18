@@ -56,15 +56,15 @@ export const createWebhookAction: Action = {
         elizaLogger.log("Validating runtime for CREATE_WEBHOOK...");
         return (
             !!(
-                runtime.character.settings.secrets?.COINBASE_API_KEY ||
+                runtime.characterTemplate.settings.secrets?.COINBASE_API_KEY ||
                 process.env.COINBASE_API_KEY
             ) &&
             !!(
-                runtime.character.settings.secrets?.COINBASE_PRIVATE_KEY ||
+                runtime.characterTemplate.settings.secrets?.COINBASE_PRIVATE_KEY ||
                 process.env.COINBASE_PRIVATE_KEY
             ) &&
             !!(
-                runtime.character.settings.secrets?.COINBASE_NOTIFICATION_URI ||
+                runtime.characterTemplate.settings.secrets?.COINBASE_NOTIFICATION_URI ||
                 process.env.COINBASE_NOTIFICATION_URI
             )
         );

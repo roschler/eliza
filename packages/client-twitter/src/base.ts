@@ -147,9 +147,9 @@ export class ClientBase extends EventEmitter {
 
         this.directions =
             "- " +
-            this.runtime.character.style.all.join("\n- ") +
+            this.runtime.characterTemplate.style.all.join("\n- ") +
             "- " +
-            this.runtime.character.style.post.join();
+            this.runtime.characterTemplate.style.post.join();
     }
 
     async init() {
@@ -203,7 +203,7 @@ export class ClientBase extends EventEmitter {
                 JSON.stringify(this.profile, null, 10)
             );
             // Store profile info for use in responses
-            this.runtime.character.twitterProfile = {
+            this.runtime.characterTemplate.twitterProfile = {
                 id: this.profile.id,
                 username: this.profile.username,
                 screenName: this.profile.screenName,
@@ -485,7 +485,7 @@ export class ClientBase extends EventEmitter {
         await this.runtime.ensureUserExists(
             this.runtime.agentId,
             this.profile.username,
-            this.runtime.character.name,
+            this.runtime.characterTemplate.name,
             "twitter"
         );
 
@@ -667,16 +667,16 @@ export class ClientBase extends EventEmitter {
                 return {
                     id: profile.userId,
                     username,
-                    screenName: profile.name || this.runtime.character.name,
+                    screenName: profile.name || this.runtime.characterTemplate.name,
                     bio:
                         profile.biography ||
-                        typeof this.runtime.character.bio === "string"
-                            ? (this.runtime.character.bio as string)
-                            : this.runtime.character.bio.length > 0
-                              ? this.runtime.character.bio[0]
+                        typeof this.runtime.characterTemplate.bio === "string"
+                            ? (this.runtime.characterTemplate.bio as string)
+                            : this.runtime.characterTemplate.bio.length > 0
+                              ? this.runtime.characterTemplate.bio[0]
                               : "",
                     nicknames:
-                        this.runtime.character.twitterProfile?.nicknames || [],
+                        this.runtime.characterTemplate.twitterProfile?.nicknames || [],
                 } satisfies TwitterProfile;
             });
 

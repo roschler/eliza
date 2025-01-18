@@ -131,11 +131,11 @@ export class TwitterPostClient {
             await this.runtime.ensureUserExists(
                 this.runtime.agentId,
                 this.client.profile.username,
-                this.runtime.character.name,
+                this.runtime.characterTemplate.name,
                 "twitter"
             );
 
-            const topics = this.runtime.character.topics.join(", ");
+            const topics = this.runtime.characterTemplate.topics.join(", ");
             const state = await this.runtime.composeState(
                 {
                     userId: this.runtime.agentId,
@@ -155,7 +155,7 @@ export class TwitterPostClient {
             const context = composeContext({
                 state,
                 template:
-                    this.runtime.character.templates?.twitterPostTemplate ||
+                    this.runtime.characterTemplate.templates?.twitterPostTemplate ||
                     twitterPostTemplate,
             });
 

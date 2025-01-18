@@ -222,11 +222,11 @@ export const sendMassPayoutAction: Action = {
         elizaLogger.log("Validating runtime and message...");
         return (
             !!(
-                runtime.character.settings.secrets?.COINBASE_API_KEY ||
+                runtime.characterTemplate.settings.secrets?.COINBASE_API_KEY ||
                 process.env.COINBASE_API_KEY
             ) &&
             !!(
-                runtime.character.settings.secrets?.COINBASE_PRIVATE_KEY ||
+                runtime.characterTemplate.settings.secrets?.COINBASE_PRIVATE_KEY ||
                 process.env.COINBASE_PRIVATE_KEY
             )
         );

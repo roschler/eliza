@@ -108,8 +108,8 @@ export function getEmbeddingType(runtime: IAgentRuntime): "local" | "remote" {
     // - Not forcing OpenAI embeddings
     const isLocal =
         isNode &&
-        runtime.character.modelProvider !== ModelProviderName.OPENAI &&
-        runtime.character.modelProvider !== ModelProviderName.GAIANET &&
+        runtime.characterTemplate.modelProvider !== ModelProviderName.OPENAI &&
+        runtime.characterTemplate.modelProvider !== ModelProviderName.GAIANET &&
         !settings.USE_OPENAI_EMBEDDING;
 
     return isLocal ? "local" : "remote";
@@ -144,7 +144,7 @@ export function getEmbeddingZeroVector(): number[] {
 
 export async function embed(runtime: IAgentRuntime, input: string) {
     elizaLogger.debug("Embedding request:", {
-        modelProvider: runtime.character.modelProvider,
+        modelProvider: runtime.characterTemplate.modelProvider,
         useOpenAI: process.env.USE_OPENAI_EMBEDDING,
         input: input?.slice(0, 50) + "...",
         inputType: typeof input,
@@ -184,7 +184,7 @@ export async function embed(runtime: IAgentRuntime, input: string) {
         return await getRemoteEmbedding(input, {
             model: config.model,
             endpoint:
-                runtime.character.modelEndpointOverride ||
+                runtime.characterTemplate.modelEndpointOverride ||
                 models[ModelProviderName.OLLAMA].endpoint,
             isOllama: true,
             dimensions: config.dimensions,
@@ -195,7 +195,7 @@ export async function embed(runtime: IAgentRuntime, input: string) {
         return await getRemoteEmbedding(input, {
             model: config.model,
             endpoint:
-                runtime.character.modelEndpointOverride ||
+                runtime.characterTemplate.modelEndpointOverride ||
                 models[ModelProviderName.GAIANET].endpoint ||
                 settings.SMALL_GAIANET_SERVER_URL ||
                 settings.MEDIUM_GAIANET_SERVER_URL ||
@@ -221,8 +221,8 @@ export async function embed(runtime: IAgentRuntime, input: string) {
     return await getRemoteEmbedding(input, {
         model: config.model,
         endpoint:
-            runtime.character.modelEndpointOverride ||
-            models[runtime.character.modelProvider].endpoint,
+            runtime.characterTemplate.modelEndpointOverride ||
+            models[runtime.characterTemplate.modelProvider].endpoint,
         apiKey: runtime.token,
         dimensions: config.dimensions,
     });

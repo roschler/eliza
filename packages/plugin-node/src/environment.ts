@@ -26,7 +26,7 @@ export async function validateNodeConfig(
     runtime: IAgentRuntime
 ): Promise<NodeConfig> {
     try {
-        const voiceSettings = runtime.character.settings?.voice;
+        const voiceSettings = runtime.characterTemplate.settings?.voice;
         const elevenlabs = voiceSettings?.elevenlabs;
 
         // Only include what's absolutely required

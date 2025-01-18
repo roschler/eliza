@@ -58,7 +58,7 @@ async function handler(runtime: IAgentRuntime, message: Memory) {
 
     const context = composeContext({
         state,
-        template: runtime.character.templates?.factsTemplate || factsTemplate,
+        template: runtime.characterTemplate.templates?.factsTemplate || factsTemplate,
     });
 
     const facts = await generateObjectArray({

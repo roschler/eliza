@@ -592,7 +592,7 @@ export class VoiceManager extends EventEmitter {
                 {
                     discordChannel: channel,
                     discordClient: this.client,
-                    agentName: this.runtime.character.name,
+                    agentName: this.runtime.characterTemplate.name,
                 }
             );
 
@@ -642,9 +642,9 @@ export class VoiceManager extends EventEmitter {
             const context = composeContext({
                 state,
                 template:
-                    this.runtime.character.templates
+                    this.runtime.characterTemplate.templates
                         ?.discordVoiceHandlerTemplate ||
-                    this.runtime.character.templates?.messageHandlerTemplate ||
+                    this.runtime.characterTemplate.templates?.messageHandlerTemplate ||
                     discordVoiceHandlerTemplate,
             });
 
@@ -666,7 +666,7 @@ export class VoiceManager extends EventEmitter {
                     userId: this.runtime.agentId,
                     content: {
                         ...content,
-                        user: this.runtime.character.name,
+                        user: this.runtime.characterTemplate.name,
                         inReplyTo: memory.id,
                     },
                     roomId,
@@ -751,7 +751,7 @@ export class VoiceManager extends EventEmitter {
         if (userId === this.client.user?.id) return false;
         const lowerMessage = message.toLowerCase();
         const botName = this.client.user.username.toLowerCase();
-        const characterName = this.runtime.character.name.toLowerCase();
+        const characterName = this.runtime.characterTemplate.name.toLowerCase();
         const guild = channel.guild;
         const member = guild?.members.cache.get(this.client.user?.id as string);
         const nickname = member?.nickname;
@@ -775,9 +775,9 @@ export class VoiceManager extends EventEmitter {
         const shouldRespondContext = composeContext({
             state,
             template:
-                this.runtime.character.templates
+                this.runtime.characterTemplate.templates
                     ?.discordShouldRespondTemplate ||
-                this.runtime.character.templates?.shouldRespondTemplate ||
+                this.runtime.characterTemplate.templates?.shouldRespondTemplate ||
                 discordShouldRespondTemplate,
         });
 

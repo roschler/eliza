@@ -77,15 +77,18 @@ async function processUrlReference(character: Character, propName: string, propV
  * Processes a character object to resolve "file:", "http:", or "https:"
  *  references in its properties, replacing the content of those properties
  *  with the content found in the referenced file path or fetched remote
- *  content in the property value.
+ *  content in the property value.  Recursively descends into any
+ *  child objects
  *
  * @param character - The character whose properties are to be evaluated.
- *                   If a property value is a string starting with "file:",
- *                   it is treated as a file reference, the file is loaded,
- *                   and the property value is replaced with the file's
- *                   content.  If the property value starts with "http:"
- *                   or "https:", the content is fetched asynchronously
- *                   using the given URL.
+ *
+ *  NOTE: If a property value is a string starting with "file:",
+ *   it is treated as a file reference, the file is loaded,
+ *   and the property value is replaced with the file's
+ *   content.  If the property value starts with "http:"
+ *   or "https:", the content is fetched asynchronously
+ *   using the given URL.
+ *
  * @throws Will throw an error if the provided character is not an object.
  * @throws Will throw an error if a property has an invalid "file:", "http:",
  *  or "https:" reference.
@@ -99,23 +102,52 @@ export async function processFileOrUrlReferences(character: Character): Promise<
     // Iterate over all properties of the character object
     for (const propName in character) {
         if (Object.prototype.hasOwnProperty.call(character, propName)) {
-            let externalContent: string | null;
-
             const propValue = (character as Record<string, any>)[propName];
 
-            // Check if the property value is a string starting with "file:"
-            if (typeof propValue === 'string') {
-                if (propValue.startsWith("file:")) {
+            if (Array.isArray(propValue)) {
+                // Process each element in the array
+                for (let i = 0; i < propValue.length; i++) {
+                    const arrayValue = propValue[i];
 
+                    if (typeof arrayValue === 'object' && arrayValue !== null) {
+                        // Recursively process objects in the array
+                        await processFileOrUrlReferences(arrayValue);
+                    } else if (typeof arrayValue === 'string') {
+                        let externalContent: string | null = null;
+
+                        // Check if the string starts with "file:" or a URL
+                        if (arrayValue.startsWith("file:")) {
+                            externalContent = processFileReference(propName, arrayValue);
+                        } else if (arrayValue.startsWith("http:") || arrayValue.startsWith("https:")) {
+                            externalContent = await processUrlReference(character, `${propName}[${i}]`, arrayValue);
+                        }
+
+                        // Update the array element if external content is retrieved
+                        if (externalContent) {
+                            propValue[i] = externalContent;
+                        }
+                    }
+                }
+            } else if (typeof propValue === 'object' && propValue !== null) {
+                // Recursively process nested objects
+                await processFileOrUrlReferences(propValue);
+            } else if (typeof propValue === 'string') {
+                let externalContent: string | null = null;
+
+                // Check if the string starts with "file:" or a URL
+                if (propValue.startsWith("file:")) {
                     externalContent = processFileReference(propName, propValue);
                 } else if (propValue.startsWith("http:") || propValue.startsWith("https:")) {
-
                     externalContent = await processUrlReference(character, propName, propValue);
                 }
-            }
 
-            if (externalContent)
-                (character as Record<string, any>)[propName] = externalContent;
+                // Update the property value if external content is retrieved
+                if (externalContent) {
+                    (character as Record<string, any>)[propName] = externalContent;
+                }
+            }
         }
     }
 }
+
+

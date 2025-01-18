@@ -213,9 +213,9 @@ export class MessageManager {
             const shouldRespondContext = composeContext({
                 state,
                 template:
-                    this.runtime.character.templates
+                    this.runtime.characterTemplate.templates
                         ?.telegramShouldRespondTemplate ||
-                    this.runtime.character?.templates?.shouldRespondTemplate ||
+                    this.runtime.characterTemplate?.templates?.shouldRespondTemplate ||
                     telegramShouldRespondTemplate,
             });
 
@@ -314,14 +314,14 @@ export class MessageManager {
         }
 
         if (
-            this.runtime.character.clientConfig?.telegram
+            this.runtime.characterTemplate.clientConfig?.telegram
                 ?.shouldIgnoreBotMessages &&
             ctx.from.is_bot
         ) {
             return;
         }
         if (
-            this.runtime.character.clientConfig?.telegram
+            this.runtime.characterTemplate.clientConfig?.telegram
                 ?.shouldIgnoreDirectMessages &&
             ctx.chat?.type === "private"
         ) {
@@ -423,9 +423,9 @@ export class MessageManager {
                 const context = composeContext({
                     state,
                     template:
-                        this.runtime.character.templates
+                        this.runtime.characterTemplate.templates
                             ?.telegramMessageHandlerTemplate ||
-                        this.runtime.character?.templates
+                        this.runtime.characterTemplate?.templates
                             ?.messageHandlerTemplate ||
                         telegramMessageHandlerTemplate,
                 });
