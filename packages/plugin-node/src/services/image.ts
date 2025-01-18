@@ -93,7 +93,7 @@ export class ImageDescriptionService
         imageUrl: string
     ): Promise<{ title: string; description: string }> {
         if (!this.initialized) {
-            const model = models[this.runtime?.characterTemplate?.modelProvider];
+            const model = models[this.runtime?.character?.modelProvider];
 
             if (model === models[ModelProviderName.LLAMALOCAL]) {
                 await this.initializeLocalModel();

@@ -35,7 +35,7 @@ export async function initializeWallet(
         const walletData: WalletData = wallet.export();
         const walletAddress = await wallet.getDefaultAddress();
         try {
-            const characterFilePath = `characters/${runtime.characterTemplate.name.toLowerCase()}.character.json`;
+            const characterFilePath = `characters/${runtime.character.name.toLowerCase()}.character.json`;
             const walletIDSave = await updateCharacterSecrets(
                 characterFilePath,
                 "COINBASE_GENERATED_WALLET_ID",
@@ -49,7 +49,7 @@ export async function initializeWallet(
             if (walletIDSave && seedSave) {
                 elizaLogger.log("Successfully updated character secrets.");
             } else {
-                const seedFilePath = `characters/${runtime.characterTemplate.name.toLowerCase()}-seed.txt`;
+                const seedFilePath = `characters/${runtime.character.name.toLowerCase()}-seed.txt`;
                 elizaLogger.error(
                     `Failed to update character secrets so adding gitignored ${seedFilePath} file please add it your env or character file and delete:`
                 );

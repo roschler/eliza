@@ -70,6 +70,7 @@ import {
     createEndObjectiveMemory
 } from "@ai16z/eliza";
 import {CLIENT_NAME} from "./common.ts";
+import {processFileUrlOrStringReference} from "./process-external-references.ts";
 
 // -------------------------- BEGIN: SOME CONSTANTS ------------------------
 
@@ -83,13 +84,12 @@ const defaultInvalidResultValueResponse: Content = {
  * If the developer did not assign a help document to the bill-of-materials
  *  line item's helpDocumentForBomLineItem property, then we will use this
  *  generic help.
- *
+ */
 const DEFAULT_BOM_HELP_DOCUMENT =
     `
-    Analyze the recent chat message history to see how you can provide
-    help to the user's current question.
-`;
-*/
+    Use your knowledge to help the user as best as you can
+    `;
+
 
 // -------------------------- END  : SOME CONSTANTS ------------------------
 
@@ -466,7 +466,7 @@ export function buildBomCancelResponse(runtime: IAgentRuntime, callerErrPrefix: 
     //  in the event of a user cancellation request, then that is
     //  an error.
     const nextCharacterName =
-        runtime.characterTemplate.switchToCharacterWhenBomSessionCancelled;
+        runtime.character.switchToCharacterWhenBomSessionCancelled;
 
     if (typeof nextCharacterName !== "string" || typeof nextCharacterName === "string" && nextCharacterName.trim().length === 0) {
         throw new Error(`${callerErrPrefix}The user has requested the cancelling of the bill-of-materials session, but the character does not specify the next agent to transfer control to (i.e. - switchToCharacterWhenBomSessionCancelled is unassigned or invalid.`);
@@ -681,7 +681,7 @@ const helpModeMessageTemplate =
  *  agent/character, FALSE if not.
  */
 export function isBomAgentCharacter(runtime: IAgentRuntime): boolean {
-    return Array.isArray(runtime.characterTemplate.billOfMaterials) && runtime.characterTemplate.billOfMaterials.length > 0;
+    return Array.isArray(runtime.character.billOfMaterials) && runtime.character.billOfMaterials.length > 0;
 }
 
 /**
@@ -884,11 +884,16 @@ export function buildBomStopAtStringsLastObjective(...additionalStopAtStrings: s
  async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, currentBomObjective: Objective): Promise<Content> {
      const errPrefix = `(askLlmBomMainQuestion) `;
 
+     const resolveHelpDocument =
+         await processFileUrlOrStringReference(
+             'currentBomObjective.billOfMaterialsLineItem.helpDocumentForBomLineItem',
+             currentBomObjective.billOfMaterialsLineItem.helpDocumentForBomLineItem);
+
      // Put the objective's help text into the state before we compose the context.
      state.helpDocument =
          // We prefer there to be a full help document attached to the current
          //  line item.
-         currentBomObjective.billOfMaterialsLineItem.helpDocumentForBomLineItem
+         resolveHelpDocument
          ??
          // If not, use the generic help text.
          DEFAULT_BOM_HELP_DOCUMENT;
@@ -896,7 +901,7 @@ export function buildBomStopAtStringsLastObjective(...additionalStopAtStrings: s
      // Do the substitution variable replacements.
      const useFormattedMessage = composeContext({
          state: state,
-         template: helpModeMessageTemplate
+         template: mainTem
      });
 
      // Default response, in case we fail to interpret the result
@@ -1121,8 +1126,16 @@ async function bomPreliminaryQuestionCheckResultHandler(
     currentBomObjective: Objective): Promise<ContentOrNull> {
     const errPrefix = `(bomPreliminaryQuestionCheckResultHandler) `;
 
+    const resolvedQuestion =
+        await processFileUrlOrStringReference(
+            'currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem',
+            currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+
     // Put the objective's preliminary question into the state before we compose the context.
-    mergeBomFieldIntoState(state, "simpleQuestion", currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+    mergeBomFieldIntoState(
+        state,
+        "simpleQuestion",
+        resolvedQuestion);
 
     // Do the substitution variable replacements.
     const useFormattedMessage = composeContext({
@@ -1820,12 +1833,15 @@ export async function determineBomQuestionResult(
  * @returns - Returns the fully assembled text that asks the question contained
  *  in the bill-of-materials objective.
  */
-export function buildBomMainQuestion(currentBomObjective: Objective): string {
+export async function buildBomMainQuestion(currentBomObjective: Objective): Promise<string> {
     const errPrefix = `(buildBomMainQuestion) `;
 
     // We need to adjust the question to encompass any validations
     //  declared in the bill-of-materials line item.
-    let retText = currentBomObjective.billOfMaterialsLineItem.prompt;
+    let retText =
+        await processFileUrlOrStringReference(
+            'currentBomObjective.billOfMaterialsLineItem.prompt',
+            currentBomObjective.billOfMaterialsLineItem.prompt);
 
     if (currentBomObjective.billOfMaterialsLineItem.type === 'boolean') {
         // -------------------------- BEGIN: BOOLEAN TYPE ------------------------
@@ -1837,7 +1853,9 @@ export function buildBomMainQuestion(currentBomObjective: Objective): string {
         // -------------------------- BEGIN: NUMBER TYPE ------------------------
 
         // Add units if present.
-        if (typeof currentBomObjective.billOfMaterialsLineItem.unitsDescription === 'string' && currentBomObjective.billOfMaterialsLineItem.unitsDescription.trim().length > 0) {
+        if (
+            typeof currentBomObjective.billOfMaterialsLineItem.unitsDescription === 'string'
+                && currentBomObjective.billOfMaterialsLineItem.unitsDescription.trim().length > 0) {
             retText += ` Please give your answer in ${currentBomObjective.billOfMaterialsLineItem.unitsDescription.trim()}.`;
         }
 
@@ -1903,7 +1921,7 @@ export function buildBomMainQuestion(currentBomObjective: Objective): string {
  *  bill-of-materials content, or if it does, returns the
  *  bill-of-materials sub-prompt made from that content.
  */
-export function buildBillOfMaterialQuestion(currentBomObjective: Objective): string | null {
+export async function buildBillOfMaterialQuestion(currentBomObjective: Objective): Promise<StringOrNull> {
     const errPrefix = `(buildBillOfMaterialQuestion) `;
 
     let retStr: StringOrNull = null;
@@ -1955,7 +1973,7 @@ export function buildBillOfMaterialQuestion(currentBomObjective: Objective): str
         // -------------------------- BEGIN: MAIN LINE ITEM QUESTION ------------------------
 
         const bomMainQuestion =
-            buildBomMainQuestion(currentBomObjective);
+            await buildBomMainQuestion(currentBomObjective);
 
         piecesOfPrompt.push(bomMainQuestion);
 

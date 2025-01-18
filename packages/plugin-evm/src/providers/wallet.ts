@@ -44,7 +44,7 @@ export const DEFAULT_CHAIN_CONFIGS: Record<SupportedChain, ChainMetadata> = {
 
 export const getChainConfigs = (runtime: IAgentRuntime) => {
     return (
-        (runtime.characterTemplate.settings.chains?.evm as ChainConfig[]) ||
+        (runtime.character.settings.chains?.evm as ChainConfig[]) ||
         DEFAULT_CHAIN_CONFIGS
     );
 };

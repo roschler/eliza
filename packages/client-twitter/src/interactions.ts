@@ -285,9 +285,9 @@ export class TwitterInteractionClient {
         const shouldRespondContext = composeContext({
             state,
             template:
-                this.runtime.characterTemplate.templates
+                this.runtime.character.templates
                     ?.twitterShouldRespondTemplate ||
-                this.runtime.characterTemplate?.templates?.shouldRespondTemplate ||
+                this.runtime.character?.templates?.shouldRespondTemplate ||
                 twitterShouldRespondTemplate,
         });
 
@@ -306,9 +306,9 @@ export class TwitterInteractionClient {
         const context = composeContext({
             state,
             template:
-                this.runtime.characterTemplate.templates
+                this.runtime.character.templates
                     ?.twitterMessageHandlerTemplate ||
-                this.runtime.characterTemplate?.templates?.messageHandlerTemplate ||
+                this.runtime.character?.templates?.messageHandlerTemplate ||
                 twitterMessageHandlerTemplate,
         });
 

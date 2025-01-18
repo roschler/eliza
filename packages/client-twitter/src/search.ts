@@ -67,8 +67,8 @@ export class TwitterSearchClient extends ClientBase {
     private async engageWithSearchTerms() {
         console.log("Engaging with search terms");
         try {
-            const searchTerm = [...this.runtime.characterTemplate.topics][
-                Math.floor(Math.random() * this.runtime.characterTemplate.topics.length)
+            const searchTerm = [...this.runtime.character.topics][
+                Math.floor(Math.random() * this.runtime.character.topics.length)
             ];
 
             console.log("Fetching search tweets");
@@ -86,7 +86,7 @@ export class TwitterSearchClient extends ClientBase {
             await this.cacheTimeline(homeTimeline);
 
             const formattedHomeTimeline =
-                `# ${this.runtime.characterTemplate.name}'s Home Timeline\n\n` +
+                `# ${this.runtime.character.name}'s Home Timeline\n\n` +
                 homeTimeline
                     .map((tweet) => {
                         return `ID: ${tweet.id}\nFrom: ${tweet.name} (@${tweet.username})${tweet.inReplyToStatusId ? ` In reply to: ${tweet.inReplyToStatusId}` : ""}\nText: ${tweet.text}\n---\n`;
@@ -255,7 +255,7 @@ export class TwitterSearchClient extends ClientBase {
             const context = composeContext({
                 state,
                 template:
-                    this.runtime.characterTemplate.templates?.twitterSearchTemplate ||
+                    this.runtime.character.templates?.twitterSearchTemplate ||
                     twitterSearchTemplate,
             });
 

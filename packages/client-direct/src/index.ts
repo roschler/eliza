@@ -126,7 +126,7 @@ export class DirectClient {
                 if (!runtime) {
                     runtime = Array.from(this.agents.values()).find(
                         (a) =>
-                            a.characterTemplate.name.toLowerCase() ===
+                            a.character.name.toLowerCase() ===
                             agentId.toLowerCase()
                     );
                 }
@@ -208,12 +208,12 @@ export class DirectClient {
                         throw new Error(`More than one goal was returned from getGoalsByRelationship.  Only one or none is expected.`);
 
                     if (bomGoalsFound.length > 0) {
-                        elizaLogger.debug(`An existing goal was found for agent/character: ${runtime.characterTemplate.name}`);
+                        elizaLogger.debug(`An existing goal was found for agent/character: ${runtime.character.name}`);
 
                         // Use the existing goal.
                         retGoalOrNull = bomGoalsFound[0];
                     } else {
-                        elizaLogger.debug(`No existing goals found for agent/character: ${runtime.characterTemplate.name}`);
+                        elizaLogger.debug(`No existing goals found for agent/character: ${runtime.character.name}`);
                     }
 
                     return retGoalOrNull;
@@ -259,7 +259,7 @@ export class DirectClient {
                     if (!runtime && agentId.trim().length > 0) {
                         runtime = Array.from(this.agents.values()).find(
                             (a) =>
-                                a.characterTemplate.name.toLowerCase() ===
+                                a.character.name.toLowerCase() ===
                                 agentId.toLowerCase()
                         );
                     }
@@ -286,7 +286,7 @@ export class DirectClient {
                         await findAgentAssignedToUser(roomId, userId, this.agents);
 
                     if (overrideRuntimeOrNull instanceof AgentRuntime) {
-                        elizaLogger.debug(`User assigned the following agent with CHARACTER name: ${overrideRuntimeOrNull.characterTemplate.name}`);
+                        elizaLogger.debug(`User assigned the following agent with CHARACTER name: ${overrideRuntimeOrNull.character.name}`);
 
                         // Override the selected agent.
                         runtime = overrideRuntimeOrNull;
@@ -302,7 +302,7 @@ export class DirectClient {
                     // If an existing user to agent/character relationship was not found,
                     //  make that association now.
                     if (!overrideRuntimeOrNull) {
-                        elizaLogger.debug(`Creating starting relationship for user ID("${userId}") with character: ${runtime.characterTemplate.name}`);
+                        elizaLogger.debug(`Creating starting relationship for user ID("${userId}") with character: ${runtime.character.name}`);
 
                         // Make an exclusive relationship between the given user ID and the
                         //  selected agent/character.  All other relationships for that user
@@ -315,16 +315,14 @@ export class DirectClient {
 
                     // -------------------------- BEGIN: HOT-LOAD CHARACTER CONTENT ------------------------
 
-                    // Make a clone of the characterTemplate object so we can modify
-                    //  its contents without modifying the template object.
-                    runtime.characterProcessed =
-                        shallowCloneCharacter(runtime.characterTemplate);
-
+                    // DEPRECATED: Deprecated in favor of true on-demand string field
+                    //  processing.
+                    //
                     // This code process all the character fields that have "file:", "http:", or "https:"
                     //  prefixes and replaces the field content with the results of a file load or
                     //  HTTP/HTTPS fetch call, with the result being put into the "characterProcessed"
                     //  property.
-                    await processFileOrUrlReferences(runtime.characterProcessed);
+                    // await processFileOrUrlReferences(runtime.character);
 
                     // -------------------------- END  : HOT-LOAD CHARACTER CONTENT ------------------------
 
@@ -335,7 +333,7 @@ export class DirectClient {
                     if (bIsBomAgentCharacter) {
                         // Yes it is.  Get the bill-of-materials goal for this agent/character.
                         const relationshipIdPair: FullUserIdCharacterIdPair =
-                            buildRelationshipIdPair(roomId, userId, runtime.characterTemplate.name);
+                            buildRelationshipIdPair(roomId, userId, runtime.character.name);
 
                         // If this is not an explicit RESET command, then see if the
                         //  current agent/character has a goal in progress.
@@ -351,7 +349,7 @@ export class DirectClient {
                         // Was an explicit RESET command triggered OR does the agent/character
                         //  not have an existing goal object?
                         if (bIsResetCommand || !mainBomGoal) {
-                            elizaLogger.debug(`RESET command received.  Building the main bill-of-materials goal for agent/character: ${runtime.characterTemplate.name}.`);
+                            elizaLogger.debug(`RESET command received.  Building the main bill-of-materials goal for agent/character: ${runtime.character.name}.`);
 
                             // Yes. Rebuild the character/agent's MAIN goal using its
                             //  bill of materials content.
@@ -359,7 +357,7 @@ export class DirectClient {
                         } else {
                             // No. mainBomGoal should have a valid bill-of-materials goal for
                             //  us to use now.
-                            elizaLogger.debug(`Re-using the main bill-of-materials goal for agent/character: ${runtime.characterTemplate.name}.`);
+                            elizaLogger.debug(`Re-using the main bill-of-materials goal for agent/character: ${runtime.character.name}.`);
                         }
                     }
 
@@ -406,7 +404,7 @@ export class DirectClient {
                     // -------------------------- END  : SAVE USER INPUT AS MEMORY ------------------------
 
                     const state = await runtime.composeState(userMessage, {
-                        agentName: runtime.characterTemplate.name,
+                        agentName: runtime.character.name,
                     });
 
 
@@ -447,7 +445,7 @@ export class DirectClient {
                             //  now that the bill-of-materials goal is complete, then that
                             //  is an error.
                             const nextCharacterName =
-                                runtime.characterTemplate.switchToCharacterWhenBomComplete;
+                                runtime.character.switchToCharacterWhenBomComplete;
 
                             if (typeof nextCharacterName !== "string" || typeof nextCharacterName === "string" && nextCharacterName.trim().length === 0) {
                                 throw new Error(`The bill-of-materials goal processing is complete, but the character does not specify the next agent to transfer control to (i.e. - switchToCharacterWhenBomComplete is unassigned or invalid.`);
@@ -485,7 +483,7 @@ export class DirectClient {
                                 elizaLogger.debug(`Building the next bill-of-materials question now, for objective: ${currentBomObjective.description}`);
 
                                 const billOfMaterialsQuestion =
-                                    buildBillOfMaterialQuestion(currentBomObjective);
+                                    await buildBillOfMaterialQuestion(currentBomObjective);
 
                                 if (billOfMaterialsQuestion.trim().length === 0)
                                     throw new Error(`The billOfMaterialsQuestion variable is empty.`);
@@ -513,9 +511,9 @@ export class DirectClient {
                         // If the character has its own message template, use that instead.
                         let useTemplate = messageHandlerTemplate;
 
-                        if (runtime.characterTemplate.messageTemplate && runtime.characterTemplate.messageTemplate.trim().length > 0) {
+                        if (runtime.character.messageTemplate && runtime.character.messageTemplate.trim().length > 0) {
                             elizaLogger.debug(`OVERRIDING message template with CHARACTER defined message template.`);
-                            useTemplate = runtime.characterTemplate.messageTemplate.trim();
+                            useTemplate = runtime.character.messageTemplate.trim();
                         }
 
                         const context = composeContext({

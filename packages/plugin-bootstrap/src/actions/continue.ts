@@ -129,8 +129,8 @@ export const continueAction: Action = {
         const context = composeContext({
             state,
             template:
-                runtime.characterTemplate.templates?.continueMessageHandlerTemplate ||
-                runtime.characterTemplate.templates?.messageHandlerTemplate ||
+                runtime.character.templates?.continueMessageHandlerTemplate ||
+                runtime.character.templates?.messageHandlerTemplate ||
                 messageHandlerTemplate,
         });
         const { userId, roomId } = message;

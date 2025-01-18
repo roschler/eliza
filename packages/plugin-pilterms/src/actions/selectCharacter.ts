@@ -60,10 +60,10 @@ export function findUserIdInState(state: State, ignoreUserNames: string[] = ["Pi
  *  the reset operation.
  */
 export async function resetBomGoalsForRelationship(roomId: UUID, userId: UUID, runtime: IAgentRuntime): Promise<Goal> {
-    elizaLogger.debug(`RESETTING main GOAL and objectives using bill of materials content for agent/character: ${runtime.characterTemplate.name}`);
+    elizaLogger.debug(`RESETTING main GOAL and objectives using bill of materials content for agent/character: ${runtime.character.name}`);
 
     // Build a room ID prepended relationship ID pair object.
-    const relationshipIdPair = buildRelationshipIdPair(roomId, userId, runtime.characterTemplate.name);
+    const relationshipIdPair = buildRelationshipIdPair(roomId, userId, runtime.character.name);
 
     // Delete all existing bill-of-materials goals for the
     //  user ID + agent ID pair that have a relationship in
@@ -101,7 +101,7 @@ export async function resetBomGoalsForRelationship(roomId: UUID, userId: UUID, r
     // Store the goal.
     await runtime.databaseAdapter.createGoal(newGoal);
 
-    elizaLogger.debug(`MAIN GOAL and objectives rebuilt using the bill of materials content for agent/character: ${runtime.characterTemplate.name}`);
+    elizaLogger.debug(`MAIN GOAL and objectives rebuilt using the bill of materials content for agent/character: ${runtime.character.name}`);
 
     return newGoal;
 }
@@ -144,10 +144,10 @@ type UuidOrNull = UUID | null;
 export async function billOfMaterialsToObjectives(runtime: IAgentRuntime): Promise<Objective[]> {
     const bomObjectivesForAgent = [];
 
-    if (runtime.characterTemplate.billOfMaterials && runtime.characterTemplate.billOfMaterials.length > 0) {
+    if (runtime.character.billOfMaterials && runtime.character.billOfMaterials.length > 0) {
         // Iterate the bill of materials array to create the objectives.
-        for (let bomNdx = 0; bomNdx < runtime.characterTemplate.billOfMaterials.length; bomNdx++) {
-            const bomLineItem = runtime.characterTemplate.billOfMaterials[bomNdx];
+        for (let bomNdx = 0; bomNdx < runtime.character.billOfMaterials.length; bomNdx++) {
+            const bomLineItem = runtime.character.billOfMaterials[bomNdx];
 
             const newObjective: Objective = {
                 // Transfer over the full bill of materials line item
@@ -223,11 +223,11 @@ export const selectCharacterAction = {
                     await isRelated(roomId, userId, runtime);
 
                 if (bIsAlreadyRelated) {
-                    elizaLogger.debug(`ACTIVE CHARACTER (continuing): ${runtime.characterTemplate.name}`);
+                    elizaLogger.debug(`ACTIVE CHARACTER (continuing): ${runtime.character.name}`);
                 } else {
                     // -------------------------- BEGIN: CREATE NEW USER/CHARACTER RELATIONSHIP ------------------------
 
-                    elizaLogger.debug(`ACTIVE CHARACTER (changing to): ${runtime.characterTemplate.name}`);
+                    elizaLogger.debug(`ACTIVE CHARACTER (changing to): ${runtime.character.name}`);
 
                     // Make an exclusive relationship between the given user ID and the
                     //  selected agent/character.  All other relationships for that user
@@ -236,7 +236,7 @@ export const selectCharacterAction = {
 
                     // Does the character have the resetGoalsOnReceivingControl flag
                     //  set?
-                    if (runtime.characterTemplate.resetGoalsOnReceivingControl) {
+                    if (runtime.character.resetGoalsOnReceivingControl) {
                         await resetBomGoalsForRelationship(roomId, userId, runtime);
                     }
 

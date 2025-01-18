@@ -194,7 +194,7 @@ export async function removeAllUserToCharacterRelationships(roomId: UUID, userId
             const agentObj = agentRegistry[agentNdx];
 
             const relationshipIdPair: FullUserIdCharacterIdPair =
-                buildRelationshipIdPair(roomId, userId, agentObj.characterTemplate.name);
+                buildRelationshipIdPair(roomId, userId, agentObj.character.name);
 
             try {
                 const bSuccess =
@@ -232,7 +232,7 @@ export async function setUserToCharacterRelationship(roomId: UUID, userId: UUID,
 
     try {
         const fullUserToCharacterIdPair =
-            buildRelationshipIdPair(roomId, userId, desiredAgent.characterTemplate.name);
+            buildRelationshipIdPair(roomId, userId, desiredAgent.character.name);
 
         // Create a relationship between the user and the selected character.
         //  runtime.databaseAdapter.createRelationship().  ALWAYS put
@@ -245,7 +245,7 @@ export async function setUserToCharacterRelationship(roomId: UUID, userId: UUID,
         );
     } catch (error) {
         // This is a serious error that will impact system operations.
-        elizaLogger.error(`The attempt to create a relationship using the following parameters FAILED:\nroomId: ${roomId}\nuserId: ${userId}\nAgent/character name: ${desiredAgent?.characterTemplate?.name}\nError details:\n`, error);
+        elizaLogger.error(`The attempt to create a relationship using the following parameters FAILED:\nroomId: ${roomId}\nuserId: ${userId}\nAgent/character name: ${desiredAgent?.character?.name}\nError details:\n`, error);
 
         return false;
     }
@@ -275,7 +275,7 @@ export async function setExclusiveUserToCharacterRelationship(
 
     try {
         const fullUserToCharacterIdPair =
-            buildRelationshipIdPair(roomId, userId, desiredAgent.characterTemplate.name);
+            buildRelationshipIdPair(roomId, userId, desiredAgent.character.name);
 
         // Remove ALL relationships the user has to any agents in the given room.
         await desiredAgent.databaseAdapter.removeAllRelationships(
@@ -295,7 +295,7 @@ export async function setExclusiveUserToCharacterRelationship(
         elizaLogger.debug(`${errPrefix}RELATIONSHIP CREATED: Room Id(${roomId}), Full user Id(${fullUserToCharacterIdPair.fullUserId}), Full character name: ${fullUserToCharacterIdPair.fullCharacterId}`);
     } catch (error) {
         // This is a serious error that will impact system operations.
-        elizaLogger.error(`${errPrefix}The attempt to create a relationship using the following parameters FAILED:\nroomId: ${roomId}\nuserId: ${userId}\nAgent/character name: ${desiredAgent?.characterTemplate?.name}\nError details:\n`, error);
+        elizaLogger.error(`${errPrefix}The attempt to create a relationship using the following parameters FAILED:\nroomId: ${roomId}\nuserId: ${userId}\nAgent/character name: ${desiredAgent?.character?.name}\nError details:\n`, error);
 
         return false;
     }
@@ -321,7 +321,7 @@ export async function isRelated(roomId: UUID, userId: UUID, agentObj: IAgentRunt
     const errPrefix = `(isRelated) `;
 
     const characterName =
-        agentObj.characterTemplate.name;
+        agentObj.character.name;
 
     if (characterName.length > 0) {
         // We build a full user ID from the current room ID

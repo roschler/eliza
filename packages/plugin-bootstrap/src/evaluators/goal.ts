@@ -65,7 +65,7 @@ async function handler(
     state = (await runtime.composeState(message)) as State;
     const context = composeContext({
         state,
-        template: runtime.characterTemplate.templates?.goalsTemplate || goalsTemplate,
+        template: runtime.character.templates?.goalsTemplate || goalsTemplate,
     });
 
     // Request generateText from OpenAI to analyze conversation and suggest goal updates

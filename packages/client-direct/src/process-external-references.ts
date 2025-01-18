@@ -1,4 +1,4 @@
-import {Character, elizaLogger} from "@ai16z/eliza";
+import {Character, elizaLogger, StringOrNull} from "@ai16z/eliza";
 import {tryLoadFile} from "./utils.ts";
 
 /**
@@ -33,44 +33,93 @@ function processFileReference(propName: string, propValue: string): string | nul
  *  reference, fetch and return the content from the specified
  *  URL.
  *
- * @param character - The character that owns the property.
  * @param propName - The name of the property.
  * @param propValue - The value of the property.
+ *
+ * @returns - Returns the content returned by the URL given
+ *  when fetched, or NULL if the retrieval operation failed.
  */
-async function processUrlReference(character: Character, propName: string, propValue: string): Promise<string | null> {
-    // Extract the file path by removing the "file:" prefix
+async function processUrlReference(propName: string, propValue: string): Promise<StringOrNull> {
+    // Extract the URL by trimming any whitespace
     const url = propValue.trim();
 
     // Log the resolution process
     elizaLogger.debug(
-        `Resolving "http:" or "https:" reference found in character property named ("${propName}") with URL: ${url}`
+        `Resolving "http:" or "https:" reference found in property named ("${propName}") with URL: ${url}`
     );
 
-    // Load the file content and assign it back to the property
+    // Load the URL content and assign it back to the property
     let urlContent = null;
 
     try {
+        const response = await fetch(url, {
+            method: "GET",
+            headers: { "Accept": "text/plain" }, // Specify that we're expecting plain text
+        });
 
-        const response = await fetch(
-            url,
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    character_name: character.name
-                }),
-            }
-        );
+        // Check if the response is OK (status code 200–299)
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
 
-        const jsonObj = await response.json();
-
-        // Content is expected to be in the "text" field.
-        urlContent = jsonObj;
+        // Read the response as plain text
+        urlContent = await response.text();
     } catch (error) {
-        console.error(`Error fetching response for URL("${url}").  Error details:\n`, error);
+        elizaLogger.error(`Error fetching response for URL("${url}"). Error details:\n`, error);
     }
 
     return urlContent;
+}
+
+/**
+ * This function takes a property value and returns the correct content
+ *  based on what it contains.
+ *
+ * NOTE: Currently, only string properties are allowed.
+ *
+ * @param propName - The name of the property.
+ * @param propertyValue - The value of the property.
+ *
+ * @returns - If the property value contains a file reference, that content
+ *  will be loaded and returned.  If it contains a URL reference, the content
+ *  at that URL will be retrieved using a GET request and the received
+ *  text response will be returned.  Otherwise, the property value will be
+ *  returned unmodified.
+ *
+ * NOTE: For URL references, the expected response format is plain text.
+ */
+export async function processFileUrlOrStringReference(propName: string, propertyValue: any): Promise<StringOrNull> {
+    const errPrefix = `(processFileUrlOrStringReference) `;
+
+    if (propName.trim().length === 0) {
+        throw new Error(`${errPrefix}The fieldName parameter is empty or invalid.`);
+    }
+
+    let retContent = null;
+    let errorMsgTemplate = null;
+
+    try {
+        // Currently we only handle string fields.
+        if (typeof propertyValue === "string") {
+            // Check if the string to process starts with "file:" or "http" or "https".
+            if (propertyValue.startsWith("file:")) {
+                errorMsgTemplate = `Error loading file using file path: ${propertyValue}`;
+                retContent = processFileReference(propName, propertyValue);
+            } else if (propertyValue.startsWith("http:") || propertyValue.startsWith("https:")) {
+                errorMsgTemplate = `Error fetching content using URL("${propertyValue}"). Error details:\n`
+                retContent = await processUrlReference(`${propName}`, propertyValue);
+            } else {
+                // Just return the property value.
+                retContent = propertyValue;
+            }
+        } else {
+            throw new Error(`${errPrefix}Currently, only fields of type "string" are allowed.`);
+        }
+    } catch (error) {
+        elizaLogger.error(errorMsgTemplate, error);
+    }
+
+    return retContent;
 }
 
 /**
@@ -119,7 +168,7 @@ export async function processFileOrUrlReferences(character: Character): Promise<
                         if (arrayValue.startsWith("file:")) {
                             externalContent = processFileReference(propName, arrayValue);
                         } else if (arrayValue.startsWith("http:") || arrayValue.startsWith("https:")) {
-                            externalContent = await processUrlReference(character, `${propName}[${i}]`, arrayValue);
+                            externalContent = await processUrlReference(`${propName}[${i}]`, arrayValue);
                         }
 
                         // Update the array element if external content is retrieved
@@ -138,7 +187,7 @@ export async function processFileOrUrlReferences(character: Character): Promise<
                 if (propValue.startsWith("file:")) {
                     externalContent = processFileReference(propName, propValue);
                 } else if (propValue.startsWith("http:") || propValue.startsWith("https:")) {
-                    externalContent = await processUrlReference(character, propName, propValue);
+                    externalContent = await processUrlReference(propName, propValue);
                 }
 
                 // Update the property value if external content is retrieved

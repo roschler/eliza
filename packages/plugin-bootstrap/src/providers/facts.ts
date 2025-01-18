@@ -53,7 +53,7 @@ const factsProvider: Provider = {
         const formattedFacts = formatFacts(allFacts);
 
         return "Key facts that {{agentName}} knows:\n{{formattedFacts}}"
-            .replace("{{agentName}}", runtime.characterTemplate.name)
+            .replace("{{agentName}}", runtime.character.name)
             .replace("{{formattedFacts}}", formattedFacts);
     },
 };

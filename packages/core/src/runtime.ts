@@ -110,19 +110,9 @@ export class AgentRuntime implements IAgentRuntime {
     fetch = fetch;
 
     /**
-     * The character to use for the agent, before processing,
-     *  in its "template" form.
+     * The character to use for the agent.
      */
-    characterTemplate: Character;
-
-    /**
-     * At the start of each chat volley, this property will contain the
-     *  all the content of the "character" property, but with any
-     *  processing needed to fully resolve the character content.
-     *  (e.g. - processing string properties with file or URL
-     *   references, etc.)
-     */
-    characterProcessed?: Character;
+    character: Character;
 
     /**
      * Store messages that are sent and received by the agent.
@@ -249,15 +239,15 @@ export class AgentRuntime implements IAgentRuntime {
             opts.character?.id ??
             opts?.agentId ??
             stringToUuid(opts.character?.name ?? uuidv4());
-        this.characterTemplate = opts.character || defaultCharacter;
+        this.character = opts.character || defaultCharacter;
 
         // By convention, we create a user and room using the agent id.
         // Memories related to it are considered global context for the agent.
         this.ensureRoomExists(this.agentId);
         this.ensureUserExists(
             this.agentId,
-            this.characterTemplate.name,
-            this.characterTemplate.name
+            this.character.name,
+            this.character.name
         );
         this.ensureParticipantExists(this.agentId, this.agentId);
 
@@ -307,22 +297,22 @@ export class AgentRuntime implements IAgentRuntime {
 
         elizaLogger.info("Setting model provider...");
         elizaLogger.info("Model Provider Selection:", {
-            characterModelProvider: this.characterTemplate.modelProvider,
+            characterModelProvider: this.character.modelProvider,
             optsModelProvider: opts.modelProvider,
             currentModelProvider: this.modelProvider,
             finalSelection:
-                this.characterTemplate.modelProvider ??
+                this.character.modelProvider ??
                 opts.modelProvider ??
                 this.modelProvider,
         });
 
         this.modelProvider =
-            this.characterTemplate.modelProvider ??
+            this.character.modelProvider ??
             opts.modelProvider ??
             this.modelProvider;
 
         this.imageModelProvider =
-            this.characterTemplate.imageModelProvider ?? this.modelProvider;
+            this.character.imageModelProvider ?? this.modelProvider;
 
         elizaLogger.info("Selected model provider:", this.modelProvider);
         elizaLogger.info(
@@ -407,11 +397,11 @@ export class AgentRuntime implements IAgentRuntime {
         }
 
         if (
-            this.characterTemplate &&
-            this.characterTemplate.knowledge &&
-            this.characterTemplate.knowledge.length > 0
+            this.character &&
+            this.character.knowledge &&
+            this.character.knowledge.length > 0
         ) {
-            await this.processCharacterKnowledge(this.characterTemplate.knowledge);
+            await this.processCharacterKnowledge(this.character.knowledge);
         }
     }
 
@@ -432,7 +422,7 @@ export class AgentRuntime implements IAgentRuntime {
 
             elizaLogger.info(
                 "Processing knowledge for ",
-                this.characterTemplate.name,
+                this.character.name,
                 " - ",
                 item.slice(0, 100)
             );
@@ -448,12 +438,12 @@ export class AgentRuntime implements IAgentRuntime {
 
     getSetting(key: string) {
         // check if the key is in the character.settings.secrets object
-        if (this.characterTemplate.settings?.secrets?.[key]) {
-            return this.characterTemplate.settings.secrets[key];
+        if (this.character.settings?.secrets?.[key]) {
+            return this.character.settings.secrets[key];
         }
         // if not, check if it's in the settings object
-        if (this.characterTemplate.settings?.[key]) {
-            return this.characterTemplate.settings[key];
+        if (this.character.settings?.[key]) {
+            return this.character.settings[key];
         }
 
         // if not, check if it's in the settings object
@@ -617,7 +607,7 @@ export class AgentRuntime implements IAgentRuntime {
                 evaluatorNames,
             } as State,
             template:
-                this.characterTemplate.templates?.evaluationTemplate ||
+                this.character.templates?.evaluationTemplate ||
                 evaluationTemplate,
         });
 
@@ -692,7 +682,7 @@ export class AgentRuntime implements IAgentRuntime {
             await this.databaseAdapter.addParticipant(userId, roomId);
             if (userId === this.agentId) {
                 elizaLogger.log(
-                    `Agent ${this.characterTemplate.name} linked to room ${roomId} successfully.`
+                    `Agent ${this.character.name} linked to room ${roomId} successfully.`
                 );
             } else {
                 elizaLogger.log(
@@ -712,8 +702,8 @@ export class AgentRuntime implements IAgentRuntime {
         await Promise.all([
             this.ensureUserExists(
                 this.agentId,
-                this.characterTemplate.name ?? "Agent",
-                this.characterTemplate.name ?? "Agent",
+                this.character.name ?? "Agent",
+                this.character.name ?? "Agent",
                 source
             ),
             this.ensureUserExists(
@@ -802,7 +792,7 @@ export class AgentRuntime implements IAgentRuntime {
         // TODO: We may wish to consolidate and just accept character.name here instead of the actor name
         const agentName =
             actorsData?.find((actor: Actor) => actor.id === this.agentId)
-                ?.name || this.characterTemplate.name;
+                ?.name || this.character.name;
 
         let allAttachments = message.content.attachments || [];
 
@@ -849,13 +839,13 @@ Text: ${attachment.text}
             )
             .join("\n");
 
-        elizaLogger.debug(`Charcter LORE id: `, this.characterTemplate.lore);
+        elizaLogger.debug(`Charcter LORE id: `, this.character.lore);
 
         // randomly get 3 bits of lore and join them into a paragraph, divided by \n
         let lore = "";
         // Assuming this.lore is an array of lore bits
-        if (this.characterTemplate.lore && this.characterTemplate.lore.length > 0) {
-            const shuffledLore = [...this.characterTemplate.lore].sort(
+        if (this.character.lore && this.character.lore.length > 0) {
+            const shuffledLore = [...this.character.lore].sort(
                 () => Math.random() - 0.5
             );
             const selectedLore = shuffledLore.slice(0, 10);
@@ -864,7 +854,7 @@ Text: ${attachment.text}
 
         elizaLogger.debug(`LORE elements used: `, lore);
 
-        const formattedCharacterPostExamples = this.characterTemplate.postExamples
+        const formattedCharacterPostExamples = this.character.postExamples
             .sort(() => 0.5 - Math.random())
             .map((post) => {
                 const messageString = `${post}`;
@@ -873,7 +863,7 @@ Text: ${attachment.text}
             .slice(0, 50)
             .join("\n");
 
-        const formattedCharacterMessageExamples = this.characterTemplate.messageExamples
+        const formattedCharacterMessageExamples = this.character.messageExamples
             .sort(() => 0.5 - Math.random())
             .slice(0, 5)
             .map((example) => {
@@ -936,7 +926,7 @@ Text: ${attachment.text}
                     const isSelf = message.userId === this.agentId;
                     let sender: string;
                     if (isSelf) {
-                        sender = this.characterTemplate.name;
+                        sender = this.character.name;
                     } else {
                         const accountId =
                             await this.databaseAdapter.getAccountById(
@@ -972,10 +962,10 @@ Text: ${attachment.text}
             actorsData
         );
 
-        elizaLogger.debug(`Character BIO is: `, this.characterTemplate.bio);
+        elizaLogger.debug(`Character BIO is: `, this.character.bio);
 
         // if bio is a string, use it. if it's an array, pick one at random
-        let bio = this.characterTemplate.bio || "";
+        let bio = this.character.bio || "";
         if (Array.isArray(bio)) {
             // get three random bio strings and join them with " "
             bio = bio
@@ -996,11 +986,11 @@ Text: ${attachment.text}
             bio,
             lore,
             adjective:
-                this.characterTemplate.adjectives &&
-                this.characterTemplate.adjectives.length > 0
-                    ? this.characterTemplate.adjectives[
+                this.character.adjectives &&
+                this.character.adjectives.length > 0
+                    ? this.character.adjectives[
                           Math.floor(
-                              Math.random() * this.characterTemplate.adjectives.length
+                              Math.random() * this.character.adjectives.length
                           )
                       ]
                     : "",
@@ -1014,25 +1004,25 @@ Text: ${attachment.text}
             recentInteractionsData: recentInteractions,
             // randomly pick one topic
             topic:
-                this.characterTemplate.topics && this.characterTemplate.topics.length > 0
-                    ? this.characterTemplate.topics[
+                this.character.topics && this.character.topics.length > 0
+                    ? this.character.topics[
                           Math.floor(
-                              Math.random() * this.characterTemplate.topics.length
+                              Math.random() * this.character.topics.length
                           )
                       ]
                     : null,
             topics:
-                this.characterTemplate.topics && this.characterTemplate.topics.length > 0
-                    ? `${this.characterTemplate.name} is interested in ` +
-                      this.characterTemplate.topics
+                this.character.topics && this.character.topics.length > 0
+                    ? `${this.character.name} is interested in ` +
+                      this.character.topics
                           .sort(() => 0.5 - Math.random())
                           .slice(0, 5)
                           .map((topic, index) => {
-                              if (index === this.characterTemplate.topics.length - 2) {
+                              if (index === this.character.topics.length - 2) {
                                   return topic + " and ";
                               }
                               // if last topic, don't add a comma
-                              if (index === this.characterTemplate.topics.length - 1) {
+                              if (index === this.character.topics.length - 1) {
                                   return topic;
                               }
                               return topic + ", ";
@@ -1043,7 +1033,7 @@ Text: ${attachment.text}
                 formattedCharacterPostExamples &&
                 formattedCharacterPostExamples.replaceAll("\n", "").length > 0
                     ? addHeader(
-                          `# Example Posts for ${this.characterTemplate.name}`,
+                          `# Example Posts for ${this.character.name}`,
                           formattedCharacterPostExamples
                       )
                     : "",
@@ -1052,31 +1042,31 @@ Text: ${attachment.text}
                 formattedCharacterMessageExamples.replaceAll("\n", "").length >
                     0
                     ? addHeader(
-                          `# Example Conversations for ${this.characterTemplate.name}`,
+                          `# Example Conversations for ${this.character.name}`,
                           formattedCharacterMessageExamples
                       )
                     : "",
             messageDirections:
-                this.characterTemplate?.style?.all?.length > 0 ||
-                this.characterTemplate?.style?.chat.length > 0
+                this.character?.style?.all?.length > 0 ||
+                this.character?.style?.chat.length > 0
                     ? addHeader(
-                          "# Message Directions for " + this.characterTemplate.name,
+                          "# Message Directions for " + this.character.name,
                           (() => {
-                              const all = this.characterTemplate?.style?.all || [];
-                              const chat = this.characterTemplate?.style?.chat || [];
+                              const all = this.character?.style?.all || [];
+                              const chat = this.character?.style?.chat || [];
                               return [...all, ...chat].join("\n");
                           })()
                       )
                     : "",
 
             postDirections:
-                this.characterTemplate?.style?.all?.length > 0 ||
-                this.characterTemplate?.style?.post.length > 0
+                this.character?.style?.all?.length > 0 ||
+                this.character?.style?.post.length > 0
                     ? addHeader(
-                          "# Post Directions for " + this.characterTemplate.name,
+                          "# Post Directions for " + this.character.name,
                           (() => {
-                              const all = this.characterTemplate?.style?.all || [];
-                              const post = this.characterTemplate?.style?.post || [];
+                              const all = this.character?.style?.all || [];
+                              const post = this.character?.style?.post || [];
                               return [...all, ...post].join("\n");
                           })()
                       )
@@ -1197,7 +1187,7 @@ Text: ${attachment.text}
                     ? formatEvaluatorExamples(evaluatorsData)
                     : "",
             providers: addHeader(
-                `# Additional Information About ${this.characterTemplate.name} and The World`,
+                `# Additional Information About ${this.character.name} and The World`,
                 providers
             ),
         };

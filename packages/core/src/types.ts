@@ -1312,8 +1312,7 @@ export interface IAgentRuntime {
     token: string | null;
     modelProvider: ModelProviderName;
     imageModelProvider: ModelProviderName;
-    characterTemplate: Character;
-    characterProcessed?: Character;
+    character: Character;
     providers: Provider[];
     actions: Action[];
     evaluators: Evaluator[];

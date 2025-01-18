@@ -247,7 +247,7 @@ const summarizeAction = {
 
         let currentSummary = "";
 
-        const model = models[runtime.characterTemplate.settings.model];
+        const model = models[runtime.character.settings.model];
         const chunkSize = model.settings.maxContextLength - 1000;
 
         const chunks = await splitChunks(formattedMemories, chunkSize, 0);

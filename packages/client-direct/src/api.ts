@@ -20,7 +20,7 @@ export function createApiRouter(agents: Map<string, AgentRuntime>) {
     router.get("/agents", (req, res) => {
         const agentsList = Array.from(agents.values()).map((agent) => ({
             id: agent.agentId,
-            name: agent.characterTemplate.name,
+            name: agent.character.name,
         }));
         res.json({ agents: agentsList });
     });
@@ -36,7 +36,7 @@ export function createApiRouter(agents: Map<string, AgentRuntime>) {
 
         res.json({
             id: agent.agentId,
-            character: agent.characterTemplate,
+            character: agent.character,
         });
     });
 

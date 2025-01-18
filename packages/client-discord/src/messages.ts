@@ -62,7 +62,7 @@ export class MessageManager {
             return;
 
         if (
-            this.runtime.characterTemplate.clientConfig?.discord
+            this.runtime.character.clientConfig?.discord
                 ?.shouldIgnoreBotMessages &&
             message.author?.bot
         ) {
@@ -70,7 +70,7 @@ export class MessageManager {
         }
 
         if (
-            this.runtime.characterTemplate.clientConfig?.discord
+            this.runtime.character.clientConfig?.discord
                 ?.shouldIgnoreDirectMessages &&
             message.channel.type === ChannelType.DM
         ) {
@@ -155,7 +155,7 @@ export class MessageManager {
                 discordClient: this.client,
                 discordMessage: message,
                 agentName:
-                    this.runtime.characterTemplate.name ||
+                    this.runtime.character.name ||
                     this.client.user?.displayName,
             });
 
@@ -205,7 +205,7 @@ export class MessageManager {
                 const context = composeContext({
                     state,
                     template:
-                        this.runtime.characterTemplate.templates
+                        this.runtime.character.templates
                             ?.discordMessageHandlerTemplate ||
                         discordMessageHandlerTemplate,
                 });
@@ -435,14 +435,14 @@ export class MessageManager {
         const botMention = `<@!?${this.client.user?.id}>`;
         messageContent = messageContent.replace(
             new RegExp(botMention, "gi"),
-            this.runtime.characterTemplate.name.toLowerCase()
+            this.runtime.character.name.toLowerCase()
         );
 
         // Replace the bot's username with the character name
         const botUsername = this.client.user?.username.toLowerCase();
         messageContent = messageContent.replace(
             new RegExp(`\\b${botUsername}\\b`, "g"),
-            this.runtime.characterTemplate.name.toLowerCase()
+            this.runtime.character.name.toLowerCase()
         );
 
         // strip all special characters
@@ -492,18 +492,18 @@ export class MessageManager {
         }
 
         const targetedPhrases = [
-            this.runtime.characterTemplate.name + " stop responding",
-            this.runtime.characterTemplate.name + " stop talking",
-            this.runtime.characterTemplate.name + " shut up",
-            this.runtime.characterTemplate.name + " stfu",
-            "stop talking" + this.runtime.characterTemplate.name,
-            this.runtime.characterTemplate.name + " stop talking",
-            "shut up " + this.runtime.characterTemplate.name,
-            this.runtime.characterTemplate.name + " shut up",
-            "stfu " + this.runtime.characterTemplate.name,
-            this.runtime.characterTemplate.name + " stfu",
-            "chill" + this.runtime.characterTemplate.name,
-            this.runtime.characterTemplate.name + " chill",
+            this.runtime.character.name + " stop responding",
+            this.runtime.character.name + " stop talking",
+            this.runtime.character.name + " shut up",
+            this.runtime.character.name + " stfu",
+            "stop talking" + this.runtime.character.name,
+            this.runtime.character.name + " stop talking",
+            "shut up " + this.runtime.character.name,
+            this.runtime.character.name + " shut up",
+            "stfu " + this.runtime.character.name,
+            this.runtime.character.name + " stfu",
+            "chill" + this.runtime.character.name,
+            this.runtime.character.name + " chill",
         ];
 
         // lose interest if pinged and told to stop responding
@@ -574,9 +574,9 @@ export class MessageManager {
         const shouldRespondContext = composeContext({
             state,
             template:
-                this.runtime.characterTemplate.templates
+                this.runtime.character.templates
                     ?.discordShouldRespondTemplate ||
-                this.runtime.characterTemplate.templates?.shouldRespondTemplate ||
+                this.runtime.character.templates?.shouldRespondTemplate ||
                 discordShouldRespondTemplate,
         });
 

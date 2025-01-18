@@ -15,7 +15,7 @@ export const TelegramClientInterface: Client = {
         await tg.start();
 
         elizaLogger.success(
-            `✅ Telegram client successfully started for character ${runtime.characterTemplate.name}`
+            `✅ Telegram client successfully started for character ${runtime.character.name}`
         );
         return tg;
     },
