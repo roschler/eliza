@@ -52,7 +52,6 @@ import {
     ObjectiveOrNull,
     StringOrNull,
     State,
-    formatMessagesWithStopAtStrings,
     END_SESSION_MESSAGE_AS_DELIMITER,
     IAgentRuntime,
     Content,
@@ -75,7 +74,7 @@ import {CLIENT_NAME} from "./common.ts";
 // -------------------------- BEGIN: SOME CONSTANTS ------------------------
 
 // This is the catch-all response to an invalid result value during
-//  a bill-of-materials line item session..
+//  a bill-of-materials line item session.
 const defaultInvalidResultValueResponse: Content = {
     text: `Sorry.  I didn't understand your response.  Please try again.`
 }
