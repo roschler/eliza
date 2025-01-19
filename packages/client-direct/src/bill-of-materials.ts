@@ -521,9 +521,8 @@ export function mergeBomFieldIntoState(state: State, bomFieldName: string, bomFi
 // These are the message templates we use to ask bill-of-materials question.
 
 /**
- * This is the DEFAULT message template we use to ask the preliminary question for
- *  an OPTIONAL bill-of-materials question line item.  It will be used if the
- *  bill-of-materials line item does not provide its own message template.
+ * This is the message template we use to ask the preliminary question for
+ *  an OPTIONAL bill-of-materials question line item.
  */
 const preliminaryQuestionLlmMessageTemplate =
     `
@@ -531,8 +530,8 @@ const preliminaryQuestionLlmMessageTemplate =
 
     QUESTION: {{preliminaryQuestion}}
 
-    - Answers that equate to boolean true are: "yes", "sure", "Ok", "Let's do that", "I'd like that", etc.
-    - Answers that equate to boolean false are: "no", "not interested", "I don't want to do that", "I don't need that", "Nah", "I'm OK without that", etc.
+    - Answers that equate to boolean true are like the following: "yes", "sure", "Ok", "Let's do that", "I'd like that", etc.
+    - Answers that equate to boolean false are like the following: "no", "not interested", "I don't want to do that", "I don't need that", "Nah", "I'm OK without that", etc.
 
     You can use the following help document to answer questions they may have, until they are ready to give a definitive answer:
 
@@ -549,7 +548,7 @@ const preliminaryQuestionLlmMessageTemplate =
     - "TRUE" if the user has given an answer that equates to true
     - "FALSE" if the user has given an answer that equates to false
     - "CANCEL" if the user has indicated that they want to stop the entire session
-    - "CONTINUE" if the user has not yet answer the question that can be definitively interpreted as either TRUE or false
+    - "CONTINUE" if the user has not yet answered the question in a way that can be definitively interpreted as either true or false
 
     The text field should contain the text that made you decide to choose your selected category.  Here are the
     rules for creating the text field:
@@ -579,131 +578,44 @@ const mainQuestionLlmMessageTemplate =
     `
         Your current task is to ask the user the following question and chat with them until they give an answer to it:
 
-    QUESTION: {{preliminaryQuestion}}
-
-    - Answers that equate to boolean true are: "yes", "sure", "Ok", "Let's do that", "I'd like that", etc.
-    - Answers that equate to boolean false are: "no", "not interested", "I don't want to do that", "I don't need that", "Nah", "I'm OK without that", etc.
+    QUESTION: {{simpleQuestion}}
 
     You can use the following help document to answer questions they may have, until they are ready to give a definitive answer:
 
     {{helpDocument}}
+
+    The user's input will fall into one of the categories below:
+
+    "CANCEL", The user has indicated that they want to stop chatting with you
+    "RESULT", The user has provided a valid result value that answers the question
+    "CONTINUE", The user has not given a valid result value that answers the question
+     yet, and you should continue chatting with them and answer any questions they have
+     using the provided help document until they do give you a valid result value
+
+    This describes the nature of the result value that answers the question
+
+    {{resultValueHelp}}
 
     Here is your recent chat history with the user:
 
     {{recentMessages}}
 
     You should output your response with a JSON answer like that shown below.  Your response must
-    contain a category and a text field.  The category must be one of the following, based on
-    your current interpretation of the progress of the chat:
-
-    - "TRUE" if the user has given an answer that equates to true
-    - "FALSE" if the user has given an answer that equates to false
-    - "CANCEL" if the user has indicated that they want to stop the entire session
-    - "CONTINUE" if the user has not yet answer the question that can be definitively interpreted as either TRUE or false
-
-    The text field should contain the text that made you decide to choose your selected category.  Here are the
-    rules for creating the text field:
-
-    - If the category is "TRUE", then the text field should be the text from the user that made you choose that category
-    - If the category is "FALSE", then the text field should be the text from the user that made you choose that category
-    - If the category is "CANCEL", then the text field should be the text from the user that made you choose that category
-    - If the category is "CONTINUE", then the text field should contain a text response that answers the users most recent question
-        and helps them decide between true and false
+    contain a category and a text field.  The category must be one of categories above, based on
+    your current interpretation of the progress of the chat.  If the category is the "RESULT"
+    category, the text field value should be the result value given by the user.  Otherwise,
+    the text field value should be the text in the user's input that made you choose the category:
 
     Here is the format of the JSON object you must output:
 
     \`\`\`json
     {
         "category": "<put the category you selected here>",
-        "text": "<put here the text that made you choose the category>"
+        "text": "<put the text you have selecte for the text field here>"
     }\`\`\`
     `;
 
 // -------------------------- END  : BOM MESSAGE TEMPLATES ------------------------
-
-// -------------------------- BEGIN: RESULT CHECK MESSAGE TEMPLATES ------------------------
-
-// The following message templates are used during a bill-of-materials form
-//  fill operation, when we ask the LLM to categorize the recent message
-//  history, and to extract any new result data from that history.
-
-
-/**
- * This is the message template we use to ask the LLM if the user
- *  answered a previously asked main question associated with
- *  an objective that carries a bill-of-materials line item.
- *  The LLM will return the result of the user answered the
- *  question, or an INTENT name if the user expressed one
- *  of these (e.g. - CANCEL, HELP, etc.)
- */
-const mainQuestionLLmResultCheckTemplate =
-    `
-    Your task is to analyze your recent chat interactions with the user and determine if
-    they have definitively answered the following question that requested a vital piece
-    of information from the user:
-
-    QUESTION: {{simpleQuestion}}
-
-    Here is your recent chat history with the user:
-
-    {{recentMessages}}
-
-    You need to decide the overall category of the user's most recent reply
-    in context of the recent chat history.
-
-    The user's answer will fall into one of the following categories. Each line below is a category definition and is formatted like this:  Each comma-delimited line starts with the string "CATEGORY:", followed by the category name in uppercase letters, then the nature of the text you should output based on that category, with everything after that followed by a description of the category that you can use to analyze the chat history, until the next category line begins.
-
-    CATEGORY: "CANCEL", The response text should be the user's input that expresses the "CANCEL" intent, This category is for when the user has indicated that they want to stop the entire session
-    CATEGORY: "CHANGE", The response text should be the user's input that expresses the "CHANGE" intent.  This category is for when the user has indicated that they want to change their answer to something different.
-    CATEGORY: "RESULT", The response text should be the result value the user provided that matches the question asked and just that text alone, This category is for when the user provides a valid result value that answers the question that is the focus of this session
-
-    Here is the kind of result text you should expect for a result value:
-
-    {{resultValueHelp}}
-
-    Determine the correct category and then give your answer in JSON format as described here:
-    \`\`\`json
-    {
-        "category": "<put the category name here>",
-        "text": "<put the response text here>"
-    }\`\`\`
-    `;
-
-/**
- * This is the message template we use to check for a result
- *  condition when we are in HELP mode.  We pass this to the
- *  LLM to have it analyze the recent chat history and let us
- *  know if the user has indicated that it's help query has
- *  been properly answered.
- *
-const helpModeResultCheckTemplate =
-    `
-    You are a helpful assistant whose goal is to analyze recent
-     messages in your chat history with the user, and to detect
-     the following conditions.  Each condition is preceded by
-     the CATEGORY label that is assigned to condition, followed by a colon,
-     the definition of the condition, and finally, the response text definition:
-
-     - ANSWERED: The user has indicated that their question has been fully answered.  The response text is the text the user used to indicate that.
-     - CANCEL:: The user wants to abandon the session. The response text is the text the user used to indicate that.
-     - HELP: The user has asked another question or wants more details on the current subject. The response text is the text the user used to ask another question or request more details on the current subject.
-     - CONFUSED: The user doesn't understand the help information you have just gave them. The response text is the text the user used to indicate that.
-
-    Here is your recent chat history with the user:
-
-    {{recentMessages}}
-
-    You must output your answer in JSON format, as described here:
-
-    \`\`\`json
-    {
-        "category": "<put the category that identifies the nature of your response here>",
-        "text": "<put your response text here>"
-    }\`\`\`
-    `;
-*/
-
-// -------------------------- END  : RESULT CHECK MESSAGE TEMPLATES ------------------------
 
 // -------------------------- BEGIN: UTILITY MESSAGE TEMPLATES ------------------------
 
