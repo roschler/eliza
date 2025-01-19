@@ -1,0 +1,54 @@
+
+LICENSE TYPE: Non-Commercial Social Remixing
+
+OVERVIEW: Allows others to remix your work. This license allows for endless free remixing while tracking all uses of your work while giving you full credit. Similar to: TikTok plus attribution.
+
+The licensee is allowed to:
+
+✅ Remix this work
+✅ Distribute their remix anywhere
+✅ Credit you appropriately
+
+The licensee is not allowed to:
+
+❌ Commercialize either the original or derivative works
+❌ Claim credit for the derivative remix as their original work
+
+
+================================================================
+
+LICENSE TYPE: Commercial Use
+
+OVERVIEW: This license allows the original author to retain control over reuse of their work, while allowing a licensee to use the work in exchange for the economic terms you set. This is similar to Shutterstock with creator-set rules.  However, the original author will not earn any revenue from sales of the derivative works.
+
+The licensee is allowed to:
+
+✅ Purchase the right to use the work created by the original author.  The purchase amount is known as the minting fee
+✅ Commercialize the original and derivative works
+✅ Distribute their remix anywhere
+
+The licensee is not allowed to:
+
+❌ Claim credit for your original work
+
+The minting fee must be greater than zero.
+
+================================================================
+
+LICENSE TYPE: Commercial Remix
+
+OVERVIEW: This license allows licensees to build on the work created by the original author while earning money from it. This license allows for endless free remixing while tracking all uses of the original author's work while giving the original author full credit, with each derivative sale paying a percentage of the revenue to the original author as a royalty.
+
+The licensee is allowed to:
+
+✅ Remix this work
+✅ Distribute their remix anywhere
+✅ Credit you appropriately
+
+The licensee is not allowed to:
+
+❌ Claim credit for the remix as original work
+❌ Claim credit for the original work
+❌ Claim all the revenue from commercial use of the original work or derivative works
+
+You can also charge a minting fee with this license, but that is optional.  However, the royalty percentage for the sale of derivative work is mandatory and must be greater than zero.

@@ -82,7 +82,7 @@ const defaultInvalidResultValueResponse: Content = {
 
 /**
  * If the developer did not assign a help document to the bill-of-materials
- *  line item's helpDocumentForBomLineItem property, then we will use this
+ *  line item's helpDocument property, then we will use this
  *  generic help.
  */
 const DEFAULT_BOM_HELP_DOCUMENT =
@@ -196,6 +196,13 @@ export enum enumPreliminaryQuestionResultCategory {
      *  entire session.
      */
     CANCEL = "CANCEL",
+
+    /**
+     * The user has not yet given an answer that can be definitively
+     *  answered as TRUE or FALSE, so the current preliminary
+     *  bill-of-materials line item sub-session should continue.
+     */
+    CONTINUE = "CONTINUE",
 
     /**
      * The user has indicated that they are interested in the
@@ -509,42 +516,117 @@ export function mergeBomFieldIntoState(state: State, bomFieldName: string, bomFi
 
 // -------------------------- END  : UTILITY BOM RELATED FUNCTIONS ------------------------
 
+// -------------------------- BEGIN: BOM MESSAGE TEMPLATES ------------------------
+
+// These are the message templates we use to ask bill-of-materials question.
+
+/**
+ * This is the DEFAULT message template we use to ask the preliminary question for
+ *  an OPTIONAL bill-of-materials question line item.  It will be used if the
+ *  bill-of-materials line item does not provide its own message template.
+ */
+const preliminaryQuestionLlmMessageTemplate =
+    `
+    Your current task is to ask the user the following question and chat with them until they give an answer that can be safely interpreted as either true or false:
+
+    QUESTION: {{preliminaryQuestion}}
+
+    - Answers that equate to boolean true are: "yes", "sure", "Ok", "Let's do that", "I'd like that", etc.
+    - Answers that equate to boolean false are: "no", "not interested", "I don't want to do that", "I don't need that", "Nah", "I'm OK without that", etc.
+
+    You can use the following help document to answer questions they may have, until they are ready to give a definitive answer:
+
+    {{helpDocument}}
+
+    Here is your recent chat history with the user:
+
+    {{recentMessages}}
+
+    You should output your response with a JSON answer like that shown below.  Your response must
+    contain a category and a text field.  The category must be one of the following, based on
+    your current interpretation of the progress of the chat:
+
+    - "TRUE" if the user has given an answer that equates to true
+    - "FALSE" if the user has given an answer that equates to false
+    - "CANCEL" if the user has indicated that they want to stop the entire session
+    - "CONTINUE" if the user has not yet answer the question that can be definitively interpreted as either TRUE or false
+
+    The text field should contain the text that made you decide to choose your selected category.  Here are the
+    rules for creating the text field:
+
+    - If the category is "TRUE", then the text field should be the text from the user that made you choose that category
+    - If the category is "FALSE", then the text field should be the text from the user that made you choose that category
+    - If the category is "CANCEL", then the text field should be the text from the user that made you choose that category
+    - If the category is "CONTINUE", then the text field should contain a text response that answers the users most recent question
+        and helps them decide between true and false
+
+    Here is the format of the JSON object you must output:
+
+    \`\`\`json
+    {
+        "category": "<put the category you selected here>",
+        "text": "<put here the text that made you choose the category>"
+    }\`\`\`
+    `;
+
+/**
+ * This is the DEFAULT message template we use to ask the main question for
+ *  an OPTIONAL or MANDATORY bill-of-materials question line item.
+ *  It will be used if the bill-of-materials line item does not provide
+ *  its own message template.
+ */
+const mainQuestionLlmMessageTemplate =
+    `
+        Your current task is to ask the user the following question and chat with them until they give an answer to it:
+
+    QUESTION: {{preliminaryQuestion}}
+
+    - Answers that equate to boolean true are: "yes", "sure", "Ok", "Let's do that", "I'd like that", etc.
+    - Answers that equate to boolean false are: "no", "not interested", "I don't want to do that", "I don't need that", "Nah", "I'm OK without that", etc.
+
+    You can use the following help document to answer questions they may have, until they are ready to give a definitive answer:
+
+    {{helpDocument}}
+
+    Here is your recent chat history with the user:
+
+    {{recentMessages}}
+
+    You should output your response with a JSON answer like that shown below.  Your response must
+    contain a category and a text field.  The category must be one of the following, based on
+    your current interpretation of the progress of the chat:
+
+    - "TRUE" if the user has given an answer that equates to true
+    - "FALSE" if the user has given an answer that equates to false
+    - "CANCEL" if the user has indicated that they want to stop the entire session
+    - "CONTINUE" if the user has not yet answer the question that can be definitively interpreted as either TRUE or false
+
+    The text field should contain the text that made you decide to choose your selected category.  Here are the
+    rules for creating the text field:
+
+    - If the category is "TRUE", then the text field should be the text from the user that made you choose that category
+    - If the category is "FALSE", then the text field should be the text from the user that made you choose that category
+    - If the category is "CANCEL", then the text field should be the text from the user that made you choose that category
+    - If the category is "CONTINUE", then the text field should contain a text response that answers the users most recent question
+        and helps them decide between true and false
+
+    Here is the format of the JSON object you must output:
+
+    \`\`\`json
+    {
+        "category": "<put the category you selected here>",
+        "text": "<put here the text that made you choose the category>"
+    }\`\`\`
+    `;
+
+// -------------------------- END  : BOM MESSAGE TEMPLATES ------------------------
+
 // -------------------------- BEGIN: RESULT CHECK MESSAGE TEMPLATES ------------------------
 
 // The following message templates are used during a bill-of-materials form
 //  fill operation, when we ask the LLM to categorize the recent message
 //  history, and to extract any new result data from that history.
 
-/**
- * This is the message template we use to ask the LLM if the user
- *  answered a previously asked preliminary question associated with
- *  an objective that carries a bill-of-materials line item.
- */
-const preliminaryQuestionLLmResultCheckTemplate =
-    `
-    Your task is to analyze your recent chat interactions with the user and determine if
-    they have definitively answered the following question:
-
-    QUESTION: {{simpleQuestion}}
-
-    Here is your recent chat history with the user:
-
-    {{recentMessages}}
-
-    The user's answer will fall into one of the following categories. Each line below is a category definition and is formatted like this:  Each line starts with the string "CATEGORY:", followed by the category name in uppercase letters, with everything after that followed by a description of the category, until the next category line begins.
-
-    CATEGORY: "TRUE", An answer that equates to boolean true.  For example, "yes", "sure", "Ok", etc.
-    CATEGORY: "FALSE", An answer that equates to boolean false.  For example, "no", "not interested", "I don't want to do that", "I don't need that", "Nah", "I'm OK without that" etc.
-    CATEGORY: "HELP", A query about the subject matter the question involves that indicates the user wants more information on the subject.
-    CATEGORY: "CANCEL", The user has indicated that they want to stop the entire session.
-
-    Determine the correct category and then give your answer in JSON format as described here:
-    \`\`\`json
-    {
-        "category": "<put the category name here>",
-        "text": "<put the user text here that made you choose the category>"
-    }\`\`\`
-    `;
 
 /**
  * This is the message template we use to ask the LLM if the user
@@ -573,7 +655,6 @@ const mainQuestionLLmResultCheckTemplate =
 
     CATEGORY: "CANCEL", The response text should be the user's input that expresses the "CANCEL" intent, This category is for when the user has indicated that they want to stop the entire session
     CATEGORY: "CHANGE", The response text should be the user's input that expresses the "CHANGE" intent.  This category is for when the user has indicated that they want to change their answer to something different.
-    CATEGORY: "HELP", The response text should be the user's input that expresses the "HELP" intent.  If the user asked a specific question then that and that alone should be the response text, This category is for when the user makes a query about the subject matter the question involves that indicates the user wants more information on the subject or just indicates in a generic manner that  they need help.
     CATEGORY: "RESULT", The response text should be the result value the user provided that matches the question asked and just that text alone, This category is for when the user provides a valid result value that answers the question that is the focus of this session
 
     Here is the kind of result text you should expect for a result value:
@@ -715,13 +796,13 @@ export function validateBillOfMaterialsLineItem(billOfMaterialsLineItem: BillOfM
     // If this line item is marked as optional, then we MUST have a preliminary
     //  question to ask the user, to see if they are interested in the line item.
     if (billOfMaterialsLineItem.isOptional) {
-        if (typeof billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem !== "string"
-            || (typeof billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem === "string" && billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem.length === 0)) {
+        if (typeof billOfMaterialsLineItem.preliminaryQuestion !== "string"
+            || (typeof billOfMaterialsLineItem.preliminaryQuestion === "string" && billOfMaterialsLineItem.preliminaryQuestion.length === 0)) {
             validationFailures.push(`The "preliminaryPromptForOptionalLineItem" field is missing or is assigned an empty string for a line items marked as "optional".`);
         }
 
-        if (typeof billOfMaterialsLineItem.helpDocumentForBomLineItem !== "string"
-            || (typeof billOfMaterialsLineItem.helpDocumentForBomLineItem === "string" && billOfMaterialsLineItem.helpDocumentForBomLineItem.length === 0)) {
+        if (typeof billOfMaterialsLineItem.helpDocument !== "string"
+            || (typeof billOfMaterialsLineItem.helpDocument === "string" && billOfMaterialsLineItem.helpDocument.length === 0)) {
             validationFailures.push(`The "helpTextForOptionalLineItem" field is missing or is assigned an empty string for a line items marked as "optional".`);
         }
     }
@@ -886,8 +967,8 @@ export function buildBomStopAtStringsLastObjective(...additionalStopAtStrings: s
 
      const resolveHelpDocument =
          await processFileUrlOrStringReference(
-             'currentBomObjective.billOfMaterialsLineItem.helpDocumentForBomLineItem',
-             currentBomObjective.billOfMaterialsLineItem.helpDocumentForBomLineItem);
+             'currentBomObjective.billOfMaterialsLineItem.helpDocument',
+             currentBomObjective.billOfMaterialsLineItem.helpDocument);
 
      // Put the objective's help text into the state before we compose the context.
      state.helpDocument =
@@ -965,7 +1046,7 @@ async function askLlmBomHelpQuestion(runtime: IAgentRuntime, state: State, curre
     state.helpDocument =
         // We prefer there to be a full help document attached to the current
         //  line item.
-        currentBomObjective.billOfMaterialsLineItem.helpDocumentForBomLineItem
+        currentBomObjective.billOfMaterialsLineItem.helpDocument
         ??
         // If not, use the generic help text.
         DEFAULT_BOM_HELP_DOCUMENT;
@@ -1129,7 +1210,7 @@ async function bomPreliminaryQuestionCheckResultHandler(
     const resolvedQuestion =
         await processFileUrlOrStringReference(
             'currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem',
-            currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+            currentBomObjective.billOfMaterialsLineItem.preliminaryQuestion);
 
     // Put the objective's preliminary question into the state before we compose the context.
     mergeBomFieldIntoState(
@@ -1955,7 +2036,7 @@ export async function buildBillOfMaterialQuestion(currentBomObjective: Objective
 
             // Yes.  Ask the user the question that determines if they are interested
             //  in the optional line item or not.
-            piecesOfPrompt.push(currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem);
+            piecesOfPrompt.push(currentBomObjective.billOfMaterialsLineItem.preliminaryQuestion);
 
             // -------------------------- END  : PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
 

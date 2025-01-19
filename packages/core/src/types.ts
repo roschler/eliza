@@ -748,9 +748,6 @@ export type BillOfMaterialsLineItem = {
     /** The type of the field.  E.g. - "string", or "number", etc. **/
     type: string;
 
-    /** The question to ask the user to get the desired value from them. **/
-    prompt: string;
-
     /**
      * The default value for the result.  If present, then the LLM
      *  will be given this value to suggest it to the user.
@@ -769,17 +766,11 @@ export type BillOfMaterialsLineItem = {
      */
     isOptional: boolean;
 
-    /** The PRELIMINARY question to ask the user to see if they are
-     *   interested or not in this line item, if and only if it is
-     *   an optional line item. get the desired value from them.
-     */
-    preliminaryPromptForOptionalLineItem?: string;
-
     /**
      * The help text to include that the LLM can use to answer
      *  any questions the user may have about the line item.
      */
-    helpDocumentForBomLineItem?: string;
+    helpDocument?: string;
 
 
     // -------------------------- END  : OPTIONAL FIELDS ------------------------
@@ -818,6 +809,32 @@ export type BillOfMaterialsLineItem = {
      *  than the minVal value if that value exists.
      */
     maxVal?: number;
+
+
+    /** This optional field, if set, will be used as the message
+     *   template to generate the prompt passed to the LLM to
+     *   generate the next text (e.g. - question, response, etc.)
+     *   that should be shown to the user, in order to collect the data
+     *   item this bill-of-materials line item handles.  If not
+     *   set, then the default message template will be used.
+     **/
+    messageTemplate?: string;
+
+    /** The PRELIMINARY question to ask the user to see if they are
+     *   interested or not in this line item, if and only if it is
+     *   an optional line item. get the desired value from them.
+     */
+    preliminaryQuestion?: string;
+
+    /**
+     * Given the nature of the data element this bill-of-materials line
+     *  item handles, this should be the most concise, simple question
+     *  that you would ask someone to get this piece of information.
+     *  (e.g. - If this was the amount of money the user would charge
+     *  for a digital asset, the question might be: "How much do you
+     *  want to charge for your digital asset?").
+     */
+    simpleQuestion: string;
 
     /**
      * If present, then this string will be appended to any numeric values

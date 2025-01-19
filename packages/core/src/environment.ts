@@ -65,15 +65,16 @@ const PluginSchema = z.object({
 const BillOfMaterialsLineItemSchema = z.object({
     name: z.string(),
     type: z.string(),
-    prompt: z.string(),
     isOptional: z.boolean(),
     listOfValidValues: z.array(z.string()).optional(),
     isInteger: z.number().optional(),
     minVal: z.number().optional(),
     maxVal: z.number().optional(),
+    messageTemplate: z.string().optional(),
     unitsDescription: z.string().optional(),
-    preliminaryPromptForOptionalLineItem: z.string().optional(),
-    helpDocumentForBomLineItem: z.string().optional(),
+    preliminaryQuestion: z.string().optional(),
+    helpDocument: z.string().optional(),
+    simpleQuestion: z.string()
 });
 
 // Main Character schema
