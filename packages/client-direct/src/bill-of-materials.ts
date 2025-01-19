@@ -861,66 +861,191 @@ export function buildBomStopAtStringsLastObjective(...additionalStopAtStrings: s
 }
 
 /**
- * This function makes an LLM call get the next response text for
- *  the user for the current bill-of-materials objective's MAIN
- *  question.
+ * This function makes an LLM call to get a result value for
+ *  the user for the current bill-of-materials line item.
  *
- * @param runtime - The current agent/character.
+ * @param runtime - The current agent/character
  * @param state - The current system state for the chat
  * @param currentBomObjective - The current bill-of-materials
- *  objective.
+ *  objective
  *
  * @returns - Returns a Content object that contains the
  *  response the system should use as the chat volley
- *  response.
+ *  response
  */
- async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, currentBomObjective: Objective): Promise<Content> {
-     const errPrefix = `(askLlmBomMainQuestion) `;
+async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, currentBomObjective: Objective): Promise<Content> {
+    const errPrefix = `(askLlmBomMainQuestion) `;
 
-     const resolveHelpDocument =
+    let useMessageTemplate;
+
+    // If the bill-of-materials line item has its own message template,
+    //  then use it. Otherwise, use the default message template.
+    if (typeof currentBomObjective.billOfMaterialsLineItem?.messageTemplate === 'string'
+            && currentBomObjective.billOfMaterialsLineItem?.messageTemplate.trim().length > 0) {
+        useMessageTemplate = currentBomObjective.billOfMaterialsLineItem?.messageTemplate;
+    } else {
+        useMessageTemplate = mainQuestionLlmMessageTemplate;
+    }
+
+    // Create text for the LLM that tells it what kind of values to expect
+    //  based on the type of bill-of-materials line item the current
+    //  objective is for, and the value constraints the line item has,
+    //  if any.
+    // -------------------------- BEGIN: LLM TEXT FOR EXPECTED RESULT VALUES ------------------------
+
+    let resultValueHelp = null;
+
+    if (currentBomObjective.billOfMaterialsLineItem?.type === 'boolean') {
+        // -------------------------- BEGIN: BOOLEAN TYPE ------------------------
+
+        resultValueHelp +=
+            `The result value should be a user expression that evaluates to boolean value.  For example, "yes", "sure", "ok", "I want to do that", "Let's do that", "sounds good", etc.  would all resolve to the result value "true".  For example, "nah", "nope", "never", "hell no!", "Forget that", "I don't want to do that", etc. would all resolve to the result value "false".`;
+
+        // -------------------------- END  : BOOLEAN TYPE ------------------------
+    } else if (currentBomObjective.billOfMaterialsLineItem?.type === 'number') {
+        // -------------------------- BEGIN: NUMBER TYPE ------------------------
+
+        resultValueHelp =
+            `The result value should be a numeric value.`;
+        // -------------------------- END  : NUMBER TYPE ------------------------
+    } else if (currentBomObjective.billOfMaterialsLineItem?.type === 'string') {
+        // -------------------------- BEGIN: STRING TYPE ------------------------
+
+        if (Array.isArray(currentBomObjective.billOfMaterialsLineItem?.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem?.listOfValidValues.length > 0) {
+            const choiceDelimiter = '\n- ';
+
+            // Add list of values.
+            const validChoices =
+                currentBomObjective.billOfMaterialsLineItem?.listOfValidValues.join(choiceDelimiter);
+
+            resultValueHelp =
+                `
+                The result value should be equal or similar to one of the following choice values:
+                 ${choiceDelimiter}${validChoices}
+                 If the user provided result value is one of these values or is closely similar to one of the above values, your response text should be the exact text of the choice value that the user text matches best.
+                 `;
+        }
+
+        // -------------------------- END  : STRING TYPE ------------------------    } else {
+    } else {
+        throw new Error(`${errPrefix}Unknown bill-of-materials type: ${currentBomObjective.billOfMaterialsLineItem?.type}`);
+    }
+
+    // If we created help text of the LLM regarding the expected result values, then
+    //  merge the expected values text into the result check message template.
+    if (resultValueHelp) {
+        mergeBomFieldIntoState(state, "resultValueHelp", resultValueHelp);
+    }
+
+    // -------------------------- END  : LLM TEXT FOR EXPECTED RESULT VALUES ------------------------
+
+    // Resolve the needed message template variable values and merge them
+
+    // VARIABLE: simpleQuestion
+    const resolvedQuestion =
+        await processFileUrlOrStringReference(
+            'currentBomObjective.billOfMaterialsLineItem?.simpleQuestion',
+            currentBomObjective.billOfMaterialsLineItem?.simpleQuestion);
+
+    mergeBomFieldIntoState(
+        state,
+        "simpleQuestion",
+        resolvedQuestion);
+
+    // VARIABLE: helpDocument
+    const resolvedHelpDocument =
          await processFileUrlOrStringReference(
-             'currentBomObjective.billOfMaterialsLineItem.helpDocument',
-             currentBomObjective.billOfMaterialsLineItem.helpDocument);
+             'currentBomObjective.billOfMaterialsLineItem?.helpDocument',
+             currentBomObjective.billOfMaterialsLineItem?.helpDocument);
 
-     // Put the objective's help text into the state before we compose the context.
-     state.helpDocument =
-         // We prefer there to be a full help document attached to the current
-         //  line item.
-         resolveHelpDocument
-         ??
-         // If not, use the generic help text.
-         DEFAULT_BOM_HELP_DOCUMENT;
+    mergeBomFieldIntoState(
+        state,
+        "helpDocument",
+        resolvedHelpDocument ?? DEFAULT_BOM_HELP_DOCUMENT
+    );
 
-     // Do the substitution variable replacements.
-     const useFormattedMessage = composeContext({
-         state: state,
-         template: mainTem
-     });
+    // VARIABLE: resultValueHelp
+    mergeBomFieldIntoState(
+        state,
+        "resultValueHelp",
+        resultValueHelp
+    );
 
-     // Default response, in case we fail to interpret the result
-     //  check properly.
-     let response: ContentOrNull = null;
+    // TODO: The following code needs to be updated.
 
-     const responseFromLlm = await generateMessageResponse({
-         runtime: runtime,
-         context: useFormattedMessage,
-         modelClass: ModelClass.SMALL,
-     });
+    // Do the substitution variable replacements.
+    const useFormattedMessage = composeContext({
+        state: state,
+        template: useMessageTemplate
+    });
 
-     if (typeof responseFromLlm.text !== 'string') {
-         elizaLogger.debug(`${errPrefix}Unable to find a "text" property in the LLM output.`);
-     }
+    let retExtractedResultValueOrErrorResponse: ExtractedResultValueOrErrorResponse =
+        {
+            contentAsErrorResponseOrNull: null,
+            resultAndCharacterNameOrNull: null
+        }
 
-     // The response should have a "text" properties.
-     const text = responseFromLlm.text ?? '(The bill-of-materials help LLM failed to produce a JSON object with a "text" property.)';
+    const responseFromLlm = await generateMessageResponse({
+        runtime: runtime,
+        context: useFormattedMessage,
+        modelClass: ModelClass.SMALL,
+    });
 
-     // Use the help text provided by the LLM.
-         response = {
-         text: text
-     }
+    // Examine the response and determine how it affects the current
+    //  chat.  The response should have a "category" and "text"
+    //  properties.
+    let category = responseFromLlm.category;
+    let text = responseFromLlm.text ?? '(none)';
 
-     return response;
-     }
+    // WE MUST have a category.  If not, we create a RETRY response in the
+    //  hope the next chat volley will result in a category being generated
+    //  by the LLM.
+    if (typeof category !== 'string' || (typeof category === 'string'  && !isValidMainQuestionResponseCategory(category))) {
+        // -------------------------- BEGIN: RETRY PROCESSING ------------------------
+
+        elizaLogger.debug(`${errPrefix}Unable to find a valid main question response category in the LLM output.  Setting response category to RETRY.`);
+
+        // Set the category to RETRY and try asking the user the current
+        //  bill-of-materials line item question again.
+        category = enumMainQuestionResultCategory.RETRY;
+        retExtractedResultValueOrErrorResponse.contentAsErrorResponseOrNull = defaultInvalidResultValueResponse;
+
+        // -------------------------- END  : RETRY PROCESSING ------------------------
+    } else {
+
+        category = (category as string).toUpperCase();
+
+        elizaLogger.debug(`${errPrefix}The selected CATEGORY for line item main question is: ${category}\nAssociated text: ${text}\nObjective description: ${currentBomObjective.description}`);
+
+        // -------------------------- BEGIN: CATEGORY BASED UPDATES ------------------------
+
+        if (category === enumMainQuestionResultCategory.CANCEL) {
+            // Build a CANCEL response.
+            retExtractedResultValueOrErrorResponse.contentAsErrorResponseOrNull =
+                buildBomCancelResponse(runtime, errPrefix);
+        } else if (category === enumMainQuestionResultCategory.RESULT) {
+            // The user gave the LLM a usable result value.  Extract it
+            //  from the "text" property returned by the LLM.
+            const resultAndCharacterNameObj =
+                extractMainQuestionResultValue(currentBomObjective, text);
+
+            retExtractedResultValueOrErrorResponse =
+                validateMainQuestionResultValue(currentBomObjective, resultAndCharacterNameObj);
+        } else {
+            throw new Error(`${errPrefix}Unknown help response category: ${category}`);
+        }
+    }
+
+    // -------------------------- END  : CATEGORY BASED UPDATES ------------------------
+
+    // We should either have a valid result value or an error response at this point.
+    //  If not, then that is an error.
+    if (retExtractedResultValueOrErrorResponse.resultAndCharacterNameOrNull === null && retExtractedResultValueOrErrorResponse.contentAsErrorResponseOrNull === null) {
+        throw new Error(`${errPrefix}The resultAndCharacterNameOrNull and contentAsErrorResponseOrNull are both unassigned for the current bill-of-materials line item: ${currentBomObjective.description}.`);
+    }
+
+    return retExtractedResultValueOrErrorResponse;
+}
 
 
 /**
@@ -958,7 +1083,7 @@ async function askLlmBomHelpQuestion(runtime: IAgentRuntime, state: State, curre
     state.helpDocument =
         // We prefer there to be a full help document attached to the current
         //  line item.
-        currentBomObjective.billOfMaterialsLineItem.helpDocument
+        currentBomObjective.billOfMaterialsLineItem?.helpDocument
         ??
         // If not, use the generic help text.
         DEFAULT_BOM_HELP_DOCUMENT;
@@ -1121,8 +1246,8 @@ async function bomPreliminaryQuestionCheckResultHandler(
 
     const resolvedQuestion =
         await processFileUrlOrStringReference(
-            'currentBomObjective.billOfMaterialsLineItem.preliminaryPromptForOptionalLineItem',
-            currentBomObjective.billOfMaterialsLineItem.preliminaryQuestion);
+            'currentBomObjective.billOfMaterialsLineItem?.preliminaryPromptForOptionalLineItem',
+            currentBomObjective.billOfMaterialsLineItem?.preliminaryQuestion);
 
     // Put the objective's preliminary question into the state before we compose the context.
     mergeBomFieldIntoState(
@@ -1319,7 +1444,7 @@ function extractMainQuestionResultValue(currentBomObjective: Objective, text: st
     //  NULL to be returned to let the caller know this.
     if (trimmedTextLowerCase.length > 0) {
 
-        if (currentBomObjective.billOfMaterialsLineItem.type === 'boolean') {
+        if (currentBomObjective.billOfMaterialsLineItem?.type === 'boolean') {
             // -------------------------- BEGIN: EXTRACT BOOLEAN VALUE ------------------------
 
             // If the text is TRUE of FALSE then that is the result value.
@@ -1333,7 +1458,7 @@ function extractMainQuestionResultValue(currentBomObjective: Objective, text: st
             }
 
             // -------------------------- END  : EXTRACT BOOLEAN VALUE ------------------------
-        } else if (currentBomObjective.billOfMaterialsLineItem.type === 'number') {
+        } else if (currentBomObjective.billOfMaterialsLineItem?.type === 'number') {
             // -------------------------- BEGIN: EXTRACT NUMERIC VALUE ------------------------
 
             // Try to parse the number as a valid numeric value.
@@ -1347,15 +1472,15 @@ function extractMainQuestionResultValue(currentBomObjective: Objective, text: st
             }
 
             // -------------------------- END  : EXTRACT NUMERIC VALUE ------------------------
-        } else if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
+        } else if (currentBomObjective.billOfMaterialsLineItem?.type === 'string') {
             // -------------------------- BEGIN: EXTRACT STRING VALUE ------------------------
 
-            if (Array.isArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem.listOfValidValues.length > 0) {
+            if (Array.isArray(currentBomObjective.billOfMaterialsLineItem?.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem?.listOfValidValues.length > 0) {
                 // First, create an array of ChoiceAndCharacterName to separate the
                 //  list of choices values from their character name suffixes, if
                 //  any exist.
                 const listOfChoiceAndCharacterNames: ChoiceAndCharacterName[] =
-                    buildChoiceAndCharacterNamesArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues);
+                    buildChoiceAndCharacterNamesArray(currentBomObjective.billOfMaterialsLineItem?.listOfValidValues);
 
                 // Validate the text returned by the result check LLM as being one of the
                 //  valid choices.
@@ -1375,7 +1500,7 @@ function extractMainQuestionResultValue(currentBomObjective: Objective, text: st
         } else {
             // -------------------------- BEGIN: UNKNOWN TYPE ------------------------
 
-            throw new Error(`${errPrefix}The bill-of-materials line item is of an unknown type: ${currentBomObjective.billOfMaterialsLineItem.type}`);
+            throw new Error(`${errPrefix}The bill-of-materials line item is of an unknown type: ${currentBomObjective.billOfMaterialsLineItem?.type}`);
 
             // -------------------------- END  : UNKNOWN TYPE ------------------------
         }
@@ -1411,7 +1536,7 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultA
 
     let response: ContentOrNull = null;
 
-    if (currentBomObjective.billOfMaterialsLineItem.type === 'boolean') {
+    if (currentBomObjective.billOfMaterialsLineItem?.type === 'boolean') {
         // -------------------------- BEGIN: EXTRACT BOOLEAN VALUE ------------------------
 
         if (typeof resultAndCharacterNameObj.resultValue !== 'boolean') {
@@ -1420,7 +1545,7 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultA
         }
 
         // -------------------------- END  : EXTRACT BOOLEAN VALUE ------------------------
-    } else if (currentBomObjective.billOfMaterialsLineItem.type === 'number') {
+    } else if (currentBomObjective.billOfMaterialsLineItem?.type === 'number') {
         // -------------------------- BEGIN: EXTRACT NUMERIC VALUE ------------------------
 
         if (typeof resultAndCharacterNameObj.resultValue !== 'number' || (typeof resultAndCharacterNameObj.resultValue === 'number' && !isFinite(resultAndCharacterNameObj.resultValue))) {
@@ -1429,31 +1554,31 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultA
         } else {
             // Do we have any constraints?
             // Add min/max constraints if present.
-            const bIsMinValPresent = typeof currentBomObjective.billOfMaterialsLineItem.minVal === 'number';
-            const bIsMaxValPresent = typeof currentBomObjective.billOfMaterialsLineItem.maxVal === 'number';
+            const bIsMinValPresent = typeof currentBomObjective.billOfMaterialsLineItem?.minVal === 'number';
+            const bIsMaxValPresent = typeof currentBomObjective.billOfMaterialsLineItem?.maxVal === 'number';
 
             if (bIsMaxValPresent && bIsMinValPresent) {
                 // >>>>> Minimum AND Maximum values present.  Is the number between these
                 //  values?
-                if (resultAndCharacterNameObj.resultValue < currentBomObjective.billOfMaterialsLineItem.minVal || resultAndCharacterNameObj.resultValue > currentBomObjective.billOfMaterialsLineItem.maxVal) {
+                if (resultAndCharacterNameObj.resultValue < currentBomObjective.billOfMaterialsLineItem?.minVal || resultAndCharacterNameObj.resultValue > currentBomObjective.billOfMaterialsLineItem?.maxVal) {
                     response = {
-                        text: `Please specify a number between ${currentBomObjective.billOfMaterialsLineItem.minVal} and ${currentBomObjective.billOfMaterialsLineItem.maxVal}`
+                        text: `Please specify a number between ${currentBomObjective.billOfMaterialsLineItem?.minVal} and ${currentBomObjective.billOfMaterialsLineItem?.maxVal}`
                     }
                 }
             } else if (bIsMinValPresent) {
                 // >>>>> ONLY minimum value present.  Is the number greater than or
                 //  equal to that value.
-                if (resultAndCharacterNameObj.resultValue < currentBomObjective.billOfMaterialsLineItem.minVal) {
+                if (resultAndCharacterNameObj.resultValue < currentBomObjective.billOfMaterialsLineItem?.minVal) {
                     response = {
-                        text: `Please specify a number greater than or equal to ${currentBomObjective.billOfMaterialsLineItem.minVal}`
+                        text: `Please specify a number greater than or equal to ${currentBomObjective.billOfMaterialsLineItem?.minVal}`
                     }
                 }
             } else if (bIsMaxValPresent) {
                 // >>>>> ONLY maximum value present.  Is the number less than or
                 //  equal to that value.
-                if (resultAndCharacterNameObj.resultValue < currentBomObjective.billOfMaterialsLineItem.maxVal) {
+                if (resultAndCharacterNameObj.resultValue < currentBomObjective.billOfMaterialsLineItem?.maxVal) {
                     response = {
-                        text: `Please specify a number less than or equal to ${currentBomObjective.billOfMaterialsLineItem.maxVal}`
+                        text: `Please specify a number less than or equal to ${currentBomObjective.billOfMaterialsLineItem?.maxVal}`
                     }
                 }
             } else {
@@ -1462,7 +1587,7 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultA
         }
 
         // -------------------------- END  : EXTRACT NUMERIC VALUE ------------------------
-    } else if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
+    } else if (currentBomObjective.billOfMaterialsLineItem?.type === 'string') {
         // -------------------------- BEGIN: EXTRACT STRING VALUE ------------------------
 
         // TODO: Where is the check to see if it is a list of values bill-of-materials line
@@ -1484,7 +1609,7 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultA
     } else {
         // -------------------------- BEGIN: UNKNOWN TYPE ------------------------
 
-        throw new Error(`${errPrefix}The bill-of-materials line item is of an unknown type: ${currentBomObjective.billOfMaterialsLineItem.type}`);
+        throw new Error(`${errPrefix}The bill-of-materials line item is of an unknown type: ${currentBomObjective.billOfMaterialsLineItem?.type}`);
 
         // -------------------------- END  : UNKNOWN TYPE ------------------------
     }
@@ -1540,7 +1665,7 @@ async function bomMainQuestionCheckResultHandler(
     const errPrefix = `(bomMainQuestionCheckResultHandler) `;
 
     // Put the objective's main question into the state before we compose the context.
-    mergeBomFieldIntoState(state, "simpleQuestion", currentBomObjective.billOfMaterialsLineItem.prompt);
+    mergeBomFieldIntoState(state, "simpleQuestion", currentBomObjective.billOfMaterialsLineItem?.prompt);
 
     // Create text for the LLM that tells it what kind of values to expect
     //  based on the type of bill-of-materials line item the current
@@ -1550,28 +1675,28 @@ async function bomMainQuestionCheckResultHandler(
 
     let llmExpectedResultValuesText = null;
 
-    if (currentBomObjective.billOfMaterialsLineItem.type === 'boolean') {
+    if (currentBomObjective.billOfMaterialsLineItem?.type === 'boolean') {
         // -------------------------- BEGIN: BOOLEAN TYPE ------------------------
 
         llmExpectedResultValuesText +=
             `The result value should be a user expression that evaluates to boolean value.  For example, "yes", "sure", "ok", "I want to do that", "Let's do that", "sounds good", etc.  would all resolve to the result value "true".  For example, "nah", "nope", "never", "hell no!", "Forget that", "I don't want to do that", etc. would all resolve to the result value "false".`;
 
         // -------------------------- END  : BOOLEAN TYPE ------------------------
-    } else if (currentBomObjective.billOfMaterialsLineItem.type === 'number') {
+    } else if (currentBomObjective.billOfMaterialsLineItem?.type === 'number') {
         // -------------------------- BEGIN: NUMBER TYPE ------------------------
 
         llmExpectedResultValuesText =
             `The result value should be a numeric value.`;
         // -------------------------- END  : NUMBER TYPE ------------------------
-    } else if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
+    } else if (currentBomObjective.billOfMaterialsLineItem?.type === 'string') {
             // -------------------------- BEGIN: STRING TYPE ------------------------
 
-            if (Array.isArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem.listOfValidValues.length > 0) {
+            if (Array.isArray(currentBomObjective.billOfMaterialsLineItem?.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem?.listOfValidValues.length > 0) {
                 const choiceDelimiter = '\n- ';
 
                 // Add list of values.
                 const validChoices =
-                    currentBomObjective.billOfMaterialsLineItem.listOfValidValues.join(choiceDelimiter);
+                    currentBomObjective.billOfMaterialsLineItem?.listOfValidValues.join(choiceDelimiter);
 
                 llmExpectedResultValuesText =
                     `
@@ -1583,7 +1708,7 @@ async function bomMainQuestionCheckResultHandler(
 
             // -------------------------- END  : STRING TYPE ------------------------    } else {
     } else {
-        throw new Error(`${errPrefix}Unknown bill-of-materials type: ${currentBomObjective.billOfMaterialsLineItem.type}`);
+        throw new Error(`${errPrefix}Unknown bill-of-materials type: ${currentBomObjective.billOfMaterialsLineItem?.type}`);
     }
 
     // If we created help text of the LLM regarding the expected result values, then
@@ -1732,7 +1857,7 @@ export async function determineBomQuestionResult(
         //
         // Is the current bill-of-materials line item optional and does the
         //  preliminary question still need to be asked.?
-        if (currentBomObjective.billOfMaterialsLineItem.isOptional && !currentBomObjective.isPreliminaryQuestionAlreadyAsked) {
+        if (currentBomObjective.billOfMaterialsLineItem?.isOptional && !currentBomObjective.isPreliminaryQuestionAlreadyAsked) {
             // -------------------------- BEGIN: OPTIONAL LINE ITEM ------------------------
 
             // Yes. Check for a declined optional line item, since those
@@ -1811,7 +1936,7 @@ export async function determineBomQuestionResult(
             }
 
             // -------------------------- END  : MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
-        } // else/if (currentBomObjective.billOfMaterialsLineItem.isOptional)
+        } // else/if (currentBomObjective.billOfMaterialsLineItem?.isOptional)
     }
 
     return response;
@@ -1833,69 +1958,69 @@ export async function buildBomMainQuestion(currentBomObjective: Objective): Prom
     //  declared in the bill-of-materials line item.
     let retText =
         await processFileUrlOrStringReference(
-            'currentBomObjective.billOfMaterialsLineItem.prompt',
-            currentBomObjective.billOfMaterialsLineItem.prompt);
+            'currentBomObjective.billOfMaterialsLineItem?.prompt',
+            currentBomObjective.billOfMaterialsLineItem?.prompt);
 
-    if (currentBomObjective.billOfMaterialsLineItem.type === 'boolean') {
+    if (currentBomObjective.billOfMaterialsLineItem?.type === 'boolean') {
         // -------------------------- BEGIN: BOOLEAN TYPE ------------------------
 
         // No text modifications needed for boolean questions.
 
         // -------------------------- END  : BOOLEAN TYPE ------------------------
-    } else if (currentBomObjective.billOfMaterialsLineItem.type === 'number') {
+    } else if (currentBomObjective.billOfMaterialsLineItem?.type === 'number') {
         // -------------------------- BEGIN: NUMBER TYPE ------------------------
 
         // Add units if present.
         if (
-            typeof currentBomObjective.billOfMaterialsLineItem.unitsDescription === 'string'
-                && currentBomObjective.billOfMaterialsLineItem.unitsDescription.trim().length > 0) {
-            retText += ` Please give your answer in ${currentBomObjective.billOfMaterialsLineItem.unitsDescription.trim()}.`;
+            typeof currentBomObjective.billOfMaterialsLineItem?.unitsDescription === 'string'
+                && currentBomObjective.billOfMaterialsLineItem?.unitsDescription.trim().length > 0) {
+            retText += ` Please give your answer in ${currentBomObjective.billOfMaterialsLineItem?.unitsDescription.trim()}.`;
         }
 
         // Add min/max constraints if present.
-        const bIsMinValPresent = typeof currentBomObjective.billOfMaterialsLineItem.minVal === 'number';
-        const bIsMaxValPresent = typeof currentBomObjective.billOfMaterialsLineItem.maxVal === 'number';
+        const bIsMinValPresent = typeof currentBomObjective.billOfMaterialsLineItem?.minVal === 'number';
+        const bIsMaxValPresent = typeof currentBomObjective.billOfMaterialsLineItem?.maxVal === 'number';
 
         if (bIsMaxValPresent && bIsMinValPresent) {
             // >>>>> Minimum AND Maximum values present.
 
             // Sanity check on the min/max values.
-            if (currentBomObjective.billOfMaterialsLineItem.minVal > currentBomObjective.billOfMaterialsLineItem.maxVal) {
-                throw new Error(`${errPrefix}The minimum value for the bill-of-materials numeric line item(${currentBomObjective.billOfMaterialsLineItem.minVal}) is greater than the maximum value: ${currentBomObjective.billOfMaterialsLineItem.maxVal}`);
+            if (currentBomObjective.billOfMaterialsLineItem?.minVal > currentBomObjective.billOfMaterialsLineItem?.maxVal) {
+                throw new Error(`${errPrefix}The minimum value for the bill-of-materials numeric line item(${currentBomObjective.billOfMaterialsLineItem?.minVal}) is greater than the maximum value: ${currentBomObjective.billOfMaterialsLineItem?.maxVal}`);
             }
 
             retText +=
-                `Please choose a number between: ${currentBomObjective.billOfMaterialsLineItem.minVal} && ${currentBomObjective.billOfMaterialsLineItem.maxVal}.`;
+                `Please choose a number between: ${currentBomObjective.billOfMaterialsLineItem?.minVal} && ${currentBomObjective.billOfMaterialsLineItem?.maxVal}.`;
         } else if (bIsMinValPresent) {
             // >>>>> ONLY minimum value present.
 
             retText +=
-                `Please choose a number greater than or equal to: ${currentBomObjective.billOfMaterialsLineItem.minVal}.`;
+                `Please choose a number greater than or equal to: ${currentBomObjective.billOfMaterialsLineItem?.minVal}.`;
 
         } else if (bIsMaxValPresent) {
             // >>>>> ONLY maximum value present.
 
             retText +=
-                `Please choose a number less than or equal to: ${currentBomObjective.billOfMaterialsLineItem.maxVal}.`;
+                `Please choose a number less than or equal to: ${currentBomObjective.billOfMaterialsLineItem?.maxVal}.`;
         } else {
             throw new Error(`${errPrefix}Invalid logic pathway encountered during bill-of-materials numeric line item processing.`);
         }
 
         // -------------------------- END  : NUMBER TYPE ------------------------
-    } else if (currentBomObjective.billOfMaterialsLineItem.type === 'string') {
+    } else if (currentBomObjective.billOfMaterialsLineItem?.type === 'string') {
             // -------------------------- BEGIN: STRING TYPE ------------------------
 
-            if (Array.isArray(currentBomObjective.billOfMaterialsLineItem.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem.listOfValidValues.length > 0) {
+            if (Array.isArray(currentBomObjective.billOfMaterialsLineItem?.listOfValidValues) && currentBomObjective.billOfMaterialsLineItem?.listOfValidValues.length > 0) {
                 // Add list of values if present.
                 const validChoices =
-                    buildBomOrStringStatement(currentBomObjective.billOfMaterialsLineItem.listOfValidValues);
+                    buildBomOrStringStatement(currentBomObjective.billOfMaterialsLineItem?.listOfValidValues);
                 retText +=
                     `The available choices are: ${validChoices}`;
             }
 
             // -------------------------- END  : STRING TYPE ------------------------
     } else {
-        throw new Error(`${errPrefix}Unknown bill-of-materials type: ${currentBomObjective.billOfMaterialsLineItem.type}`);
+        throw new Error(`${errPrefix}Unknown bill-of-materials type: ${currentBomObjective.billOfMaterialsLineItem?.type}`);
     }
 
     return retText;
@@ -1934,7 +2059,7 @@ export async function buildBillOfMaterialQuestion(currentBomObjective: Objective
     let bIsTimeForThePreliminaryQuestion = false;
 
     // Is the objective's bill-of-materials line item object optional?
-    if (currentBomObjective.billOfMaterialsLineItem.isOptional) {
+    if (currentBomObjective.billOfMaterialsLineItem?.isOptional) {
         // Yes. Check for a declined optional line item, since those
         //  should not be passed to this function.
         if (currentBomObjective.resultData === null) {
@@ -1948,7 +2073,7 @@ export async function buildBillOfMaterialQuestion(currentBomObjective: Objective
 
             // Yes.  Ask the user the question that determines if they are interested
             //  in the optional line item or not.
-            piecesOfPrompt.push(currentBomObjective.billOfMaterialsLineItem.preliminaryQuestion);
+            piecesOfPrompt.push(currentBomObjective.billOfMaterialsLineItem?.preliminaryQuestion);
 
             // -------------------------- END  : PRELIMINARY QUESTION FOR OPTIONAL LINE ITEM ------------------------
 
