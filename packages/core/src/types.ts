@@ -32,6 +32,24 @@ export type ResultAndCharacterName = {
 export type ResultAndCharacterNameOrNull = ResultAndCharacterName | null;
 
 /**
+ * This type is returned by the function that asks the preliminary question
+ *  to the LLM for an OPTIONAL bill-of-materials line item objective.
+ */
+export type ExtractedPreliminaryValueOrErrorResponse = {
+    // If the LLM response contained a boolean value,
+    //  from the user, indicating whether or not they want
+    //  to use the bill-of-materials line item, then this
+    //  property will contain that boolean value.  Otherwise, it
+    //  should be NULL.
+    booleanValueOrNull: BooleanOrNull,
+    // If the LLM response did NOT contain a valid boolean
+    //  value, then this property will a Content object that will
+    //  contain the error response that should be shown to the user,
+    //  or handled by downstream code.  Otherwise, it should be NULL.
+    contentAsErrorResponseOrNull: ContentOrNull
+}
+
+/**
  * This type is returned by functions like validateMainQuestionResultValue()
  *  that either return a ResultAndCharacterName if the LLM response contained
  *  a valid bill-of-materials result, or ContentOrNull object that should

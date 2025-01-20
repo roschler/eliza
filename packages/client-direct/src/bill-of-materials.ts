@@ -67,7 +67,7 @@ import {
     createEndSessionMemory,
     UUID,
     isUuid,
-    createEndObjectiveMemory
+    createEndObjectiveMemory, ExtractedPreliminaryValueOrErrorResponse
 } from "@ai16z/eliza";
 import {CLIENT_NAME} from "./common.ts";
 import {processFileUrlOrStringReference} from "./process-external-references.ts";
@@ -877,6 +877,163 @@ export function buildBomStopAtStringsLastObjective(...additionalStopAtStrings: s
 }
 
 /**
+ * This function makes an LLM call to find out if the user
+ *  does or does not want to use an OPTIONAL bill-of-materials
+ *  line item.
+ *
+ * @param runtime - The current agent/character
+ * @param state - The current system state for the chat
+ * @param currentBomObjective - The current bill-of-materials
+ *  objective
+ *
+ * @returns - Returns an ExtractedPreliminaryValueOrErrorResponse
+ *  object that contains either the response the system
+ *  should use as the chat volley response or the
+ *  boolean value the user gave as their input as found in the
+ *  recent chat messages stream.
+ */
+async function askLlmBomPreliminaryQuestion(runtime: IAgentRuntime, state: State, currentBomObjective: Objective): Promise<ExtractedPreliminaryValueOrErrorResponse> {
+    const errPrefix = `(askLlmBomPreliminaryQuestion) `;
+
+    const useMessageTemplate = defaultPreliminaryQuestionLlmMessageTemplate;
+
+    // Create text for the LLM that tells it what kind of values to expect
+    //  based on the type of bill-of-materials line item the current
+    //  objective is for, and the value constraints the line item has,
+    //  if any.
+    // -------------------------- BEGIN: LLM TEXT FOR EXPECTED RESULT VALUES ------------------------
+
+    let resultValueHelp =
+        `The result value should be a user expression that evaluates to boolean value.  For example, "yes", "sure", "ok", "I want to do that", "Let's do that", "sounds good", etc.  would all resolve to the result value "true".  For example, "nah", "nope", "never", "hell no!", "Forget that", "I don't want to do that", etc. would all resolve to the result value "false".`;
+
+
+    // -------------------------- END  : LLM TEXT FOR EXPECTED RESULT VALUES ------------------------
+
+    // Resolve the needed message template variable values and merge them
+
+    // VARIABLE: preliminaryQuestion
+    const resolvedQuestion =
+        await processFileUrlOrStringReference(
+            'currentBomObjective.billOfMaterialsLineItem?.preliminaryQuestion',
+            currentBomObjective.billOfMaterialsLineItem?.preliminaryQuestion);
+
+    if (resolvedQuestion.trim().length === 0) {
+        throw new Error(`${errPrefix}The resolved preliminary question is empty.`);
+    }
+
+    mergeBomFieldIntoState(
+        state,
+        "preliminaryQuestion",
+        resolvedQuestion);
+
+    // VARIABLE: helpDocument
+    const resolvedHelpDocument =
+        await processFileUrlOrStringReference(
+            'currentBomObjective.billOfMaterialsLineItem?.helpDocument',
+            currentBomObjective.billOfMaterialsLineItem?.helpDocument);
+
+    mergeBomFieldIntoState(
+        state,
+        "helpDocument",
+        resolvedHelpDocument ?? DEFAULT_BOM_HELP_DOCUMENT
+    );
+
+    // VARIABLE: resultValueHelp
+    mergeBomFieldIntoState(
+        state,
+        "resultValueHelp",
+        resultValueHelp
+    );
+
+    // TODO: The following code needs to be updated.
+
+    // Do the substitution variable replacements.
+    const useFormattedMessage = composeContext({
+        state: state,
+        template: useMessageTemplate
+    });
+
+    let retExtractedBooleanValueOrErrorResponse: ExtractedPreliminaryValueOrErrorResponse =
+        {
+            contentAsErrorResponseOrNull: null,
+            booleanValueOrNull: null
+        }
+
+    // Ask the LLM for the next response.
+    const responseFromLlm = await generateMessageResponse({
+        runtime: runtime,
+        context: useFormattedMessage,
+        modelClass: ModelClass.SMALL,
+    });
+
+    // Examine the response and determine how it affects the current
+    //  chat.  The response should have a "category" and "text"
+    //  properties.
+    let category = responseFromLlm.category;
+    let text = responseFromLlm.text ?? '(none)';
+
+    // The response must be a JSON object with a "category" and a "text
+    //  field.  If not, create a RETRY response in the hope the next chat
+    //  volley will result in the correct response object being generated
+    //  by the LLM.
+    if (typeof category !== 'string' || (typeof category === 'string'  && !isValidMainQuestionResponseCategory(category))
+        &&
+        typeof text !== 'string' || (typeof text === 'string' && text.trim().length === 0)) {
+        // -------------------------- BEGIN: RETRY PROCESSING ------------------------
+
+        elizaLogger.debug(`${errPrefix}Unable to find a valid main question response object in the LLM output.  Setting response category to RETRY.`);
+
+        // Set the category to RETRY and try asking the user the current
+        //  bill-of-materials line item question again.
+        category = enumPreliminaryQuestionResultCategory.RETRY;
+        retExtractedBooleanValueOrErrorResponse.contentAsErrorResponseOrNull = defaultInvalidResultValueResponse;
+
+        // -------------------------- END  : RETRY PROCESSING ------------------------
+    } else {
+
+        category = (category as string).toUpperCase();
+
+        elizaLogger.debug(`${errPrefix}The selected CATEGORY for line item main question is: ${category}\nAssociated text: ${text}\nObjective description: ${currentBomObjective.description}`);
+
+        // -------------------------- BEGIN: CATEGORY BASED UPDATES ------------------------
+
+        if (category === enumPreliminaryQuestionResultCategory.CANCEL) {
+            // Build a CANCEL response.
+            retExtractedBooleanValueOrErrorResponse.contentAsErrorResponseOrNull =
+                buildBomCancelResponse(runtime, errPrefix);
+        } else if (category === enumPreliminaryQuestionResultCategory.FALSE) {
+            // The user has indicated they want to use the bill-of-materials line item.
+            retExtractedBooleanValueOrErrorResponse.booleanValueOrNull = false;
+        } else if (category === enumPreliminaryQuestionResultCategory.TRUE) {
+            // The user has indicated they want to use the bill-of-materials line item.
+            retExtractedBooleanValueOrErrorResponse.booleanValueOrNull = true;
+        } else if (category === enumMainQuestionResultCategory.CONTINUE) {
+            // The user needs further help or discussion.  The "text" property
+            //  should contain the response to show the user.
+            retExtractedBooleanValueOrErrorResponse =
+                {
+                    booleanValueOrNull: null,
+                    contentAsErrorResponseOrNull: {
+                        text: text
+                    }
+                }
+        } else {
+            throw new Error(`${errPrefix}Unknown response category: ${category}`);
+        }
+    }
+
+    // -------------------------- END  : CATEGORY BASED UPDATES ------------------------
+
+    // We should either have a valid result value or an error response at this point.
+    //  If not, then that is an error.
+    if (retExtractedBooleanValueOrErrorResponse.booleanValueOrNull === null && retExtractedBooleanValueOrErrorResponse.contentAsErrorResponseOrNull === null) {
+        throw new Error(`${errPrefix}The booleanValueOrNull and contentAsErrorResponseOrNull are both unassigned for the current bill-of-materials line item: ${currentBomObjective.description}.`);
+    }
+
+    return retExtractedBooleanValueOrErrorResponse;
+}
+
+/**
  * This function makes an LLM call to get a result value for
  *  the user for the current bill-of-materials line item.
  *
@@ -885,10 +1042,10 @@ export function buildBomStopAtStringsLastObjective(...additionalStopAtStrings: s
  * @param currentBomObjective - The current bill-of-materials
  *  objective
  *
- * @returns - Returns a ExtractedResultValueOrErrorResponse
+ * @returns - Returns an ExtractedResultValueOrErrorResponse
  *  object that contains either the response the system
  *  should use as the chat volley response or the validated
- *  result value the user gave as their input found in the
+ *  result value the user gave as their input as found in the
  *  recent chat messages stream.
  */
 async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, currentBomObjective: Objective): Promise<ExtractedResultValueOrErrorResponse> {
@@ -964,6 +1121,10 @@ async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, curre
             'currentBomObjective.billOfMaterialsLineItem?.simpleQuestion',
             currentBomObjective.billOfMaterialsLineItem?.simpleQuestion);
 
+    if (resolvedQuestion.trim().length === 0) {
+        throw new Error(`${errPrefix}The resolved main question is empty.`);
+    }
+
     mergeBomFieldIntoState(
         state,
         "simpleQuestion",
@@ -987,8 +1148,6 @@ async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, curre
         "resultValueHelp",
         resultValueHelp
     );
-
-    // TODO: The following code needs to be updated.
 
     // Do the substitution variable replacements.
     const useFormattedMessage = composeContext({
@@ -1053,13 +1212,15 @@ async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, curre
             retExtractedResultValueOrErrorResponse =
                 validateMainQuestionResultValue(currentBomObjective, resultAndCharacterNameObj);
         } else if (category === enumMainQuestionResultCategory.CONTINUE) {
-            // The user gave the LLM a usable result value.  Extract it
-            //  from the "text" property returned by the LLM.
-            const resultAndCharacterNameObj =
-                extractMainQuestionResultValue(currentBomObjective, text);
-
+            // The user needs further help or discussion.  The "text" property
+            //  should contain the response to show the user.
             retExtractedResultValueOrErrorResponse =
-                validateMainQuestionResultValue(currentBomObjective, resultAndCharacterNameObj);
+                {
+                    resultAndCharacterNameOrNull: null,
+                    contentAsErrorResponseOrNull: {
+                        text: text
+                    }
+                }
         } else {
             throw new Error(`${errPrefix}Unknown response category: ${category}`);
         }
@@ -1075,7 +1236,6 @@ async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, curre
 
     return retExtractedResultValueOrErrorResponse;
 }
-
 
 /**
  * This function makes an LLM call get the next help text for
