@@ -268,6 +268,13 @@ export enum enumMainQuestionResultCategory {
     CANCEL = "CANCEL",
 
     /**
+     * The user needs help on the bill-of-materials line item subject
+     *  or needs some other further chat to get to a proper result
+     *  value.
+     */
+    CONTINUE = "CONTINUE",
+
+    /**
      * The user has indicated that they want to change their answer
      *  to something different.
      */
@@ -524,7 +531,7 @@ export function mergeBomFieldIntoState(state: State, bomFieldName: string, bomFi
  * This is the message template we use to ask the preliminary question for
  *  an OPTIONAL bill-of-materials question line item.
  */
-const preliminaryQuestionLlmMessageTemplate =
+const defaultPreliminaryQuestionLlmMessageTemplate =
     `
     Your current task is to ask the user the following question and chat with them until they give an answer that can be safely interpreted as either true or false:
 
@@ -574,7 +581,7 @@ const preliminaryQuestionLlmMessageTemplate =
  *  It will be used if the bill-of-materials line item does not provide
  *  its own message template.
  */
-const mainQuestionLlmMessageTemplate =
+const defaultMainQuestionLlmMessageTemplate =
     `
         Your current task is to ask the user the following question and chat with them until they give an answer to it:
 
@@ -697,8 +704,8 @@ export function validateBillOfMaterialsLineItem(billOfMaterialsLineItem: BillOfM
         validationFailures.push(`The "type" field is empty.`);
     }
 
-    if (billOfMaterialsLineItem.prompt.trim().length === 0) {
-        validationFailures.push(`The "prompt" field is empty.`);
+    if (billOfMaterialsLineItem.simpleQuestion.trim().length === 0) {
+        validationFailures.push(`The "simpleQuestion" field is empty.`);
     }
 
     if (typeof billOfMaterialsLineItem.defaultValue === 'string' && billOfMaterialsLineItem.defaultValue.trim().length === 0) {
@@ -724,8 +731,17 @@ export function validateBillOfMaterialsLineItem(billOfMaterialsLineItem: BillOfM
         // If the list of values array is assigned, then it must contain
         //  at least one value.
 
-        if (Array.isArray(billOfMaterialsLineItem) && billOfMaterialsLineItem.listOfValidValues.length === 0) {
-            validationFailures.push(`The "listOfValidValues" array is empty.`);
+        if (Array.isArray(billOfMaterialsLineItem)) {
+            if (billOfMaterialsLineItem.listOfValidValues.length === 0) {
+                validationFailures.push(`The "listOfValidValues" array is empty.`);
+            } else {
+                // Make sure none of the values are empty.
+                if (billOfMaterialsLineItem.listOfValidValues.some( listValue => {
+                    return listValue.trim().length === 0;
+                })) {
+                    validationFailures.push(`One or more values in the "listOfValidValues" array is empty.`);
+                }
+            }
         }
 
         // -------------------------- END  : STRING TYPE VALIDATIONS ------------------------
@@ -869,11 +885,13 @@ export function buildBomStopAtStringsLastObjective(...additionalStopAtStrings: s
  * @param currentBomObjective - The current bill-of-materials
  *  objective
  *
- * @returns - Returns a Content object that contains the
- *  response the system should use as the chat volley
- *  response
+ * @returns - Returns a ExtractedResultValueOrErrorResponse
+ *  object that contains either the response the system
+ *  should use as the chat volley response or the validated
+ *  result value the user gave as their input found in the
+ *  recent chat messages stream.
  */
-async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, currentBomObjective: Objective): Promise<Content> {
+async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, currentBomObjective: Objective): Promise<ExtractedResultValueOrErrorResponse> {
     const errPrefix = `(askLlmBomMainQuestion) `;
 
     let useMessageTemplate;
@@ -884,7 +902,7 @@ async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, curre
             && currentBomObjective.billOfMaterialsLineItem?.messageTemplate.trim().length > 0) {
         useMessageTemplate = currentBomObjective.billOfMaterialsLineItem?.messageTemplate;
     } else {
-        useMessageTemplate = mainQuestionLlmMessageTemplate;
+        useMessageTemplate = defaultMainQuestionLlmMessageTemplate;
     }
 
     // Create text for the LLM that tells it what kind of values to expect
@@ -924,17 +942,16 @@ async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, curre
                  ${choiceDelimiter}${validChoices}
                  If the user provided result value is one of these values or is closely similar to one of the above values, your response text should be the exact text of the choice value that the user text matches best.
                  `;
+        } else {
+            resultValueHelp =
+                `
+                The result value should be a string.
+                 `;
         }
 
         // -------------------------- END  : STRING TYPE ------------------------    } else {
     } else {
         throw new Error(`${errPrefix}Unknown bill-of-materials type: ${currentBomObjective.billOfMaterialsLineItem?.type}`);
-    }
-
-    // If we created help text of the LLM regarding the expected result values, then
-    //  merge the expected values text into the result check message template.
-    if (resultValueHelp) {
-        mergeBomFieldIntoState(state, "resultValueHelp", resultValueHelp);
     }
 
     // -------------------------- END  : LLM TEXT FOR EXPECTED RESULT VALUES ------------------------
@@ -985,6 +1002,7 @@ async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, curre
             resultAndCharacterNameOrNull: null
         }
 
+    // Ask the LLM for the next response.
     const responseFromLlm = await generateMessageResponse({
         runtime: runtime,
         context: useFormattedMessage,
@@ -997,13 +1015,16 @@ async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, curre
     let category = responseFromLlm.category;
     let text = responseFromLlm.text ?? '(none)';
 
-    // WE MUST have a category.  If not, we create a RETRY response in the
-    //  hope the next chat volley will result in a category being generated
+    // The response must be a JSON object with a "category" and a "text
+    //  field.  If not, create a RETRY response in the hope the next chat
+    //  volley will result in the correct response object being generated
     //  by the LLM.
-    if (typeof category !== 'string' || (typeof category === 'string'  && !isValidMainQuestionResponseCategory(category))) {
+    if (typeof category !== 'string' || (typeof category === 'string'  && !isValidMainQuestionResponseCategory(category))
+        &&
+        typeof text !== 'string' || (typeof text === 'string' && text.trim().length === 0)) {
         // -------------------------- BEGIN: RETRY PROCESSING ------------------------
 
-        elizaLogger.debug(`${errPrefix}Unable to find a valid main question response category in the LLM output.  Setting response category to RETRY.`);
+        elizaLogger.debug(`${errPrefix}Unable to find a valid main question response object in the LLM output.  Setting response category to RETRY.`);
 
         // Set the category to RETRY and try asking the user the current
         //  bill-of-materials line item question again.
@@ -1031,8 +1052,16 @@ async function askLlmBomMainQuestion(runtime: IAgentRuntime, state: State, curre
 
             retExtractedResultValueOrErrorResponse =
                 validateMainQuestionResultValue(currentBomObjective, resultAndCharacterNameObj);
+        } else if (category === enumMainQuestionResultCategory.CONTINUE) {
+            // The user gave the LLM a usable result value.  Extract it
+            //  from the "text" property returned by the LLM.
+            const resultAndCharacterNameObj =
+                extractMainQuestionResultValue(currentBomObjective, text);
+
+            retExtractedResultValueOrErrorResponse =
+                validateMainQuestionResultValue(currentBomObjective, resultAndCharacterNameObj);
         } else {
-            throw new Error(`${errPrefix}Unknown help response category: ${category}`);
+            throw new Error(`${errPrefix}Unknown response category: ${category}`);
         }
     }
 
@@ -1258,7 +1287,7 @@ async function bomPreliminaryQuestionCheckResultHandler(
     // Do the substitution variable replacements.
     const useFormattedMessage = composeContext({
         state: state,
-        template: preliminaryQuestionLLmResultCheckTemplate
+        template: defaultPreliminaryQuestionLlmMessageTemplate
     });
 
     // Default response, in case we fail to interpret the result
@@ -1657,7 +1686,7 @@ function validateMainQuestionResultValue(currentBomObjective: Objective, resultA
  *         in this function, it will be found in the ExtractedResultValueOrErrorResponse's
  *         contentAsErrorResponseOrNull field, which should be shown to the user
  *         or used by subsequent code as an error response.
- */
+ *
 async function bomMainQuestionCheckResultHandler(
     runtime: IAgentRuntime,
     state: State,
@@ -1793,6 +1822,7 @@ async function bomMainQuestionCheckResultHandler(
 
     return retExtractedResultValueOrErrorResponse;
 }
+*/
 
 /**
  * Analyze the recent message stream to see how we should proceed
@@ -1958,8 +1988,8 @@ export async function buildBomMainQuestion(currentBomObjective: Objective): Prom
     //  declared in the bill-of-materials line item.
     let retText =
         await processFileUrlOrStringReference(
-            'currentBomObjective.billOfMaterialsLineItem?.prompt',
-            currentBomObjective.billOfMaterialsLineItem?.prompt);
+            'currentBomObjective.billOfMaterialsLineItem?.simpleQuestion',
+            currentBomObjective.billOfMaterialsLineItem?.simpleQuestion);
 
     if (currentBomObjective.billOfMaterialsLineItem?.type === 'boolean') {
         // -------------------------- BEGIN: BOOLEAN TYPE ------------------------
