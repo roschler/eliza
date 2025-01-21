@@ -16,7 +16,8 @@ import {
     JOKER_UUID_AS_ROOMS_ID_WILDCARD,
     setExclusiveUserToCharacterRelationship,
     isUuid,
-    createEndSessionMemory, shallowCloneCharacter, SELECT_CHARACTER_PREFIX
+    createEndSessionMemory,
+    SELECT_CHARACTER_PREFIX
 } from "@ai16z/eliza";
 import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
@@ -38,7 +39,7 @@ import {
     askNextBomLlmQuestion,
     getNextBomObjective,
     isBomAgentCharacter,
-    messageHandlerTemplate, isSelectCharacterResponse
+    messageHandlerTemplate, isSelectCharacterResponse, buildBillOfMaterialQuestion
 } from "./bill-of-materials.ts";
 import {CLIENT_NAME} from "./common.ts";
 const upload = multer({ storage: multer.memoryStorage() });
@@ -412,6 +413,35 @@ export class DirectClient {
                     if (mainBomGoal) {
                         // Yes. Do bill-of-materials processing.
 
+                        // This function does the processing for a completed goal.  It creates
+                        //  a response that switches to the agent/character specified as
+                        //  the one that should receive control, now that the goal for the
+                        //  current agent/character is complete.
+                        function doCompletedGoalProcessing(runtime: IAgentRuntime): Content {
+                            // -------------------------- BEGIN: BILL-OF-MATERIALS GOAL COMPLETE ------------------------
+
+                            // Yes.  If we don't have an agent/character to switch control to,
+                            //  now that the bill-of-materials goal is complete, then that
+                            //  is an error.
+                            const nextCharacterName =
+                                runtime.character.switchToCharacterWhenBomComplete;
+
+                            if (typeof nextCharacterName !== "string" || typeof nextCharacterName === "string" && nextCharacterName.trim().length === 0) {
+                                throw new Error(`The bill-of-materials goal processing is complete, but the character does not specify the next agent to transfer control to (i.e. - switchToCharacterWhenBomComplete is unassigned or invalid.`);
+                            }
+
+                            // Emit the action that will transfer control of the conversation
+                            //  to the next agent/character.
+                            const responseToSwitchCharacters = {
+                                text: `Transferring you over to the next agent: ${nextCharacterName}`,
+                                action: `${SELECT_CHARACTER_PREFIX}${nextCharacterName}`
+                            }
+
+                            // -------------------------- END  : BILL-OF-MATERIALS GOAL COMPLETE ------------------------
+
+                            return responseToSwitchCharacters;
+                        }
+
                         // -------------------------- BEGIN: BILL-OF-MATERIALS PROCESSING ------------------------
 
                         // Determine the next objective that needs to be completed.
@@ -419,6 +449,9 @@ export class DirectClient {
 
                         // Is the GOAL (aka form fill operation) complete?
                         if (currentBomObjective === null) {
+                            response =
+                                doCompletedGoalProcessing(runtime);
+
                             // -------------------------- BEGIN: BILL-OF-MATERIALS GOAL COMPLETE ------------------------
 
                             // Yes.  If we don't have an agent/character to switch control to,
@@ -453,27 +486,34 @@ export class DirectClient {
                             //  the user?
                             if (!response) {
                                 // No.  We need to re-calculate the next bill-of-materials objective
-                                //  in case one of the result checks marked the current
-                                //  objective as completed, or in case an OPTIONAL line item
-                                //  objective was just marked as being of interest, or not of
-                                //  interest to the user.
+                                //  in case one of the LLM calls changed the state of the current
+                                //  goals objectives.  Mainly, a preliminary question was answered
+                                //  or a result value was received for a main question.
                                 currentBomObjective =
                                     getNextBomObjective(mainBomGoal);
 
-                                elizaLogger.debug(`Building the next bill-of-materials question now, for objective: ${currentBomObjective.description}`);
+                                // Check for a completed goal.
+                                if (currentBomObjective) {
+                                    // New objective, Create a response that shows the current bill-of-materials
+                                    //  line item's question to the user.
+                                    elizaLogger.debug(`Building the next bill-of-materials question now, for objective: ${currentBomObjective.description}`);
 
-                                const billOfMaterialsQuestion =
-                                    await buildBillOfMaterialQuestion(currentBomObjective);
+                                    const billOfMaterialsQuestion =
+                                        await buildBillOfMaterialQuestion(currentBomObjective);
 
-                                if (billOfMaterialsQuestion.trim().length === 0)
-                                    throw new Error(`The billOfMaterialsQuestion variable is empty.`);
+                                    if (billOfMaterialsQuestion.trim().length === 0)
+                                        throw new Error(`The billOfMaterialsQuestion variable is empty.`);
 
-                                // Create a response that will ask the user the desired question.
-                                response = {
-                                    text: billOfMaterialsQuestion
+                                    // Create a response that will ask the user the desired question.
+                                    response = {
+                                        text: billOfMaterialsQuestion
+                                    }
+                                } else {
+                                    // The goal is completed. Do the processing for that event.
+                                    response =
+                                        doCompletedGoalProcessing(runtime);
                                 }
-                            }
-
+                            } // if (!response) {
 
                             // -------------------------- BEGIN: UPDATE GOAL ------------------------
 

@@ -2233,7 +2233,7 @@ export async function buildBomMainQuestion(currentBomObjective: Objective): Prom
  * @returns - Returns NULL if the goal has no
  *  bill-of-materials content, or if it does, returns the
  *  bill-of-materials sub-prompt made from that content.
- *
+ */
 export async function buildBillOfMaterialQuestion(currentBomObjective: Objective): Promise<StringOrNull> {
     const errPrefix = `(buildBillOfMaterialQuestion) `;
 
@@ -2302,7 +2302,6 @@ export async function buildBillOfMaterialQuestion(currentBomObjective: Objective
 
     return retStr;
 }
-*/
 
 // -------------------------- END  : BILL-OF-MATERIALS SUB-PROMPT PROCESSING ------------------------
 
