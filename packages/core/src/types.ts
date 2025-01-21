@@ -13,6 +13,13 @@ export type ObjectOrNull = object | null;
 export type RelationshipOrNull = Relationship | null;
 export type StringOrNull = string | null;
 
+// -------------------------- BEGIN: SOME CONSTANTS ------------------------
+
+// This is the prefix used in select agent/character actions.
+export const SELECT_CHARACTER_PREFIX = 'SELECT_CHARACTER_PREFIX_';
+
+// -------------------------- END  : SOME CONSTANTS ------------------------
+
 // -------------------------- BEGIN: BILL-OF-MATERIALS RESULT DATA TYPES ------------------------
 
 /**

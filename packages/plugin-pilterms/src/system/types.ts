@@ -1,10 +1,8 @@
 // Some types we use throughout our plugin.
 
-import {State} from "@ai16z/eliza";
+import {SELECT_CHARACTER_PREFIX, State, StringOrNull} from "@ai16z/eliza";
 
-export type BooleanOrNull = boolean | null;
-export type NumberOrNull = number | null;
-export type StringOrNull = string | null;
+// -------------------------- END  : SOME CONSTANTS ------------------------
 
 // -------------------------- BEGIN: HELPER FUNCTIONS ------------------------
 
@@ -33,7 +31,7 @@ function extractDesiredCharacterNameFromActionName(theActionName: string): Strin
     // ([A-Z]+)               => Captures one or more uppercase letters as the character name
     // \)                     => Matches the closing parenthesis ")"
     // $                      => Ensures the string ends here
-    const regex = /SELECT_CHARACTER_([A-Z]+)$/;
+    const regex = new RegExp(`^${SELECT_CHARACTER_PREFIX}_([A-Z]+)$`);
 
     // Execute the regex on the input string
     const match = theActionName.match(regex);
@@ -65,11 +63,11 @@ function extractDesiredCharacterNameFromRecentMessage(str: string): StringOrNull
     // Define a regular expression with the following components:
     // ^PickLicense           => Ensures the string starts with "PickLicense"
     // .*?                    => Non-greedy match for any characters in between
-    // \(SELECT_CHARACTER_    => Matches "(SELECT_CHARACTER_"
+    // \(${SELECT_CHARACTER_PREFIX}    => Matches the SELECT_CHARACTER_PREFIX
     // ([A-Z]+)               => Captures one or more uppercase letters as the character name
     // \)                     => Matches the closing parenthesis ")"
     // $                      => Ensures the string ends here
-    const regex = /^PickLicense.*\(SELECT_CHARACTER_([A-Z]+)\)$/;
+    const regex = `^PickLicense.*\(${SELECT_CHARACTER_PREFIX}([A-Z]+)\)$`;
 
     // Execute the regex on the input string
     const match = str.match(regex);

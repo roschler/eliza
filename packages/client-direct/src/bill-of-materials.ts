@@ -64,10 +64,11 @@ import {
     ResultAndCharacterName,
     ExtractedResultValueOrErrorResponse,
     END_OBJECTIVE_MESSAGE_AS_DELIMITER,
-    createEndSessionMemory,
     UUID,
     isUuid,
-    createEndObjectiveMemory, ExtractedPreliminaryValueOrErrorResponse
+    createEndObjectiveMemory,
+    ExtractedPreliminaryValueOrErrorResponse,
+    SELECT_CHARACTER_PREFIX
 } from "@ai16z/eliza";
 import {CLIENT_NAME} from "./common.ts";
 import {processFileUrlOrStringReference} from "./process-external-references.ts";
@@ -350,6 +351,25 @@ export type ChoiceAndCharacterName = {
 // -------------------------- BEGIN: UTILITY BOM RELATED FUNCTIONS ------------------------
 
 /**
+ * This checks to see if the response contains a select agent/character action.
+ *
+ * @param response - The Content object to inspect.
+ *
+ * @returns - Returns TRUE if the "action" property, if it exists, in the
+ *  response object contains a select agent/character action, FALSE if not.
+ */
+export function isSelectCharacterResponse(response: Content): boolean {
+
+    let retVal = false;
+
+    if (typeof response.action === 'string') {
+        retVal = response.action.includes(SELECT_CHARACTER_PREFIX);
+    }
+
+    return retVal;
+}
+
+/**
  * This function takes a choice, which may have an optional character/agent
  *  name appended to it, and returns a ChoiceAndCharacterName object built
  *  from it.
@@ -490,7 +510,7 @@ export function buildBomCancelResponse(runtime: IAgentRuntime, callerErrPrefix: 
     //  to the next agent/character.
     const response = {
         text: `Cancelling your session and transferring you over to the next agent: ${nextCharacterName}`,
-        action: `SELECT_CHARACTER_${nextCharacterName}`
+        action: `${SELECT_CHARACTER_PREFIX}${nextCharacterName}`
     }
 
     return response;
@@ -1426,7 +1446,7 @@ async function bomHelpModeCheckResultHandler(
  *  response the system should use as the chat volley
  *  response, OR, returns NULL indicating the calling
  *  code should continue
- */
+ *
 async function bomPreliminaryQuestionCheckResultHandler(
     runtime: IAgentRuntime,
     state: State,
@@ -1510,6 +1530,7 @@ async function bomPreliminaryQuestionCheckResultHandler(
 
     return response;
 }
+*/
 
 /**
  * Finds the index of the first ChoiceAndCharacterName object in the provided array
@@ -1985,14 +2006,7 @@ async function bomMainQuestionCheckResultHandler(
 */
 
 /**
- * Analyze the recent message stream to see how we should proceed
- *  with the current chat volley.
- *
- *  NOTE: If the current context is the main question for a
- *   bill-of-materials line item, and we were able to isolate a
- *   valid, concrete result, then this function will write the
- *   result into the objective's resultData field and mark it
- *   as completed.
+ * This function asks the next bill-of-materials question.
  *
  * @param runtime - The current agent/character.
  * @param roomId - The current room ID.
@@ -2000,22 +2014,28 @@ async function bomMainQuestionCheckResultHandler(
  * @param state - The current system state.
  * @param currentBomObjective - The current bill-of-materials objective.
  *
- * @returns - If an immediate response is required, due to something
- *  like a result value validation failure
+ * @returns - If the LLM still needs to chat with the user
+ *  to help them get to a valid result value, then a response
+ *  will be returned with the next text to show the user (e.g. -
+ *  a question or some help text).  However, if a valid result
+ *  value is received from the user during this call, then the
+ *  current bill-of-materials line item objective will have its
+ *  resultData property filled in, and it will be marked as
+ *  completed.
  *
  * NOTE: If the current bill-of-materials line item is of type
- *   "string", and it had a list of values constraint attached to
+ *   "string", and it had a list-of-values constraint attached to
  *   it, and the user made a choice that had an AGENT SWITCH
  *   action associated with it, this function will output a
  *   response that triggers that switch.
  */
-export async function determineBomQuestionResult(
+export async function askNextBomLlmQuestion(
         runtime: IAgentRuntime,
         roomId: UUID,
         userId: UUID,
         state: State,
         currentBomObjective: Objective): Promise<Content> {
-    const errPrefix = `(determineBomQuestionResult) `;
+    const errPrefix = `(askNextBomLlmQuestion) `;
 
     if (!isUuid(roomId)) {
         throw new Error(`${errPrefix}The roomId parameter does not contain a valid room ID.`);
@@ -2037,97 +2057,82 @@ export async function determineBomQuestionResult(
 
     let response: ContentOrNull = null;
 
-    // Do we have a direct response, based on the result checks?
-    if (response) {
-        // Yes.  Use it as is.
-    } else {
-        // No.  Validate the current context and if OK, allow
-        //  the NULL response to be returned so buildBillOfMaterialQuestion()
-        //  can craft a new bill-of-materials question.
-        //
-        // Is the current bill-of-materials line item optional and does the
-        //  preliminary question still need to be asked.?
-        if (currentBomObjective.billOfMaterialsLineItem?.isOptional && !currentBomObjective.isPreliminaryQuestionAlreadyAsked) {
-            // -------------------------- BEGIN: OPTIONAL LINE ITEM ------------------------
+    // No.  Validate the current context and if OK, allow
+    //  the NULL response to be returned so buildBillOfMaterialQuestion()
+    //  can craft a new bill-of-materials question.
+    //
+    // Is the current bill-of-materials line item optional and does the
+    //  preliminary question still need to be asked.?
+    if (currentBomObjective.billOfMaterialsLineItem?.isOptional && !currentBomObjective.isPreliminaryQuestionAlreadyAsked) {
+        // -------------------------- BEGIN: OPTIONAL LINE ITEM ------------------------
 
-            // Yes. Check for a declined optional line item, since those
-            //  should not be passed to this function.
-            if (currentBomObjective.resultData === null) {
-                throw new Error(`${errPrefix}The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user declined it.  This objective should never have been passed to buildBillOfMaterialQuestion() in the first place.`);
-            }
+        // Yes. Check for a declined optional line item, since those
+        //  should not be passed to this function.
+        if (currentBomObjective.resultData === null) {
+            throw new Error(`${errPrefix}The bill-of-materials line item object is marked as OPTIONAL, yet the objective's resultData is set to NULL, indicating the user declined it.  This objective should never have been passed to buildBillOfMaterialQuestion() in the first place.`);
+        }
 
-            // Ask the preliminary question now.
-            elizaLogger.debug(`${errPrefix}Asking the preliminary question for bill-of-materials objective: ${currentBomObjective.description}`);
+        // Ask the preliminary question now.
+        elizaLogger.debug(`${errPrefix}Asking the preliminary question for bill-of-materials objective: ${currentBomObjective.description}`);
 
-            response =
-                await bomPreliminaryQuestionCheckResultHandler(runtime, state, currentBomObjective);
+        const retExtractedPreliminaryValueOrErrorResponse: ExtractedPreliminaryValueOrErrorResponse =
+            await askLlmBomPreliminaryQuestion(runtime, state, currentBomObjective);
 
-            // Did the user give a valid answer to the preliminary question?
-            if (currentBomObjective.isOptionalFieldDesiredByUser === true || currentBomObjective.isOptionalFieldDesiredByUser === false) {
-                // Yes.  Mark the optional bill-of-materials line item objective has
-                //  having already asked the preliminary question.
-                currentBomObjective.isPreliminaryQuestionAlreadyAsked = true;
-            }
+        // Was a response object generated?
+        if (retExtractedPreliminaryValueOrErrorResponse.contentAsErrorResponseOrNull) {
+            // Yes. Use it.
+            response = retExtractedPreliminaryValueOrErrorResponse.contentAsErrorResponseOrNull;
+        } else {
+            // No. Update the bill-of-materials line item objective to reflect the user's
+            //  interest in using it.
+            currentBomObjective.isOptionalFieldDesiredByUser =retExtractedPreliminaryValueOrErrorResponse.booleanValueOrNull;
+
+            // Set the flag that lets us know the preliminary question has already been asked.
+            currentBomObjective.isPreliminaryQuestionAlreadyAsked = true;
 
             // Leave the response null so that buildBillOfMaterialQuestion() is
             //  executed to build the next response.
+        }
 
-            // -------------------------- END  : OPTIONAL LINE ITEM ------------------------
+        // -------------------------- END  : OPTIONAL LINE ITEM ------------------------
+    } else {
+        // -------------------------- BEGIN: MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
+
+        // Ask the main bill-of-materials question.
+        const retExtractedResultValueOrErrorResponse: ExtractedResultValueOrErrorResponse =
+            await askLlmBomMainQuestion(runtime, state, currentBomObjective);
+
+        // Was a response object generated?
+        if (retExtractedResultValueOrErrorResponse.contentAsErrorResponseOrNull) {
+            // Yes. Use it.
+            response = retExtractedResultValueOrErrorResponse.contentAsErrorResponseOrNull;
         } else {
-            // -------------------------- BEGIN: MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
-
-            // Do the result checking code for the non-optional main question, which
-            //  involves validating the result, if present, against the line item's
-            //  value constraint fields, if any, while checking for non-result
-            //  oriented items like the HELP and CANCEL intents expressed by the user.
-            const retExtractedResultValueOrErrorResponse: ExtractedResultValueOrErrorResponse =
-                await bomMainQuestionCheckResultHandler(runtime, state, currentBomObjective);
-
-            if (!retExtractedResultValueOrErrorResponse.contentAsErrorResponseOrNull) {
-                // If we don't have an error response, then we MUST have a result value.
-                if (!retExtractedResultValueOrErrorResponse.resultAndCharacterNameOrNull) {
-                    throw new Error(`${errPrefix}The result and character name field in the extracted result value object is unassigned.`);
-                }
-
-                // We now have a concrete result value.  Save it into the
-                //  bill-of-materials objective and mark the objective as
-                //  completed.
-                currentBomObjective.completed = true;
-                currentBomObjective.resultData =
-                    retExtractedResultValueOrErrorResponse.resultAndCharacterNameOrNull.resultValue;
-
-                // Write an END OBJECTIVE message into the recent messages stream, now that this
-                //  bill-of-materials objective is completed.
-                await createEndObjectiveMemory(runtime, CLIENT_NAME, roomId, userId);
-
-                // -------------------------- BEGIN: LIST OF VALUES AGENT SWITCH ------------------------
-
-                // If the result and character name object indicates an agent
-                //  switch, due to a list of values choice having an agent
-                //  switch attached to it, output a response that makes the
-                //  switch.
-                if (retExtractedResultValueOrErrorResponse.resultAndCharacterNameOrNull.characterName) {
-                    const switchAction =
-                        `SELECT_CHARACTER_${retExtractedResultValueOrErrorResponse.resultAndCharacterNameOrNull.characterName.toUpperCase().trim()}`;
-
-                    response = {
-                        text: `Ok.`,
-                        action: switchAction
-                    }
-
-                    elizaLogger.debug(`Switching to agent/character("${switchAction}") due to the following list of values choice that had an associated agent/character name: ${response.text}`);
-
-                    // Write an END SESSION message into the recent messages stream.  Switching
-                    //  characters implicitly ends the session.
-                    await createEndSessionMemory(runtime, CLIENT_NAME, roomId, userId);
-                }
-
-                // -------------------------- END  : LIST OF VALUES AGENT SWITCH ------------------------
+            // If we don't have an error response, then we MUST have a result value.
+            if (!retExtractedResultValueOrErrorResponse.resultAndCharacterNameOrNull) {
+                throw new Error(`${errPrefix}The result and character name field in the extracted result value object is unassigned.`);
             }
 
-            // -------------------------- END  : MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
-        } // else/if (currentBomObjective.billOfMaterialsLineItem?.isOptional)
-    }
+            // -------------------------- BEGIN: UPDATE BILL-OF-MATERIALS OBJECTIVE'S RESULT DATA VALUE ------------------------
+
+            // We now have a concrete result value.  Save it into the
+            //  bill-of-materials objective and mark the objective as
+            //  completed.
+            currentBomObjective.completed = true;
+            currentBomObjective.resultData =
+                retExtractedResultValueOrErrorResponse.resultAndCharacterNameOrNull.resultValue;
+
+            // Write an END OBJECTIVE message into the recent messages stream, now that this
+            //  bill-of-materials objective is completed.
+            await createEndObjectiveMemory(runtime, CLIENT_NAME, roomId, userId);
+
+            // -------------------------- END  : UPDATE BILL-OF-MATERIALS OBJECTIVE'S RESULT DATA VALUE ------------------------
+
+            // Leave the response null so that buildBillOfMaterialQuestion() is
+            //  executed to build the next response.
+        }
+
+        // -------------------------- END  : MAIN QUESTION FOR OPTIONAL OR NON-OPTIONAL LINE ITEM ------------------------
+    } // else/if (currentBomObjective.billOfMaterialsLineItem?.isOptional)
 
     return response;
 }
@@ -2228,7 +2233,7 @@ export async function buildBomMainQuestion(currentBomObjective: Objective): Prom
  * @returns - Returns NULL if the goal has no
  *  bill-of-materials content, or if it does, returns the
  *  bill-of-materials sub-prompt made from that content.
- */
+ *
 export async function buildBillOfMaterialQuestion(currentBomObjective: Objective): Promise<StringOrNull> {
     const errPrefix = `(buildBillOfMaterialQuestion) `;
 
@@ -2297,6 +2302,7 @@ export async function buildBillOfMaterialQuestion(currentBomObjective: Objective
 
     return retStr;
 }
+*/
 
 // -------------------------- END  : BILL-OF-MATERIALS SUB-PROMPT PROCESSING ------------------------
 

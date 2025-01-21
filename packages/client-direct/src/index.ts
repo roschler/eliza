@@ -16,7 +16,7 @@ import {
     JOKER_UUID_AS_ROOMS_ID_WILDCARD,
     setExclusiveUserToCharacterRelationship,
     isUuid,
-    createEndSessionMemory, shallowCloneCharacter
+    createEndSessionMemory, shallowCloneCharacter, SELECT_CHARACTER_PREFIX
 } from "@ai16z/eliza";
 import { composeContext } from "@ai16z/eliza";
 import { generateMessageResponse } from "@ai16z/eliza";
@@ -34,12 +34,11 @@ import { settings } from "@ai16z/eliza";
 import { createApiRouter } from "./api.ts";
 import * as fs from "fs";
 import * as path from "path";
-import {processFileOrUrlReferences} from "./process-external-references.ts";
 import {
-    buildBillOfMaterialQuestion, determineBomQuestionResult,
+    askNextBomLlmQuestion,
     getNextBomObjective,
     isBomAgentCharacter,
-    messageHandlerTemplate
+    messageHandlerTemplate, isSelectCharacterResponse
 } from "./bill-of-materials.ts";
 import {CLIENT_NAME} from "./common.ts";
 const upload = multer({ storage: multer.memoryStorage() });
@@ -407,35 +406,16 @@ export class DirectClient {
                         agentName: runtime.character.name,
                     });
 
-
-                    // TODO: If there is a bill-of-materials goal active for the current
-                    //  agent/character, then it is time to facilitate that objective
-                    //  by creating the bill-of-materials sub-prompt for insertion into
-                    //  the message handler template.
-
                     let response: Content | null = null;
 
+                    // Is there an active bill-of-materials goal for the current agent/character?
                     if (mainBomGoal) {
+                        // Yes. Do bill-of-materials processing.
+
+                        // -------------------------- BEGIN: BILL-OF-MATERIALS PROCESSING ------------------------
+
                         // Determine the next objective that needs to be completed.
                         let currentBomObjective = getNextBomObjective(mainBomGoal);
-
-                        if (currentBomObjective !== null) {
-                            // -------------------------- BEGIN: ANALYZE STATUS OF CURRENT BOM OBJECTIVE ------------------------
-
-                            // First, we need to check for an answer to a recently
-                            //  asked optional line item preliminary question,
-                            //  optional line item main question, or non-optional
-                            //  line item main question.  This function may
-                            //  come up with a response to show the user in
-                            //  certain contexts.  For example, like when
-                            //  HELP mode is active and the chat history
-                            //  indicates the user wants to cancel the
-                            //  bill-of-materials session.
-                            response =
-                                await determineBomQuestionResult(runtime, roomId, userId, state, currentBomObjective);
-
-                            // -------------------------- END  : ANALYZE STATUS OF CURRENT BOM OBJECTIVE ------------------------
-                        }
 
                         // Is the GOAL (aka form fill operation) complete?
                         if (currentBomObjective === null) {
@@ -455,13 +435,8 @@ export class DirectClient {
                             //  to the next agent/character.
                             response = {
                                 text: `Transferring you over to the next agent: ${nextCharacterName}`,
-                                action: `SELECT_CHARACTER_${nextCharacterName}`
+                                action: `${SELECT_CHARACTER_PREFIX}${nextCharacterName}`
                             }
-
-                            // Write an END SESSION message into the recent messages stream.  The
-                            //  completion of the goal marks the end of the bill-of-materials
-                            //  session.
-                            await createEndSessionMemory(runtime, CLIENT_NAME, roomId, userId);
 
                             // -------------------------- END  : BILL-OF-MATERIALS GOAL COMPLETE ------------------------
 
@@ -471,11 +446,16 @@ export class DirectClient {
                             // If a response was already generated, then we use it.
                             //  Otherwise, we determine what question we should ask
                             //  the user now and build a response from that.
+                            response =
+                                await askNextBomLlmQuestion(runtime, roomId, userId, state, currentBomObjective);
+
+                            // Did that askNextBomLlmQuestion() generate a response we should show
+                            //  the user?
                             if (!response) {
-                                // We need to re-calculate the next bill-of-materials objective
+                                // No.  We need to re-calculate the next bill-of-materials objective
                                 //  in case one of the result checks marked the current
                                 //  objective as completed, or in case an OPTIONAL line item
-                                //  objective was just marked as being of interest or not of
+                                //  objective was just marked as being of interest, or not of
                                 //  interest to the user.
                                 currentBomObjective =
                                     getNextBomObjective(mainBomGoal);
@@ -505,6 +485,17 @@ export class DirectClient {
 
                             // -------------------------- END  : ASK NEXT BOM QUESTION ------------------------
                         }
+
+                        // If a character switch was requested, write an END SESSION string into
+                        //  the recent messages stream because that implicitly stops the session
+                        //  with the current agent character.
+                        if (isSelectCharacterResponse(response)) {
+                            elizaLogger.debug(`${errPrefix}Writing END SESSION string into recent messages due to requested agent/character switch request.`);
+
+                            await createEndSessionMemory(runtime, CLIENT_NAME, roomId, userId);
+                        }
+
+                        // -------------------------- END  : BILL-OF-MATERIALS PROCESSING ------------------------
                     } else {
                         // -------------------------- BEGIN: LEGACY PROCESSING (Not bill-of-materials) ------------------------
 
